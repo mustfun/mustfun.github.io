@@ -1,0 +1,338 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>maven相关 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="##一、maven1、maven地址&amp;emsp;maven的仓库的定义是在${M2_HOME}/lib/maven-2.0.10-uber.jar 里面。你可以在里面找到\org\apache\maven\project\pom-4.0.0.xml 这个文件，在这个文件里面定义了默认中央仓库的地址，所以可以更改 2、maven配置文件如果你想覆盖中央仓库的默认地址，那么这里我们就会使用的镜像了，还">
+<meta name="keywords" content="maven">
+<meta property="og:type" content="article">
+<meta property="og:title" content="maven相关">
+<meta property="og:url" content="http://yoursite.com/2017/05/26/day1/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="##一、maven1、maven地址&amp;emsp;maven的仓库的定义是在${M2_HOME}/lib/maven-2.0.10-uber.jar 里面。你可以在里面找到\org\apache\maven\project\pom-4.0.0.xml 这个文件，在这个文件里面定义了默认中央仓库的地址，所以可以更改 2、maven配置文件如果你想覆盖中央仓库的默认地址，那么这里我们就会使用的镜像了，还">
+<meta property="og:updated_time" content="2017-01-10T11:31:22.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="maven相关">
+<meta name="twitter:description" content="##一、maven1、maven地址&amp;emsp;maven的仓库的定义是在${M2_HOME}/lib/maven-2.0.10-uber.jar 里面。你可以在里面找到\org\apache\maven\project\pom-4.0.0.xml 这个文件，在这个文件里面定义了默认中央仓库的地址，所以可以更改 2、maven配置文件如果你想覆盖中央仓库的默认地址，那么这里我们就会使用的镜像了，还">
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="yoursite.com">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-day1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/05/26/day1/" class="article-date">
+  <time datetime="2017-05-26T11:14:30.830Z" itemprop="datePublished">2017-05-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      maven相关
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>##一、maven<br><strong>1、maven地址</strong><br>&emsp;maven的仓库的定义是在${M2_HOME}/lib/maven-2.0.10-uber.jar 里面。你可以在里面找到\org\apache\maven\project\pom-4.0.0.xml 这个文件，在这个文件里面定义了默认中央仓库的地址，所以可以更改</p>
+<p><strong>2、maven配置文件</strong><br>如果你想覆盖中央仓库的默认地址，那么这里我们就会使用的镜像了，还在setting. xml里面配置：</p>
+<pre><code><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">settings</span>&gt;</span>           </div><div class="line">  <span class="tag">&lt;<span class="name">mirrors</span>&gt;</span>      </div><div class="line">    <span class="tag">&lt;<span class="name">mirror</span>&gt;</span>      </div><div class="line">      <span class="tag">&lt;<span class="name">id</span>&gt;</span> maven-net-cn<span class="tag">&lt;/<span class="name">id</span>&gt;</span>      </div><div class="line">      <span class="tag">&lt;<span class="name">name</span>&gt;</span> Maven China Mirror<span class="tag">&lt;/<span class="name">name</span>&gt;</span>      </div><div class="line">      <span class="tag">&lt;<span class="name">url</span>&gt;</span> http://maven.net.cn/content/groups/public/<span class="tag">&lt;/<span class="name">url</span>&gt;</span>      </div><div class="line">      <span class="tag">&lt;<span class="name">mirrorOf</span>&gt;</span> central<span class="tag">&lt;/<span class="name">mirrorOf</span>&gt;</span>      </div><div class="line">    <span class="tag">&lt;/<span class="name">mirror</span>&gt;</span>      </div><div class="line">  <span class="tag">&lt;/<span class="name">mirrors</span>&gt;</span>      </div><div class="line"><span class="tag">&lt;/<span class="name">settings</span>&gt;</span></div></pre></td></tr></table></figure>
+</code></pre><a id="more"></a>
+<blockquote>
+<mirrorof> central</mirrorof>表示只为central仓库做镜像，如果想为所有的仓库做镜像那么可以改为：<br><mirrorof>*</mirrorof>
+
+
+</blockquote>
+<p>##二、ImmutableSet、ImmutableMap</p>
+<p>1、这个类是一个不可变的set/map/list，有of方法直接初始化。比如说<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Set&lt;String&gt; DEFAULT_METHODS =</div><div class="line">    ImmutableSet.of(<span class="string">"findOne"</span>, <span class="string">"findAll"</span>, <span class="string">"findBy"</span>, <span class="string">"get"</span>, <span class="string">"list"</span>, <span class="string">"find"</span>);</div><div class="line"><span class="comment">//定义了一堆不可变的方法名称</span></div></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">ImmutableMap&lt;String, Integer&gt; map = ImmutableMap.of(  </div><div class="line">    <span class="string">"1"</span>, <span class="number">1</span>,  </div><div class="line">    <span class="string">"2"</span>, <span class="number">2</span>,  </div><div class="line">    <span class="string">"3"</span>, <span class="number">3</span>  </div><div class="line">);</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">final</span> ImmutableMap.Builder&lt;String, Object&gt; builder = ImmutableMap.builder();</div><div class="line">   builder.put(<span class="string">"LastValue"</span>, monitor.getLastValue());</div><div class="line">   builder.put(<span class="string">"Hits"</span>, monitor.getHits());</div><div class="line">   builder.put(<span class="string">"Avg"</span>, BigDecimal.valueOf(monitor.getAvg()).setScale(<span class="number">2</span>, HALF_UP));</div><div class="line">   builder.put(<span class="string">"Total"</span>, BigDecimal.valueOf(monitor.getTotal()).setScale(<span class="number">2</span>, HALF_UP));</div><div class="line">   builder.put(<span class="string">"Min"</span>, BigDecimal.valueOf(monitor.getMin()).setScale(<span class="number">2</span>, HALF_UP));</div><div class="line">   builder.put(<span class="string">"Max"</span>, BigDecimal.valueOf(monitor.getMax()).setScale(<span class="number">2</span>, HALF_UP));</div><div class="line">   builder.put(<span class="string">"Active"</span>, monitor.getActive());</div><div class="line">   builder.put(<span class="string">"Avg Active"</span>, monitor.getAvgActive());</div><div class="line">   builder.put(<span class="string">"Max Active"</span>, monitor.getMaxActive());</div><div class="line">   builder.put(<span class="string">"First Access"</span>, monitor.getFirstAccess().toInstant());</div><div class="line">   builder.put(<span class="string">"Last Access"</span>, monitor.getLastAccess().toInstant());</div><div class="line">   <span class="keyword">return</span> Joiner.on(<span class="string">", "</span>).withKeyValueSeparator(<span class="string">"="</span>).join(builder.build());</div></pre></td></tr></table></figure>
+<p>2、能用上面两个就不要用set、list了，这个特性用于存储一些不是实现知道的常量</p>
+<p>##三、Supplier接口<br>1、这个类Java8新加入的一个功能性接口，可以返回一个对象的实例，也可以返回方法名称。可以理解成是一个对象工厂，每次调用返回一个给定类型的对象<br>实体类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Item</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> String name;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Item</span><span class="params">()</span></span>&#123;     </div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Item</span><span class="params">(String name)</span></span>&#123;     </div><div class="line">        <span class="keyword">this</span>.name=name;</div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">getStaticVal</span><span class="params">()</span></span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"Static Val"</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getMsg</span><span class="params">()</span></span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"Hello World!"</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> name;</div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.name = name;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SupplierReturnObject</span> </span>&#123;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">    Supplier&lt;Item&gt; supplier = Item::<span class="keyword">new</span>;</div><div class="line">    Item item = supplier.get();</div><div class="line">    System.out.println(item.getMsg());</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们会发现上面的输出就是<code>hello world</code></p>
+<p>继续测试：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SupplierFetchMethod</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        Supplier&lt;String&gt; supplier = Item::getStaticVal;</div><div class="line">        String val = supplier.get();</div><div class="line">        System.out.println(<span class="string">"Calling  Method:"</span>+val);</div><div class="line">    &#125;    </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>我们会发现上面的输出就是<code>static val</code></p>
+<p>##AOP<br>1、pointcut的理解<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;aop:pointcut id=<span class="string">"repositoryPointcut"</span></div><div class="line">                  expression=<span class="string">"execution(public * com.dzy..*.*(..)) and @within(org.springframework.stereotype.Repository)"</span>/&gt;</div></pre></td></tr></table></figure></p>
+<blockquote>
+<p>解析：第一个public表示修饰类型，任意公共方法执行都会切入，接下来的星号表示可以返回所有的类型，接下来是包，表示所有子包，所有的类，所有的方法。然后 <code>(..)</code> 这个所有的参数类型。如果是<code>(*,String)</code>匹配了一个接受两个参数的方法，第一个可以是任意类型，第二个则必须是String类型<br>最后的一个within表示的是而且还要包含<code>repository</code>注释的</p>
+</blockquote>
+<p><strong>值得注意的是：</strong><br>1、controller里面不能用切入，就是pointcut不能写在切入上<br>   如果非要的话，那么加 <code>and @within(org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter.handle(..))</code> 根据说，是被代理了</p>
+<p>2、aop实例</p>
+<p>(1)、首先到配置文件中<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">aop:aspectj-autoproxy</span>/&gt;</span>   <span class="comment">&lt;!--打开aop自动代理--&gt;</span></div></pre></td></tr></table></figure></p>
+<p>(2)、编写代理类<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.dzy.aop;</div><div class="line"><span class="meta">@Aspect</span></div><div class="line"><span class="meta">@Component</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServiceAspect</span> </span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * <span class="doctag">@author</span> dengzhiyuan</div><div class="line">     * <span class="doctag">@version</span> ServiceAspect.java</div><div class="line">     * <span class="doctag">@since</span> 2.0</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOG = Logger.getLogger(ServiceAspect.class);</div><div class="line"></div><div class="line">    <span class="comment">// 配置切入点,该方法无方法体,主要为方便同类中其他方法使用此处配置的切入点</span></div><div class="line">    <span class="comment">//第一个代表返回任意类型，第二个代表controller下面所有，第三个表示所有方法</span></div><div class="line">    <span class="meta">@Pointcut</span>(<span class="string">"execution(* com.dzy.service.impl..*.*(..))"</span>)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">aspect</span><span class="params">()</span> </span>&#123;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">/*</span></div><div class="line">     * 配置前置通知,使用在方法aspect()上注册的切入点 同时接受JoinPoint切入点对象,可以没有该参数</div><div class="line">     */</div><div class="line">    <span class="meta">@Before</span>(<span class="string">"aspect()"</span>)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">before</span><span class="params">(JoinPoint joinPoint)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (LOG.isInfoEnabled()) &#123;</div><div class="line">            LOG.info(<span class="string">"before "</span> + joinPoint);</div><div class="line">        &#125;</div><div class="line">        System.out.println(<span class="string">"切入时候前置通知"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 配置后置通知,使用在方法aspect()上注册的切入点</span></div><div class="line">    <span class="meta">@After</span>(<span class="string">"aspect()"</span>)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">after</span><span class="params">(JoinPoint joinPoint)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (LOG.isInfoEnabled()) &#123;</div><div class="line">            LOG.info(<span class="string">"after "</span> + joinPoint);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">   <span class="comment">// 配置环绕通知,使用在方法aspect()上注册的切入点</span></div><div class="line">    <span class="meta">@Around</span>(<span class="string">"aspect()"</span>)</div><div class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">around</span><span class="params">(JoinPoint joinPoint)</span> </span>&#123;</div><div class="line">        <span class="keyword">long</span> start = System.currentTimeMillis();</div><div class="line">        Object returnValues=<span class="keyword">null</span>;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            returnValues=((ProceedingJoinPoint) joinPoint).proceed();</div><div class="line">            <span class="keyword">long</span> end = System.currentTimeMillis();</div><div class="line">            <span class="keyword">if</span> (LOG.isInfoEnabled()) &#123;</div><div class="line">                LOG.info(<span class="string">"around "</span> + joinPoint + <span class="string">"\tUse time : "</span></div><div class="line">                        + (end - start) + <span class="string">" ms!"</span>);</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">catch</span> (Throwable e) &#123;</div><div class="line">            <span class="keyword">long</span> end = System.currentTimeMillis();</div><div class="line">            <span class="keyword">if</span> (LOG.isInfoEnabled()) &#123;</div><div class="line">                LOG.info(<span class="string">"around "</span> + joinPoint + <span class="string">"\tUse time : "</span></div><div class="line">                        + (end - start) + <span class="string">" ms with exception : "</span></div><div class="line">                        + e.getMessage());</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="comment">//这个value就是我们方法执行之后的返回值</span></div><div class="line">        LOG.info(<span class="string">"------------------------"</span>+returnValues);</div><div class="line">        <span class="keyword">return</span> returnValues;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 配置后置返回通知,使用在方法aspect()上注册的切入点</span></div><div class="line">    <span class="meta">@AfterReturning</span>(<span class="string">"aspect()"</span>)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterReturn</span><span class="params">(JoinPoint joinPoint)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (LOG.isInfoEnabled()) &#123;</div><div class="line">            LOG.info(<span class="string">"afterReturn "</span> + joinPoint);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 配置抛出异常后通知,使用在方法aspect()上注册的切入点</span></div><div class="line">    <span class="meta">@AfterThrowing</span>(pointcut = <span class="string">"aspect()"</span>, throwing = <span class="string">"ex"</span>)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterThrow</span><span class="params">(JoinPoint joinPoint, Exception ex)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (LOG.isInfoEnabled()) &#123;</div><div class="line">            LOG.info(<span class="string">"afterThrow "</span> + joinPoint + <span class="string">"\t"</span> + ex.getMessage());</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>其实到这里我们已经完成了，跑一下看看。从这里看到我们切入的service层</p>
+<p>2、注解方式</p>
+<p>(1)、先自顶一个注解<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Target</span>(ElementType.METHOD)</div><div class="line"><span class="meta">@Documented</span></div><div class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</div><div class="line"><span class="comment">// 这个注解表示notEmpty应该放在方法上面</span></div><div class="line"><span class="keyword">public</span> <span class="meta">@interface</span> NotEmpty &#123;</div><div class="line"></div><div class="line">    <span class="comment">// 这个注解，参数是string数组</span></div><div class="line">    String[] value();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>(2)、然后修改一下pointcut即可<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Pointcut</span>(value = <span class="string">"@annotation(com.dzy.validation.annotation.NotEmpty)"</span>)</div></pre></td></tr></table></figure></p>
+<p>(3)、测试即可成功<br>解压 tar zxvf 文件名.tar.gz<br>压缩 tar zcvf 文件名.tar.gz 目标名</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2017/05/26/day1/" data-id="cj35rl36p0009dcj3s5wojsjp" class="article-share-link" data-share="baidu" data-title="maven相关">分享到</a>
+      
+
+      
+        <a href="http://yoursite.com/2017/05/26/day1/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/maven/">maven</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/05/26/day11/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          读写所相关
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/05/26/windows hexo 搭建教程/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">windows hexo 搭建个人博客教程</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+  <section id="comments">
+    <div id="ds-thread" class="ds-thread" data-thread-key="2017/05/26/day1/" data-title="maven相关" data-url="http://yoursite.com/2017/05/26/day1/"></div>
+  </section>
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/05/26/高并发的核心技术-幂等的实现方案/">高并发的核心技术-幂等的实现方案</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/面试大全/">初级面试必备教程</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/自己收集的面试题/">自己收集的面试题</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/自定义注解/">自定义注解</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/耳鸣疗法/">耳鸣疗法</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://arvinxiang.com" target="_blank">主题作者</a>
+          </li>
+        
+          <li>
+            <a href="http://reqianduan.com" target="_blank">热前端</a>
+          </li>
+        
+          <li>
+            <a href="http://yuancheng.work" target="_blank">远程.work</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!-- 多说公共js代码 start -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"reqianduan"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共js代码 end -->
+
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+</div>
+</body>
+</html>

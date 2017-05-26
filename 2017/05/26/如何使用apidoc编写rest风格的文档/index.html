@@ -1,0 +1,369 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>如何利用apidoc编写rest风格的文档 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="一、ApiDoc是什么事实上我们大多时候说的apidoc实际上是apidoc.js，是使用nodejs命令行模块来生成文档的">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何利用apidoc编写rest风格的文档">
+<meta property="og:url" content="http://yoursite.com/2017/05/26/如何使用apidoc编写rest风格的文档/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="一、ApiDoc是什么事实上我们大多时候说的apidoc实际上是apidoc.js，是使用nodejs命令行模块来生成文档的">
+<meta property="og:image" content="https://blog.jscrambler.com/content/images/2016/12/site-apidocjs.png">
+<meta property="og:image" content="https://blog.jscrambler.com/content/images/2016/12/api-documented.png">
+<meta property="og:updated_time" content="2017-01-13T01:55:24.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="如何利用apidoc编写rest风格的文档">
+<meta name="twitter:description" content="一、ApiDoc是什么事实上我们大多时候说的apidoc实际上是apidoc.js，是使用nodejs命令行模块来生成文档的">
+<meta name="twitter:image" content="https://blog.jscrambler.com/content/images/2016/12/site-apidocjs.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="yoursite.com">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-如何使用apidoc编写rest风格的文档" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/05/26/如何使用apidoc编写rest风格的文档/" class="article-date">
+  <time datetime="2017-05-26T11:14:31.030Z" itemprop="datePublished">2017-05-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      如何利用apidoc编写rest风格的文档
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="一、ApiDoc是什么"><a href="#一、ApiDoc是什么" class="headerlink" title="一、ApiDoc是什么"></a>一、ApiDoc是什么</h3><p>事实上我们大多时候说的apidoc实际上是apidoc.js，是使用nodejs命令行模块来生成文档的</p>
+<p><img src="https://blog.jscrambler.com/content/images/2016/12/site-apidocjs.png" alt=""></p>
+<a id="more"></a>
+<p>首先你需要安装nodejs，mac上直接使用brew安装很简单,执行下面命令即可</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">brew install node</div></pre></td></tr></table></figure>
+<h3 id="二、安装ApiDoc"><a href="#二、安装ApiDoc" class="headerlink" title="二、安装ApiDoc"></a>二、安装ApiDoc</h3><p>然后安装apidoc吧</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm install apidoc -g</div></pre></td></tr></table></figure>
+<h3 id="三、生成API"><a href="#三、生成API" class="headerlink" title="三、生成API"></a>三、生成API</h3><p>首先，我们创建一个task-api目录来初始化目录</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">mkdir task-api</div><div class="line">cd task-api</div><div class="line">npm init</div></pre></td></tr></table></figure>
+<p>执行npm init之后就会让你填写很多信息，name，version，main，repository，keywords，author，懂的就填写一下，不懂的直接回车,系统会帮你创建一个package.json文件。</p>
+<p>为了建立我们的api代码，我们创建一个index.js</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>);  </div><div class="line"><span class="keyword">var</span> app = express();</div><div class="line"></div><div class="line"><span class="comment">// 为了public文件夹服务</span></div><div class="line">app.use(express.static(<span class="string">'public'</span>));</div><div class="line"></div><div class="line">app.get(<span class="string">'/tasks'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for list all tasks...</span></div><div class="line">&#125;);</div><div class="line">app.get(<span class="string">'/tasks/:id'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for find a task...</span></div><div class="line">&#125;);</div><div class="line">app.post(<span class="string">'/tasks'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for create a task...</span></div><div class="line">&#125;);</div><div class="line">app.put(<span class="string">'/tasks/:id'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for update a task...</span></div><div class="line">&#125;);</div><div class="line">app.delete(<span class="string">'/tasks/:id'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for delete a task...</span></div><div class="line">&#125;);</div><div class="line">app.listen(<span class="number">3000</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;  </div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'Task api up and running...'</span>);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>这行代码<code>app.use(express.static(&#39;public&#39;))</code>将启用public文件夹的静态服务，这个目录将成所有的文档文件。</p>
+<h3 id="四、API路由"><a href="#四、API路由" class="headerlink" title="四、API路由"></a>四、API路由</h3><p>OK，准备完毕，我们可以开始写我们的api了，我们需要使用apidoc提供的一些简单参数</p>
+<p>然后你需要创建一个apidoc.json文件，在根目录，包括这些参数，也可以直接把apidoc这些属性直接放到上面package.json目录下。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    "name": "Task API documentation",//文档名称</div><div class="line">    "version": "1.0.0",//文档版本号</div><div class="line">    "description": "API task list manager",//文档描述</div><div class="line">    "template": &#123;</div><div class="line">        "forceLanguage": "en"//语言</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>设置template下面的forceLanguage可以屏蔽浏览器的语言检测，强制使用英语</p>
+<p>有这些参数可以设置：</p>
+<ul>
+<li>name：项目名称 </li>
+<li>version：项目版本 </li>
+<li>description：项目介绍 </li>
+<li>title：浏览器显示的标题内容 </li>
+<li>url：endpoints的前缀，例如<a href="https://api.github.com/v1" target="_blank" rel="external">https://api.github.com/v1</a> </li>
+<li>sampleUrl：如果设置了，则在api文档中出现一个<a href="http://lib.csdn.net/base/softwaretest" target="_blank" rel="external">测试</a>用的from表单 </li>
+<li>header </li>
+<li>title：导航文字包含header.md文件 </li>
+<li>filename：markdown-file 文件名 </li>
+<li>footer </li>
+<li>title：导航文字包含header.md文件 </li>
+<li>filename：markdown-file 文件名 </li>
+<li>order：用于配置输出 api-names/group-names 排序，在列表中的将按照列表中的顺序排序，不在列表中的名称将自动显示。</li>
+</ul>
+<hr>
+<p>OK，下面我们开始文档的编写。</p>
+<p>编辑index.js，首先我们在<code>app.get(&#39;/tasks&#39;)</code>方法上面编辑，我们可以加入下面这些参数</p>
+<ul>
+<li><code>@api</code>: http方法 、地址和方法名称;</li>
+<li><code>@apiGroup</code>: 属于哪一个路由组;</li>
+<li><code>@apiSuccess</code>: 描述成功返回</li>
+<li><code>@apiSuccessExample</code>: 展示返回值</li>
+<li><code>@apiErrorExample</code>: 展示失败值</li>
+</ul>
+<p>直接看下代码吧。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * @api &#123;get&#125; /tasks 展示所有的任务</div><div class="line"> * @apiGroup Tasks   //属于task组</div><div class="line"> * @apiSuccess &#123;Object[]&#125; tasks Task's list</div><div class="line"> * @apiSuccess &#123;Number&#125; tasks.id Task id</div><div class="line"> * @apiSuccess &#123;String&#125; tasks.title Task title</div><div class="line"> * @apiSuccess &#123;Boolean&#125; tasks.done Task is done?</div><div class="line"> * @apiSuccess &#123;Date&#125; tasks.updated_at Update's date</div><div class="line"> * @apiSuccess &#123;Date&#125; tasks.created_at Register's date</div><div class="line"> * @apiSuccessExample &#123;json&#125; Success</div><div class="line"> *    HTTP/1.1 200 OK</div><div class="line"> *    [&#123;</div><div class="line"> *      "id": 1,</div><div class="line"> *      "title": "Study",</div><div class="line"> *      "done": false</div><div class="line"> *      "updated_at": "2016-02-10T15:46:51.778Z",</div><div class="line"> *      "created_at": "2016-02-10T15:46:51.778Z"</div><div class="line"> *    &#125;]</div><div class="line"> * @apiErrorExample &#123;json&#125; List error</div><div class="line"> *    HTTP/1.1 500 Internal Server Error</div><div class="line"> */</div><div class="line">app.get(<span class="string">'/tasks'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for listing all tasks...</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>下一个路由路径、我们加入了一个新的参数</p>
+<ul>
+<li><code>@apiParam</code>: 描述路径下的参数</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * @api &#123;get&#125; /tasks/:id Find a task</div><div class="line"> * @apiGroup Tasks</div><div class="line"> * @apiParam &#123;id&#125; id Task id</div><div class="line"> * @apiSuccess &#123;Number&#125; id Task id</div><div class="line"> * @apiSuccess &#123;String&#125; title Task title</div><div class="line"> * @apiSuccess &#123;Boolean&#125; done Task is done?</div><div class="line"> * @apiSuccess &#123;Date&#125; updated_at Update's date</div><div class="line"> * @apiSuccess &#123;Date&#125; created_at Register's date</div><div class="line"> * @apiSuccessExample &#123;json&#125; Success</div><div class="line"> *    HTTP/1.1 200 OK</div><div class="line"> *    &#123;</div><div class="line"> *      "id": 1,</div><div class="line"> *      "title": "Study",</div><div class="line"> *      "done": false</div><div class="line"> *      "updated_at": "2016-02-10T15:46:51.778Z",</div><div class="line"> *      "created_at": "2016-02-10T15:46:51.778Z"</div><div class="line"> *    &#125;</div><div class="line"> * @apiErrorExample &#123;json&#125; Task not found</div><div class="line"> *    HTTP/1.1 404 Not Found</div><div class="line"> * @apiErrorExample &#123;json&#125; Find error</div><div class="line"> *    HTTP/1.1 500 Internal Server Error</div><div class="line"> */</div><div class="line">app.get(<span class="string">'/tasks/:id'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for finding a task...</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>辣么如何使用post方法呢？</p>
+<p>就会用到<code>@apiParam</code> 和 <code>@apiParamExample</code> ，为了解释body里面返回的参数，done=false表示默认值。看下面</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * @api &#123;post&#125; /tasks Register a new task</div><div class="line"> * @apiGroup Tasks</div><div class="line"> * @apiParam &#123;String&#125; title Task title</div><div class="line"> * @apiParamExample &#123;json&#125; Input</div><div class="line"> *    &#123;</div><div class="line"> *      "title": "Study"</div><div class="line"> *    &#125;</div><div class="line"> * @apiSuccess &#123;Number&#125; id Task id</div><div class="line"> * @apiSuccess &#123;String&#125; title Task title</div><div class="line"> * @apiSuccess &#123;Boolean&#125; done=false Task is done?</div><div class="line"> * @apiSuccess &#123;Date&#125; updated_at Update date</div><div class="line"> * @apiSuccess &#123;Date&#125; created_at Register date</div><div class="line"> * @apiSuccessExample &#123;json&#125; Success</div><div class="line"> *    HTTP/1.1 200 OK</div><div class="line"> *    &#123;</div><div class="line"> *      "id": 1,</div><div class="line"> *      "title": "Study",</div><div class="line"> *      "done": false,</div><div class="line"> *      "updated_at": "2016-02-10T15:46:51.778Z",</div><div class="line"> *      "created_at": "2016-02-10T15:46:51.778Z"</div><div class="line"> *    &#125;</div><div class="line"> * @apiErrorExample &#123;json&#125; Register error</div><div class="line"> *    HTTP/1.1 500 Internal Server Error</div><div class="line"> */</div><div class="line">app.post(<span class="string">'/tasks'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for creating a task...</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>下面展示put和delete方法</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * @api &#123;put&#125; /tasks/:id Update a task</div><div class="line"> * @apiGroup Tasks</div><div class="line"> * @apiParam &#123;id&#125; id Task id</div><div class="line"> * @apiParam &#123;String&#125; title Task title</div><div class="line"> * @apiParam &#123;Boolean&#125; done Task is done?</div><div class="line"> * @apiParamExample &#123;json&#125; Input</div><div class="line"> *    &#123;</div><div class="line"> *      "title": "Work",</div><div class="line"> *      "done": true</div><div class="line"> *    &#125;</div><div class="line"> * @apiSuccessExample &#123;json&#125; Success</div><div class="line"> *    HTTP/1.1 204 No Content</div><div class="line"> * @apiErrorExample &#123;json&#125; Update error</div><div class="line"> *    HTTP/1.1 500 Internal Server Error</div><div class="line"> */</div><div class="line">app.put(<span class="string">'/tasks/:id'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for update a task</span></div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * @api &#123;delete&#125; /tasks/:id Remove a task</div><div class="line"> * @apiGroup Tasks</div><div class="line"> * @apiParam &#123;id&#125; id Task id</div><div class="line"> * @apiSuccessExample &#123;json&#125; Success</div><div class="line"> *    HTTP/1.1 204 No Content</div><div class="line"> * @apiErrorExample &#123;json&#125; Delete error</div><div class="line"> *    HTTP/1.1 500 Internal Server Error</div><div class="line"> */</div><div class="line">app.delete(<span class="string">'/tasks/:id'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for deleting a task</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>ok ,可以生产文档了，使用下面的命令(i 是input代表输入文件夹，o是output代表输出文件夹)</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">apidoc  -i public / -o  apidoc  </div><div class="line">node index.js  //(你没有这个js就不要执行这个咯，这个是我上面js用的，监听3000端口的)</div></pre></td></tr></table></figure>
+<p>你就可以访问localhost:3000/apidoc，赶紧自己动手试试吧</p>
+<p><img src="https://blog.jscrambler.com/content/images/2016/12/api-documented.png" alt="图片例子"></p>
+<p>OK，我们已经完成了所有的任务</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2017/05/26/如何使用apidoc编写rest风格的文档/" data-id="cj35rl37y001edcj39fl2jp7m" class="article-share-link" data-share="baidu" data-title="如何利用apidoc编写rest风格的文档">分享到</a>
+      
+
+      
+        <a href="http://yoursite.com/2017/05/26/如何使用apidoc编写rest风格的文档/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/05/26/搭建SS服务器教程/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          搭建SS服务器教程
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/05/26/单例模式/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">单例模式大比拼</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+  <section id="comments">
+    <div id="ds-thread" class="ds-thread" data-thread-key="2017/05/26/如何使用apidoc编写rest风格的文档/" data-title="如何利用apidoc编写rest风格的文档" data-url="http://yoursite.com/2017/05/26/如何使用apidoc编写rest风格的文档/"></div>
+  </section>
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/05/26/高并发的核心技术-幂等的实现方案/">高并发的核心技术-幂等的实现方案</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/面试大全/">初级面试必备教程</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/自己收集的面试题/">自己收集的面试题</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/自定义注解/">自定义注解</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/耳鸣疗法/">耳鸣疗法</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://arvinxiang.com" target="_blank">主题作者</a>
+          </li>
+        
+          <li>
+            <a href="http://reqianduan.com" target="_blank">热前端</a>
+          </li>
+        
+          <li>
+            <a href="http://yuancheng.work" target="_blank">远程.work</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!-- 多说公共js代码 start -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"reqianduan"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共js代码 end -->
+
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+</div>
+</body>
+</html>

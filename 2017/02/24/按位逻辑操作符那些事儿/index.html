@@ -1,0 +1,507 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>按位逻辑操作符那些事儿 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="按位操作符运算符概述在java底层里面，用到了很多这种符号，不对这些按位逻辑符号弄清楚，不容易看懂jdk源码，这里对按位符号做一个简单的梳理    运算符 用法 描述     按位与（ AND） a &amp;amp; b 对于每一个比特位，只有两个操作数相应的比特位都是1时，结果才为1，否则为0。   按位或（OR） `a \ b` 对于每一个比特位，当两个操作数相应的比特位至少有一个1时，结果为1，否">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="按位逻辑操作符那些事儿">
+<meta property="og:url" content="http://yoursite.com/2017/02/24/按位逻辑操作符那些事儿/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="按位操作符运算符概述在java底层里面，用到了很多这种符号，不对这些按位逻辑符号弄清楚，不容易看懂jdk源码，这里对按位符号做一个简单的梳理    运算符 用法 描述     按位与（ AND） a &amp;amp; b 对于每一个比特位，只有两个操作数相应的比特位都是1时，结果才为1，否则为0。   按位或（OR） `a \ b` 对于每一个比特位，当两个操作数相应的比特位至少有一个1时，结果为1，否">
+<meta property="og:updated_time" content="2017-02-24T06:34:36.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="按位逻辑操作符那些事儿">
+<meta name="twitter:description" content="按位操作符运算符概述在java底层里面，用到了很多这种符号，不对这些按位逻辑符号弄清楚，不容易看懂jdk源码，这里对按位符号做一个简单的梳理    运算符 用法 描述     按位与（ AND） a &amp;amp; b 对于每一个比特位，只有两个操作数相应的比特位都是1时，结果才为1，否则为0。   按位或（OR） `a \ b` 对于每一个比特位，当两个操作数相应的比特位至少有一个1时，结果为1，否">
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="yoursite.com">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-按位逻辑操作符那些事儿" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/02/24/按位逻辑操作符那些事儿/" class="article-date">
+  <time datetime="2017-02-23T16:00:00.000Z" itemprop="datePublished">2017-02-24</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      按位逻辑操作符那些事儿
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="按位操作符运算符概述"><a href="#按位操作符运算符概述" class="headerlink" title="按位操作符运算符概述"></a>按位操作符运算符概述</h1><p>在java底层里面，用到了很多这种符号，不对这些按位逻辑符号弄清楚，不容易看懂jdk源码，这里对按位符号做一个简单的梳理</p>
+<table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>用法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>按位与（ AND）</td>
+<td><code>a &amp; b</code></td>
+<td>对于每一个比特位，只有两个操作数相应的比特位都是1时，结果才为1，否则为0。</td>
+</tr>
+<tr>
+<td>按位或（OR）</td>
+<td>`a \</td>
+<td>b`</td>
+<td>对于每一个比特位，当两个操作数相应的比特位至少有一个1时，结果为1，否则为0。</td>
+</tr>
+<tr>
+<td>按位异或（XOR）</td>
+<td><code>a ^ b</code></td>
+<td>对于每一个比特位，当两个操作数相应的比特位有且只有一个1时，结果为1，否则为0。</td>
+</tr>
+<tr>
+<td>按位非（NOT）</td>
+<td><code>~ a</code></td>
+<td>反转操作数的比特位，即0变成1，1变成0。</td>
+</tr>
+<tr>
+<td>左移（L）</td>
+<td><code>a &lt;&lt; b</code></td>
+<td>将 <code>a</code> 的二进制形式向左移 <code>b</code> (&lt; 32) 比特位，右边用0填充。</td>
+</tr>
+<tr>
+<td>有符号右移</td>
+<td><code>a &gt;&gt; b</code></td>
+<td>将 a 的二进制表示向右移<code>b</code>(&lt; 32) 位，丢弃被移出的位。</td>
+</tr>
+<tr>
+<td>无符号右移</td>
+<td><code>a &gt;&gt;&gt; b</code></td>
+<td>将 a 的二进制表示向右移<code>b</code>(&lt; 32) 位，丢弃被移出的位，并使用 0 在左侧填充。</td>
+</tr>
+</tbody>
+</table>
+<p><strong>这里注意，java里面没有无符号左移，因为无符号左移&lt;&lt;&lt;和左移&lt;&lt;是一样的概念</strong></p>
+<a id="more"></a>
+<h2 id="按位逻辑操作符"><a href="#按位逻辑操作符" class="headerlink" title="按位逻辑操作符"></a>按位逻辑操作符</h2><h3 id="amp-按位与"><a href="#amp-按位与" class="headerlink" title="&amp; (按位与)"></a>&amp; (按位与)</h3><p>对每对比特位执行<strong>与（AND）操作</strong>。只有 a 和 b 都是 1 时，a AND b 才是 1。<strong>与操作</strong>的真值表如下：</p>
+<table>
+<thead>
+<tr>
+<th>a</th>
+<th>b</th>
+<th>a AND b</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p>上代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Test</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testAnweiyu</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="comment">//按位与,1与0位0,1与1为1,0与0为0</span></div><div class="line">    <span class="keyword">int</span> a=<span class="number">14</span> &amp; <span class="number">8</span>;</div><div class="line">    toBinaryOutPut(<span class="number">14</span>,<span class="string">"&amp;"</span>,<span class="number">8</span>);</div><div class="line">    System.out.println(Integer.toBinaryString(a)+<span class="string">"===="</span>+a);</div><div class="line">&#125;</div><div class="line">结果：</div><div class="line"><span class="number">1110</span> &amp; <span class="number">1000</span></div><div class="line"><span class="number">1000</span>====<span class="number">8</span></div></pre></td></tr></table></figure>
+<h3 id="按位或"><a href="#按位或" class="headerlink" title="| (按位或)"></a>| (按位或)</h3><p>对每一对比特位执行<strong>或（OR）操作</strong>。如果 a 或 b 为 1，则 <code>a</code> OR <code>b</code> 结果为 1。<strong>或操作</strong>的真值表：</p>
+<table>
+<thead>
+<tr>
+<th>a</th>
+<th>b</th>
+<th>a OR b</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Test</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testAnweiHuo</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="comment">//按位或,1或0为1,0或0为0,1或1为1</span></div><div class="line">    <span class="keyword">int</span> a=<span class="number">14</span> | <span class="number">8</span>;</div><div class="line">    toBinaryOutPut(<span class="number">14</span>,<span class="string">"|"</span>,<span class="number">8</span>);</div><div class="line">    System.out.println(Integer.toBinaryString(a)+<span class="string">"===="</span>+a);</div><div class="line">&#125;</div><div class="line">结果</div><div class="line"><span class="number">1110</span> | <span class="number">1000</span></div><div class="line"><span class="number">1110</span>====<span class="number">14</span></div></pre></td></tr></table></figure>
+<h3 id="按位异或"><a href="#按位异或" class="headerlink" title="^ (按位异或)"></a>^ (按位异或)</h3><p>对每一对比特位执行<strong>异或（XOR）操作</strong>。当 a 和 b 不相同时，<code>a</code> XOR <code>b</code> 的结果为 1。<strong>异或操作</strong>真值表：</p>
+<table>
+<thead>
+<tr>
+<th>a</th>
+<th>b</th>
+<th>a XOR b</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"> <span class="meta">@Test</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testAnweiYiHuo</span><span class="params">()</span></span>&#123;</div><div class="line">        <span class="keyword">int</span> a=<span class="number">14</span> ^ <span class="number">8</span>;</div><div class="line">        toBinaryOutPut(<span class="number">14</span>,<span class="string">"^"</span>,<span class="number">8</span>);</div><div class="line">        System.out.println(Integer.toBinaryString(a)+<span class="string">"===="</span>+a);</div><div class="line">    &#125;</div><div class="line">结果</div><div class="line"><span class="number">1110</span> ^ <span class="number">1000</span></div><div class="line"><span class="number">110</span>====<span class="number">6</span></div></pre></td></tr></table></figure>
+<h3 id="按位非"><a href="#按位非" class="headerlink" title="~ (按位非)"></a>~ (按位非)</h3><p>对每一个比特位执行<strong>非（NOT）操作</strong>。NOT <code>a</code> 结果为 a 的反转（即反码）。<strong>非操作</strong>的真值表：</p>
+<table>
+<thead>
+<tr>
+<th>a</th>
+<th>NOT a</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Test</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testAnweiFei</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> a=~<span class="number">14</span>;</div><div class="line">    System.out.println(Integer.toBinaryString(<span class="number">14</span>));</div><div class="line">    System.out.println(Integer.toBinaryString(a)+<span class="string">"===="</span>+a);</div><div class="line">&#125;</div><div class="line">结果</div><div class="line"><span class="number">1110</span></div><div class="line"><span class="number">11111111111111111111111111110001</span>====-<span class="number">15</span></div></pre></td></tr></table></figure>
+<h2 id="按位移动操作符"><a href="#按位移动操作符" class="headerlink" title="按位移动操作符"></a>按位移动操作符</h2><h3 id="lt-lt-有符号左移"><a href="#lt-lt-有符号左移" class="headerlink" title="&lt;&lt;有符号左移"></a>&lt;&lt;有符号左移</h3><p>该操作符会将第一个操作数向左移动指定的位数。向左被移出的位被丢弃，右侧用 0 补充</p>
+<p>在数字 <strong>x</strong> 上左移 <strong>y</strong> 比特得到 <strong>x * 2y</strong></p>
+<p>上代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Test</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testLeftMove</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> a=<span class="number">9</span>&lt;&lt;<span class="number">2</span>;<span class="comment">//9左移动2位</span></div><div class="line">    toBinaryOutPut(<span class="number">9</span>,<span class="string">"&lt;&lt;"</span>,<span class="number">2</span>);</div><div class="line">    System.out.println(Integer.toBinaryString(a)+<span class="string">"===="</span>+a);</div><div class="line">&#125;</div><div class="line">结果：</div><div class="line"><span class="number">1001</span> &lt;&lt; <span class="number">10</span></div><div class="line"><span class="number">100100</span>====<span class="number">36</span></div></pre></td></tr></table></figure>
+<h3 id="gt-gt-有符号右移"><a href="#gt-gt-有符号右移" class="headerlink" title="&gt;&gt;有符号右移"></a>&gt;&gt;有符号右移</h3><p>该操作符会将第一个操作数向右移动指定的位数。向右被移出的位被丢弃，<strong>拷贝最左侧的位以填充左侧</strong>。由于新的最左侧的位总是和以前相同，符号位没有被改变。所以被称作“符号传播”。</p>
+<p>例如， <code>9 &gt;&gt; 2</code> 得到 2</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Test</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testRightMove</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> a=<span class="number">9</span>&gt;&gt;<span class="number">2</span>;<span class="comment">//9右边移动2位</span></div><div class="line">    toBinaryOutPut(<span class="number">9</span>,<span class="string">"&gt;&gt;"</span>,<span class="number">2</span>);</div><div class="line">    System.out.println(Integer.toBinaryString(a)+<span class="string">"===="</span>+a);</div><div class="line">&#125;</div><div class="line">结果：</div><div class="line"><span class="number">1001</span> &gt;&gt; <span class="number">10</span></div><div class="line"><span class="number">10</span>====<span class="number">2</span></div></pre></td></tr></table></figure>
+<h3 id="gt-gt-gt-无符号右移"><a href="#gt-gt-gt-无符号右移" class="headerlink" title="&gt;&gt;&gt;无符号右移"></a>&gt;&gt;&gt;无符号右移</h3><p>该操作符会将第一个操作数向右移动指定的位数。向右被移出的位被丢弃，<strong>左侧用0填充</strong>。因为符号位变成了 0，所以结果总是非负的。（译注：即便右移 0 个比特，结果也是非负的。）</p>
+<p>对于非负数，有符号右移和无符号右移总是返回相同的结果。例如， <code>9 &gt;&gt;&gt; 2</code> 得到 2 和 <code>9 &gt;&gt; 2</code>相同</p>
+<p>但是对于负数却不尽相同。 <code>-9 &gt;&gt;&gt; 2</code> 产生 1073741821 这和 <code>-9 &gt;&gt; 2</code> 不同：</p>
+<p>上代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Test</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testNoSignRightMove</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> a=-<span class="number">9</span>&gt;&gt;&gt;<span class="number">2</span>;<span class="comment">//9无符号右移动2位</span></div><div class="line">    toBinaryOutPut(-<span class="number">9</span>,<span class="string">"&gt;&gt;&gt;"</span>,<span class="number">2</span>);</div><div class="line">    System.out.println(Integer.toBinaryString(a)+<span class="string">"===="</span>+a);</div><div class="line">&#125;</div><div class="line">结果：</div><div class="line"><span class="number">11111111111111111111111111110111</span> &gt;&gt;&gt; <span class="number">10</span></div><div class="line"><span class="number">111111111111111111111111111101</span>====<span class="number">1073741821</span></div></pre></td></tr></table></figure>
+<p>提问时间如下：</p>
+<ul>
+<li><p>首先负数的二进制为什么是这样的？</p>
+<blockquote>
+<p>在计算机中，负数以其正值的补码形式表达，将二进制数按位取反，所得的新二进制数称为原二进制数的反码，然后反码+1就是补码了</p>
+<p>例如：9的原码是00000000 00000000 00000000 00001001</p>
+<p>​                 反码是11111111 11111111 11111111 11110110</p>
+<p>​         补码是11111111 11111111 11111111 11110111</p>
+<p>所以-9是这样的</p>
+</blockquote>
+</li>
+<li><p>int在计算机中存储的是4字节，所以有32位，所以这么长，前面正数是因为把前面的0省略了</p>
+</li>
+<li><p>那么有符号右移和无符号右移有什么区别呢？</p>
+<blockquote>
+<p>一个是copy最左侧的位来填充，一个是用0来填充，所以无符号右移总是一个正数</p>
+</blockquote>
+</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2017/02/24/按位逻辑操作符那些事儿/" data-id="cj35rl381001jdcj32s102bav" class="article-share-link" data-share="baidu" data-title="按位逻辑操作符那些事儿">分享到</a>
+      
+
+      
+        <a href="http://yoursite.com/2017/02/24/按位逻辑操作符那些事儿/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/02/28/Logstash中grok filter example例子/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          Logstash中grok filter example例子
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/02/13/写给自己的2017/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">写给自己的2017</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+  <section id="comments">
+    <div id="ds-thread" class="ds-thread" data-thread-key="2017/02/24/按位逻辑操作符那些事儿/" data-title="按位逻辑操作符那些事儿" data-url="http://yoursite.com/2017/02/24/按位逻辑操作符那些事儿/"></div>
+  </section>
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/05/26/高并发的核心技术-幂等的实现方案/">高并发的核心技术-幂等的实现方案</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/面试大全/">初级面试必备教程</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/自己收集的面试题/">自己收集的面试题</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/自定义注解/">自定义注解</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/耳鸣疗法/">耳鸣疗法</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://arvinxiang.com" target="_blank">主题作者</a>
+          </li>
+        
+          <li>
+            <a href="http://reqianduan.com" target="_blank">热前端</a>
+          </li>
+        
+          <li>
+            <a href="http://yuancheng.work" target="_blank">远程.work</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!-- 多说公共js代码 start -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"reqianduan"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共js代码 end -->
+
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+</div>
+</body>
+</html>

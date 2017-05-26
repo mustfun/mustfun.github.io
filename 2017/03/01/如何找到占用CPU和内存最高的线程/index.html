@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>如何找到占用CPU和内存最高的线程 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="一、如何找到CPU和内存占用最高的线程 代码示例 我们先来写一段代码 1234567891011121314151617@Testpublic void testLinuxTop() throws  Exception&amp;#123;    boolean b=true;    System.out.println(&quot;start the cpu Thread&quot;);    while (b)&amp;#123;">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何找到占用CPU和内存最高的线程">
+<meta property="og:url" content="http://yoursite.com/2017/03/01/如何找到占用CPU和内存最高的线程/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="一、如何找到CPU和内存占用最高的线程 代码示例 我们先来写一段代码 1234567891011121314151617@Testpublic void testLinuxTop() throws  Exception&amp;#123;    boolean b=true;    System.out.println(&quot;start the cpu Thread&quot;);    while (b)&amp;#123;">
+<meta property="og:image" content="http://yoursite.com/Users/dengzhiyuan/Pictures/QQ20170301-0@2x.png">
+<meta property="og:updated_time" content="2017-03-01T08:05:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="如何找到占用CPU和内存最高的线程">
+<meta name="twitter:description" content="一、如何找到CPU和内存占用最高的线程 代码示例 我们先来写一段代码 1234567891011121314151617@Testpublic void testLinuxTop() throws  Exception&amp;#123;    boolean b=true;    System.out.println(&quot;start the cpu Thread&quot;);    while (b)&amp;#123;">
+<meta name="twitter:image" content="http://yoursite.com/Users/dengzhiyuan/Pictures/QQ20170301-0@2x.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="yoursite.com">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-如何找到占用CPU和内存最高的线程" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/03/01/如何找到占用CPU和内存最高的线程/" class="article-date">
+  <time datetime="2017-02-28T16:00:00.000Z" itemprop="datePublished">2017-03-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      如何找到占用CPU和内存最高的线程
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="一、如何找到CPU和内存占用最高的线程"><a href="#一、如何找到CPU和内存占用最高的线程" class="headerlink" title="一、如何找到CPU和内存占用最高的线程"></a>一、如何找到CPU和内存占用最高的线程</h3><ol>
+<li><p><strong>代码示例</strong></p>
+<p>我们先来写一段代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="meta">@Test</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testLinuxTop</span><span class="params">()</span> <span class="keyword">throws</span>  Exception</span>&#123;</div><div class="line">    <span class="keyword">boolean</span> b=<span class="keyword">true</span>;</div><div class="line">    System.out.println(<span class="string">"start the cpu Thread"</span>);</div><div class="line">    <span class="keyword">while</span> (b)&#123;</div><div class="line">        <span class="keyword">int</span> i=(<span class="keyword">int</span>)Math.random()*<span class="number">1000</span>;</div><div class="line">        <span class="keyword">if</span> (i%<span class="number">3</span>==<span class="number">1</span>)&#123;</div><div class="line"></div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (i==<span class="number">1000</span>)&#123;</div><div class="line">            System.out.println(<span class="string">"stop"</span>);</div><div class="line">            b=<span class="keyword">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>随便写了个死循环，然后怎么看下CPU占用情况呢？</p>
+<p><strong>TOP命令</strong></p>
+<p>先用<code>ps -ef|grep tomcat</code>查看一下你当前tomcat的进程号，比如我看出来我的进程号是8545</p>
+<p>然后用TOP命令查看当前所有进程</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">top -p 8545</div><div class="line">top -p 8545 -H //这样也可以</div></pre></td></tr></table></figure>
+<p>使用地址中，进入了下面这个界面之后就要按H了</p>
+<p>于是你就会看到下面这张图片</p>
+<p><img src="/Users/dengzhiyuan/Pictures/QQ20170301-0@2x.png" alt="QQ20170301-0@2x"></p>
+<p>CPU占用接近满了，内存占用30M，怎么会占用这么多？OK，我们记住PID  8545</p>
+</li>
+<li><p><strong>jstack命令</strong></p>
+<p>OK，我们在栈里面来找出这段代码，可以直接用jstack把栈里面的东西打出来</p>
+<p>直接使用下面的就可以</p>
+<p><code>jstack 8545 &gt; stack.log</code> 在你的当前目录下面就会出现一个stack.log文件，这是包括所有的栈信息的，这里的8545是<strong>tomcat的进程号</strong>、<strong>tomcat的进程号</strong>、<strong>tomcat的进程号</strong>，重要的事情强调一下</p>
+<p>如何找到有问题的代码呢？</p>
+<p>我们刚才拿到了一个CPU最高的进程号8545，OK，转化为16进制，使用下面命令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">printf "%x\n" 8545</div><div class="line">//或者</div><div class="line">printf 0x%x 8545</div></pre></td></tr></table></figure>
+<p>上面两种都可以拿到16进制的8545，或者你自己去用计算器拿去，这里我们得到的是0x2162或者2161（上面一种可以直接拿到2161，没有0x），我们要的就是2161</p>
+<p>可以直接到jstack.log文件里面去搜索，就看到出问题的代码了</p>
+</li>
+<li><p>想直接看</p>
+<p>下面提供一种直接看的方法</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jstack 8545|grep -A 30 2162</div></pre></td></tr></table></figure>
+<p>得到线程堆栈信息中2162这个线程所在行的后面30行</p>
+</li>
+<li><p>question</p>
+<p>4.1 我使用jstack pid报错了怎么办？</p>
+<blockquote>
+<p>使用jstack pid可能会出现8545 operation permitted之类的错误，解决办法，请切换至root用户执行命令</p>
+</blockquote>
+</li>
+<li><p>over</p>
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2017/03/01/如何找到占用CPU和内存最高的线程/" data-id="cj35rl37z001gdcj3vetatri1" class="article-share-link" data-share="baidu" data-title="如何找到占用CPU和内存最高的线程">分享到</a>
+      
+
+      
+        <a href="http://yoursite.com/2017/03/01/如何找到占用CPU和内存最高的线程/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/05/26/windows hexo 搭建教程/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          windows hexo 搭建个人博客教程
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/03/01/JAVA面试题之基础篇/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">JAVA面试题之基础篇</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+  <section id="comments">
+    <div id="ds-thread" class="ds-thread" data-thread-key="2017/03/01/如何找到占用CPU和内存最高的线程/" data-title="如何找到占用CPU和内存最高的线程" data-url="http://yoursite.com/2017/03/01/如何找到占用CPU和内存最高的线程/"></div>
+  </section>
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/05/26/高并发的核心技术-幂等的实现方案/">高并发的核心技术-幂等的实现方案</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/面试大全/">初级面试必备教程</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/自己收集的面试题/">自己收集的面试题</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/自定义注解/">自定义注解</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/耳鸣疗法/">耳鸣疗法</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://arvinxiang.com" target="_blank">主题作者</a>
+          </li>
+        
+          <li>
+            <a href="http://reqianduan.com" target="_blank">热前端</a>
+          </li>
+        
+          <li>
+            <a href="http://yuancheng.work" target="_blank">远程.work</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!-- 多说公共js代码 start -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"reqianduan"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共js代码 end -->
+
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,709 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>JAVA面试题之基础篇 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="九种基本数据类型的大小，以及他们的封装类。各自占多少字节  boolean, byte, char, short,  int, long, float, double, void 还有一种引用类型 Boolean, Byte, Character, Short, Integer, Long, Float, Double, Void 存在原因：节省内存开销 2        2">
+<meta name="keywords" content="面试题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JAVA面试题之基础篇">
+<meta property="og:url" content="http://yoursite.com/2017/03/01/JAVA面试题之基础篇/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="九种基本数据类型的大小，以及他们的封装类。各自占多少字节  boolean, byte, char, short,  int, long, float, double, void 还有一种引用类型 Boolean, Byte, Character, Short, Integer, Long, Float, Double, Void 存在原因：节省内存开销 2        2">
+<meta property="og:image" content="http://img.blog.csdn.net/20130917104606406?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZmpzbG92ZWpobA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="https://camo.githubusercontent.com/681cdea2d92098612ae41b92a0cc4d7aa7ad3e58/687474703a2f2f696d672e626c6f672e6373646e2e6e65742f3230313630343038313530353331303935">
+<meta property="og:updated_time" content="2017-03-01T03:46:48.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JAVA面试题之基础篇">
+<meta name="twitter:description" content="九种基本数据类型的大小，以及他们的封装类。各自占多少字节  boolean, byte, char, short,  int, long, float, double, void 还有一种引用类型 Boolean, Byte, Character, Short, Integer, Long, Float, Double, Void 存在原因：节省内存开销 2        2">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20130917104606406?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZmpzbG92ZWpobA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="yoursite.com">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-JAVA面试题之基础篇" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/03/01/JAVA面试题之基础篇/" class="article-date">
+  <time datetime="2017-02-28T16:00:00.000Z" itemprop="datePublished">2017-03-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      JAVA面试题之基础篇
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <ol>
+<li><p>九种基本数据类型的大小，以及他们的封装类。各自占多少字节</p>
+<blockquote>
+<p>boolean, byte, char, short,  int, long, float, double, void 还有一种引用类型</p>
+<p>Boolean, Byte, Character, Short, Integer, Long, Float, Double, Void</p>
+<p>存在原因：节省内存开销</p>
+<p>2        2            2           4             8     </p>
+</blockquote>
+</li>
+<li><p>String 类能被继承吗,为什么。</p>
+<blockquote>
+<p>不能，String是一个final类</p>
+</blockquote>
+</li>
+<li><p>讲讲类的实例化顺序,比如父类静态数据,构造函数,字段，当 new 的时候,他们的执行顺序</p>
+<blockquote>
+<p>类实例化的过程中，先执行父类的构造器，然后执行隐式的构造代码，再执行构造方法中的代码</p>
+</blockquote>
+</li>
+<li><p>JAVA8 的 ConcurrentHashMap 为什么放弃了分段锁,有什么问题吗,如果你来设计,你如何设计</p>
+<blockquote>
+<p>它摒弃了Segment（锁段）的概念，而是启用了一种全新的方式实现,利用CAS算法，段锁性能也不是很高，而CAS操作是CPU支持的操作，是一种原子操作</p>
+<p>1、下面讲一下concurrentHashMap的结构</p>
+<p>ConcurrentHashMap是由Segment数组结构和HashEntry数组结构组成（一个segment里面有一个hashEntry数组）。Segment是一种可重入锁ReentrantLock，在ConcurrentHashMap里扮演锁的角色，HashEntry则用于存储键值对数据。一个ConcurrentHashMap里包含一个Segment数组，Segment的结构和HashMap类似，是一种数组和链表结构</p>
+</blockquote>
+<a id="more"></a>
+</li>
+<li><p>有没有有顺序的 Map 实现类,如果有,他们是怎么保证有序的。</p>
+<blockquote>
+<p>LinkedHashMap 双向链表</p>
+</blockquote>
+</li>
+<li><p>继承和聚合的区别在哪</p>
+<blockquote>
+<p>聚合：指的是整体与部分的关系。通常在定义一个整体类后，再去分析这个整体类的组成结构。从而找出一些组成类，该整体类和组成类之间就形成了聚合关系。例如一个航母编队包括海空母舰、驱护舰艇、舰载飞机及核动力攻击潜艇等。需求描述中“包含”、“组成”、“分为…部分”等词常意味着聚合关系。</p>
+</blockquote>
+</li>
+<li><p>讲讲你理解的 nio</p>
+<blockquote>
+<p>Java NIO的非阻塞模式，使一个线程从某通道发送请求读取数据，但是它仅能得到目前可用的数据，如果目前没有数据可用时，就什么都不会获取。而不是保持线程阻塞，所以直至数据变的可以读取之前，该线程可以继续做其他的事情</p>
+</blockquote>
+</li>
+<li><p>反射中,Class.forName 和 ClassLoader 区别</p>
+<blockquote>
+<p>ClassLoader.loadClass(className)实际上调用的是ClassLoader.loadClass(name, false)，第二个参数指出Class是否被初始化。区别就出来了。Class.forName(className)装载的class已经被初始化，而ClassLoader.loadClass(className)装载的class还没有被link。</p>
+</blockquote>
+</li>
+<li><p>描述动态代理的几种实现方式,分别说出相应的优缺点。</p>
+<blockquote>
+<p>JDK代理（Proxy.newProxyInstance()方法创建动态代理）和CGLIB代理</p>
+<p>CGLib创建的动态代理对象性能比JDK创建的动态代理对象的性能高不少，但是CGLib在创建代理对象时所花费的时间却比JDK多得多，所以对于单例的对象，因为无需频繁创建对象，用CGLib合适，反之，使用JDK方式要更为合适一些。同时，由于CGLib由于是采用动态创建子类的方法，对于final方法，无法进行代理</p>
+</blockquote>
+</li>
+<li><p>动态代理与cglib实现的区别</p>
+<blockquote>
+<p>JDK动态代理只能对实现了接口的类生成代理，而不能针对类 。<br>CGLIB是针对类实现代理，主要是对指定的类生成一个子类，覆盖其中的方法 。<br>因为是继承，所以该类或方法最好不要声明成final ，final可以阻止继承和多态。</p>
+<p>jdk中的动态代理通过反射类<code>Proxy</code>和<code>InvocationHandler</code>回调接口实现，要求委托类必须实现一个接口，只能对该类接口中定义的方法实现代理，这在实际编程中有一定的局限性。</p>
+</blockquote>
+</li>
+<li><p>为什么CGlib方式可以对接口实现代理</p>
+<blockquote>
+<p>CGLIB是通过生成java 字节码从而动态的产生代理对象</p>
+</blockquote>
+</li>
+<li><p>final的用途</p>
+<blockquote>
+<p> final类不能被继承，因此final类的成员方法没有机会被覆盖，默认都是final的。在设计类时候，如果这个类不需要有子类，类的实现细节不允许改变，并且确信这个类不会载被扩展，那么就设计为final类。</p>
+</blockquote>
+</li>
+<li><p>写出三种单例模式实现</p>
+<blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&gt; <span class="comment">//饿汉模式</span></div><div class="line">&gt; <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</div><div class="line">&gt;     <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> Singleton INSTANCE = <span class="keyword">new</span> Singleton();</div><div class="line">&gt;   </div><div class="line">&gt;     <span class="comment">// Private constructor suppresses   </span></div><div class="line">&gt;     <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span> </span>&#123;&#125;</div><div class="line">&gt;  </div><div class="line">&gt;     <span class="comment">// default public constructor</span></div><div class="line">&gt;     <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</div><div class="line">&gt;         <span class="keyword">return</span> INSTANCE;</div><div class="line">&gt;     &#125;</div><div class="line">&gt;   &#125;</div><div class="line">&gt;</div></pre></td></tr></table></figure>
+</blockquote>
+<p>&gt;</p>
+<blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">&gt; <span class="comment">//懒汉模式，和双重检查锁模式</span></div><div class="line">&gt; <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</div><div class="line">&gt;     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">volatile</span> Singleton INSTANCE = <span class="keyword">null</span>;</div><div class="line">&gt;   </div><div class="line">&gt;     <span class="comment">// Private constructor suppresses </span></div><div class="line">&gt;     <span class="comment">// default public constructor</span></div><div class="line">&gt;     <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span> </span>&#123;&#125;</div><div class="line">&gt;   </div><div class="line">&gt;     <span class="comment">//thread safe and performance  promote </span></div><div class="line">&gt;     <span class="function"><span class="keyword">public</span> <span class="keyword">static</span>  Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</div><div class="line">&gt;         <span class="keyword">if</span>(INSTANCE == <span class="keyword">null</span>)&#123;</div><div class="line">&gt;              <span class="keyword">synchronized</span>(Singleton.class)&#123;</div><div class="line">&gt;                  <span class="comment">//when more than two threads run into the first null check same time, to avoid instanced more than one time, it needs to be checked again.</span></div><div class="line">&gt;                  <span class="keyword">if</span>(INSTANCE == <span class="keyword">null</span>)&#123; </div><div class="line">&gt;                      INSTANCE = <span class="keyword">new</span> Singleton();</div><div class="line">&gt;                   &#125;</div><div class="line">&gt;               &#125; </div><div class="line">&gt;         &#125;</div><div class="line">&gt;         <span class="keyword">return</span> INSTANCE;</div><div class="line">&gt;     &#125;</div><div class="line">&gt;</div></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p>如何在父类中为子类自动完成所有的 hashcode 和 equals 实现?这么做有何优劣</p>
+<blockquote>
+<p>直接重写equals方法和hashcode方法</p>
+<p>保证hashcode唯一                                （这题我不会….</p>
+</blockquote>
+</li>
+<li><p>请结合 OO 设计理念,谈谈访问修饰符 public、private、protected、default 在应</p>
+<p>   用设计中的作用</p>
+<blockquote>
+<p>面对对象设计理念，自己扯，安全，访问控制域</p>
+</blockquote>
+</li>
+<li><p>数组和链表数据结构描述,各自的时间复杂度</p>
+<blockquote>
+<p>数组要求是一块连续的内存空间来存储，单链表，每个元素除了存储本身的值外还存储了前驱的引用也就是存储了前驱所在的内存地址信息。这样像链条一样把各元素保证了在逻辑上的连续性。双链表就是不仅存储了前驱的引用还存储了后继的引用</p>
+</blockquote>
+</li>
+<li><p>请列出 5 个运行时异常</p>
+<blockquote>
+<p>NullPointerException- 空指针引用异常<br>ClassCastException - 类型强制转换异常。<br>IllegalArgumentException - 传递非法参数异常。<br>ArithmeticException - 算术运算异常<br>ArrayStoreException - 向数组中存放与声明类型不兼容对象异常<br>IndexOutOfBoundsException - 下标越界异常<br>NegativeArraySizeException - 创建一个大小为负数的数组错误异常<br>NumberFormatException - 数字格式异常<br>SecurityException - 安全异常<br>UnsupportedOperationException - 不支持的操作异常</p>
+</blockquote>
+</li>
+<li><p>在自己的代码中,如果创建一个 java.lang.String 对象,这个对象是否可以被类加载器加载?为什么</p>
+<blockquote>
+<p>不能，双亲委派模型来加载</p>
+</blockquote>
+</li>
+<li><p>说一说你对 java.lang.Object 对象中 hashCode 和 equals 方法的理解。在什么场景下需要重新实现这两个方法</p>
+<blockquote>
+<p>两个方法是一起的，equals方法对比两个对象是否值相等，如果相等他们的hashcode也要相等，如果如果你有需要要重写equals方法，也要重写hashCode方法（自己理解，(⊙﹏⊙)）</p>
+</blockquote>
+</li>
+<li><p>在 jdk1.5 中,引入了泛型,泛型的存在是用来解决什么问题。</p>
+<blockquote>
+<p>解决强制转换带来的内存消耗</p>
+</blockquote>
+</li>
+<li><p>这样的 a.hashcode() 有什么用,与 a.equals(b)有什么关系。</p>
+<blockquote>
+<p>算出hashcode，比较值相等，则hashCode相等</p>
+</blockquote>
+</li>
+<li><p>有没有可能 2 个不相等的对象有相同的 hashcode</p>
+<blockquote>
+<p>存在</p>
+</blockquote>
+</li>
+<li><p>Java 中的 HashSet 内部是如何工作的</p>
+<blockquote>
+<p> HashSet 内部使用 HashMap 。它将元素存储为键和值。（译者注：HashSet 把存储的值作为 key）</p>
+</blockquote>
+</li>
+<li><p>什么是序列化,怎么序列化,为什么序列化,反序列化会遇到什么问题,如何解决。</p>
+<blockquote>
+<ul>
+<li>序列化： 将数据结构或对象转换成二进制串的过程。</li>
+<li>反序列化：将在序列化过程中所生成的二进制串转换成数据结构或者对象的过程。</li>
+</ul>
+<p>有些特定对象无法反序列化</p>
+</blockquote>
+</li>
+<li><p>Switch能否用string做参数？</p>
+<blockquote>
+<p>jdk 1.7之后就加上了</p>
+</blockquote>
+</li>
+<li><p>equals与==的区别。</p>
+<blockquote>
+<p>equals比较是他们的值是否相等，==比较的是他们在内存中的存放地址</p>
+</blockquote>
+</li>
+<li><p>Object有哪些公用方法？</p>
+<blockquote>
+<p>toString,hashcode,equals,getClass</p>
+</blockquote>
+</li>
+<li><p>Java的四种引用，强弱软虚，用到的场景。</p>
+<blockquote>
+<p>强引用： 如Object object = new Object() 这个Object()就是一个强引用了，如果一个对象具有强引用。垃圾回收器就不会去回收有强引用的对象</p>
+<p>弱引用：只要垃圾回收器在自己的内存空间中线程检测到了，就会立即被回收</p>
+<p>软引用：如果内存空间足够，那么垃圾回收器就不会回收它</p>
+<p>虚引用：如果一个对象只具有虚引用，那么它就和没有任何引用一样，随时会被jvm当作垃圾进行回收</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&gt; <span class="comment">//创建一个强引用Test</span></div><div class="line">&gt; String str = <span class="keyword">new</span> String(<span class="string">"Test"</span>);</div><div class="line">&gt; <span class="comment">//创建一个引用队列</span></div><div class="line">&gt; ReferenceQueue&lt;string&gt; rq = <span class="keyword">new</span> ReferenceQueue&lt;string&gt;();</div><div class="line">&gt; <span class="comment">//实现一个软引用，将强引用类型str和是实例化的rq放到软引用实现里面</span></div><div class="line">&gt; SoftReference&lt;string&gt; srf = <span class="keyword">new</span> SoftReference&lt;string&gt;(str,rq);</div><div class="line">&gt; <span class="comment">//通过软引用get方法获取强引用中创建的内存空间Test值</span></div><div class="line">&gt; System.out.println(srf.get());</div><div class="line">&gt; <span class="comment">//程序执行下gc现在jvm的内存空间还有很多所以gc不会回收str的对象</span></div><div class="line">&gt; System.gc();</div><div class="line">&gt; <span class="comment">//所以这里执行get还是会打印Test的</span></div><div class="line">&gt; System.out.println(srf.get());</div><div class="line">&gt;</div></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p>Hashcode的作用。</p>
+<blockquote>
+<p>hashCode是用来在散列存储结构中确定对象的存储地址的,</p>
+<ol>
+<li>hashcode是用来查找的，如果你学过数据结构就应该知道，在查找和排序这一章有  </li>
+<li>例如内存中有这样的位置  </li>
+<li>0  1  2  3  4  5  6  7    </li>
+<li>而我有个类，这个类有个字段叫ID,我要把这个类存放在以上8个位置之一，如果不用hashcode而任意存放，那么当查找时就需要到这八个位置里挨个去找，或者用二分法一类的算法。  </li>
+<li>但如果用hashcode那就会使效率提高很多。  </li>
+<li>我们这个类中有个字段叫ID,那么我们就定义我们的hashcode为ID％8，然后把我们的类存放在取得得余数那个位置。比如我们的ID为9，9除8的余数为1，那么我们就把该类存在1这个位置，如果ID是13，求得的余数是5，那么我们就把该类放在5这个位置。这样，以后在查找该类时就可以通过ID除 8求余数直接找到存放的位置了。  </li>
+</ol>
+</blockquote>
+</li>
+<li><p>ArrayList、LinkedList、Vector的区别。</p>
+<blockquote>
+<p>ArrayList 和Vector是采用数组方式存储数据，此数组元素数大于实际存储的数据以便增加和插入元素，都允许直接序号索引元素，但是插入数据要设计到数组元素移动等内存操作，所以索引数据快插入数据慢，Vector由于使用了synchronized方法（线程安全）所以性能上比ArrayList要差，LinkedList使用双向链表实现存储，按序号索引数据需要进行向前或向后遍历，但是插入数据时只需要记录本项的前后项即可，所以插入数度较快！</p>
+</blockquote>
+</li>
+<li><p>String、StringBuffer与StringBuilder的区别。</p>
+<blockquote>
+<p>String 是不可变的对象, 因此在每次对 String 类型进行改变的时候其实都等同于生成了一个新的 String 对象，然后将指针指向新的 String 对象</p>
+<p>StringBuffer每次结果都会对 StringBuffer 对象本身进行操作，而不是生成新的对象，再改变对象引用</p>
+<p>该类被设计用作 StringBuffer 的一个简易替换，用在字符串缓冲区被单个线程使用的时候，大多数实现中，它比 StringBuffer 要快。两者的方法基本相同</p>
+</blockquote>
+</li>
+<li><p>Map、Set、List、Queue、Stack的特点与用法。</p>
+<blockquote>
+<p>Set集合类似于一个罐子，”丢进”Set集合里的多个对象之间没有明显的顺序。Set继承自Collection接口，不能包含有重复元素(记住，这是整个Set类层次的共有属性)。只能用Lterator实现单项遍历</p>
+<p>List集合代表一个元素有序、可重复的集合，集合中每个元素都有其对应的顺序索引。List集合允许加入重复元素，因为它可以通过索引来访问指定位置的集合元素。List集合默认按元素的添加顺序设置元素的索引，可以在任意位置增加删除元素。 </p>
+<p>Queue用于模拟”队列”这种数据结构(先进先出 FIFO)。队列的头部保存着队列中存放时间最长的元素，队列的尾部保存着队列中存放时间最短的元素。新元素插入(offer)到队列的尾部，访问元素(poll)操作会返回队列头部的元素，队列不允许随机访问队列中的元素。结合生活中常见的排队就会很好理解这个概念</p>
+<p>Map用于保存具有”映射关系”的数据，因此Map集合里保存着两组值，一组值用于保存Map里的key，另外一组值用于保存Map里的value。key和value都可以是任何引用类型的数据。Map的key不允许重复</p>
+<p>Stack是Vector提供的一个子类，用于模拟”栈”这种数据结构(LIFO后进先出)，它提供了通常的push和pop操作，以及取堆栈顶点的peek()方法、<a href="http://lib.csdn.net/base/softwaretest" target="_blank" rel="external">测试</a>堆栈是否为空的empty方法等</p>
+</blockquote>
+</li>
+<li><p>HashMap和HashTable的区别。</p>
+<blockquote>
+<p>HashMap是非synchronized，而Hashtable是synchronized，这意味着Hashtable是线程安全的，多个线程可以共享一个Hashtable；而如果没有正确的同步的话，多个线程是不能共享HashMap的。Java 5提供了ConcurrentHashMap，它是HashTable的替代，比HashTable的扩展性更好。</p>
+</blockquote>
+</li>
+<li><p>HashMap和ConcurrentHashMap的区别，HashMap的底层源码。</p>
+<blockquote>
+<p><img src="http://img.blog.csdn.net/20130917104606406?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZmpzbG92ZWpobA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="hashmap原理"></p>
+<p>就不自己画图了，盗了一个图，在这里hashCode函数就是用于确定当前key应该放在hash桶里面的位置，这里hash桶可以看成是一个数组，最简单的通过一些取余的方法就能用来确认key应该摆放的位置，而equal函数则是为了与后面的元素之间判断重复</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">&gt; <span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value)</span> </span>&#123;  </div><div class="line">&gt;     <span class="keyword">if</span> (key == <span class="keyword">null</span>)  </div><div class="line">&gt;         <span class="keyword">return</span> putForNullKey(value);  </div><div class="line">&gt;     <span class="keyword">int</span> hash = hash(key);  <span class="comment">//获取当前key的hash值  </span></div><div class="line">&gt;     <span class="keyword">int</span> i = indexFor(hash, table.length);  <span class="comment">//返回在hash桶里面的位置  </span></div><div class="line">&gt;     <span class="keyword">for</span> (Entry&lt;K,V&gt; e = table[i]; e != <span class="keyword">null</span>; e = e.next) &#123;  <span class="comment">//遍历当前hansh桶后面的元素  </span></div><div class="line">&gt;         Object k;  </div><div class="line">&gt;         <span class="keyword">if</span> (e.hash == hash &amp;&amp; ((k = e.key) == key || key.equals(k))) &#123;  <span class="comment">//如果有相同的key，那么需要替换value  </span></div><div class="line">&gt;             V oldValue = e.value;  </div><div class="line">&gt;             e.value = value;  </div><div class="line">&gt;             e.recordAccess(<span class="keyword">this</span>);  </div><div class="line">&gt;             <span class="keyword">return</span> oldValue;  <span class="comment">//返回以前的value  </span></div><div class="line">&gt;         &#125;  </div><div class="line">&gt;     &#125;  </div><div class="line">&gt;   </div><div class="line">&gt;     modCount++;  </div><div class="line">&gt;     addEntry(hash, key, value, i);  <span class="comment">//放入entry  </span></div><div class="line">&gt;     <span class="keyword">return</span> <span class="keyword">null</span>;  </div><div class="line">&gt; &#125;  </div><div class="line">&gt;</div></pre></td></tr></table></figure>
+</blockquote>
+<p>&gt;</p>
+<blockquote>
+<p>区别：</p>
+<p>1）ConcurrentHashMap对整个桶数组进行了分段，而HashMap则没有</p>
+<p>2）ConcurrentHashMap在每一个分段上都用锁进行保护，从而让锁的粒度更精细一些，并发性能更好，而HashMap没有锁机制，不是线程安全的</p>
+<p>强烈推荐这个博客：</p>
+<p>[hashmap原理和concurrentHashMap]: <a href="http://blog.csdn.net/fjslovejhl/article/details/11762721" target="_blank" rel="external">http://blog.csdn.net/fjslovejhl/article/details/11762721</a></p>
+</blockquote>
+</li>
+<li><p>TreeMap、HashMap、LindedHashMap的区别。</p>
+<blockquote>
+<ul>
+<li>hashmap中元素的排列顺序是随机的</li>
+<li>TreeMap按键值排序，默认是按升序排序，也可以指定排序的比较器，当用Iterator 遍历TreeMap时，得到的记录是排过序的。散列或比较函数只能作用于键，与键关联的值不能进行散列或  比较</li>
+<li>LinkedHashMap按照插入元素项的顺序排序</li>
+<li>hashmap、hashtable性能好些，是基于hash；treemap是基于红黑树（一种自平衡二叉查找树）实现的，性能较差</li>
+<li>HashTable，TreeMap不允许null值，key和value都不可以,HashMap允许null值，key和value都可以，但只能由一个null值，因为hashmap如果key值相同，新的key, value将替代旧的</li>
+</ul>
+</blockquote>
+</li>
+<li><p>Collection包结构，与Collections的区别。</p>
+<blockquote>
+<p><img src="https://camo.githubusercontent.com/681cdea2d92098612ae41b92a0cc4d7aa7ad3e58/687474703a2f2f696d672e626c6f672e6373646e2e6e65742f3230313630343038313530353331303935" alt="包结构"></p>
+<p>Collections是提供了对集合进行操作的强大方法的工具类 ，它包含有各种有关集合操作的静态多态方法。此类不能实例化</p>
+</blockquote>
+</li>
+<li><p>try catch finally，try里有return，finally还执行么？</p>
+<blockquote>
+<p>执行，执行时机问题。finally总会执行（除非是System.exit()），正常情况下在try后执行，抛异常时在catche后面执行</p>
+</blockquote>
+</li>
+<li><p>Excption与Error包结构。OOM你遇到过哪些情况，SOF你遇到过哪些情况。</p>
+<blockquote>
+<p>Error类和Exception类都继承自Throwable类,Excption可以是 可被控制(checked) 或 不可控制的(unchecked) ,Error总是 不可控制的(unchecked) .</p>
+<p>OOM(OutOfMemoryError)</p>
+<ul>
+<li>内存中加载的数据量过于庞大，如一次从数据库取出过多数据；</li>
+<li>集合类中有对对象的引用，使用完后未清空，使得JVM不能回收；</li>
+<li>代码中存在死循环或循环产生过多重复的对象实体；</li>
+<li>使用的第三方软件中的BUG；</li>
+<li>启动参数内存值设定的过小；</li>
+</ul>
+<p>SOF(StackOverflow)</p>
+<ul>
+<li>递归调用</li>
+<li>大量循环或死循环</li>
+<li>全局变量是否过多</li>
+<li>数组、List、map数据过大</li>
+</ul>
+</blockquote>
+</li>
+<li><p>Java面向对象的三个特征与含义。</p>
+<blockquote>
+<p>封装、继承、多态</p>
+<ul>
+<li>封装把一个对象的属性私有化，同时提供一些可以被外界访问的属性的方法</li>
+<li>继承是使用已存在的类的定义作为基础建立新类的技术，新类的定义可以增加新的数据或新的功能，也可以用父类的功能，但不能选择性地继承父类</li>
+<li>所谓多态就是指程序中定义的引用变量所指向的具体类型和通过该引用变量发出的方法调用在编程时并不确定，而是在程序运行期间才确定</li>
+</ul>
+</blockquote>
+</li>
+<li><p>Override和Overload的含义去区别。</p>
+<blockquote>
+<ul>
+<li><strong>重载 (Overload)</strong>  表示同一个类中可以有多个名称相同的方法，但这些方法的参数列表各不相同（即参数个数、类型或顺序不同）。</li>
+<li><strong>覆盖 (Override)  </strong>表示子类中的方法可以与父类中的某个方法的名称 和参数完全相同，通过子类创建的实例对象调用这个方法时，将调用子类中的定义方法，这相当于把父类中定义的那 个完全相同的方法给覆盖了</li>
+</ul>
+</blockquote>
+</li>
+<li><p>Interface与abstract类的区别。</p>
+<blockquote>
+<p>抽象类是被用来创建继承层级里子类的模板</p>
+<p>接口是抽象方法的集合。如果一个类实现了某个接口，那么它就继承了这个接口的抽象方法，可以理解为接口是一种特殊的抽象类</p>
+</blockquote>
+</li>
+<li><p>Static class 与non static class的区别。</p>
+<blockquote>
+<p>静态内部类和非静态内部类</p>
+<p>非静态内部类能够访问外部类的静态和非静态成员。</p>
+<p>静态类不能访问外部类的非静态成员。他只能访问外部类的静态成员</p>
+</blockquote>
+</li>
+<li><p>java多态的实现原理。</p>
+<blockquote>
+<p>多态就是指程序中定义的引用变量所指向的具体类型和通过该引用变量发出的方法调用在编程时并不确定，而是在程序运行期间才确定，即一个引用变量倒底会指向哪个类的实例对象，该引用变量发出的方法调用到底是哪个类中实现的方法，必须在由程序运行期间才能决定。因为在程序运行时才确定具体的类，这样，不用修改源程序代码，就可以让引用变量绑定到各种不同的类实现上，从而导致该引用调用的具体方法随之改变，即不修改程序代码就可以改变程序运行时所绑定的具体代码，让程序可以选择多个运行状态，这就是多态性。</p>
+<p>​</p>
+<p>指向子类的父类引用由于向上转型了，它只能访问父类中拥有的方法和属性，而对于子类中存在而父类中不存在的方法，该引用是不能使用的，尽管是重载该方法。若子类重写了父类中的某些方法，在调用该些方法的时候，必定是使用子类中定义的这些方法（动态连接、动态调用）。</p>
+<p>[多态经典解释看这里]: <a href="http://www.cnblogs.com/chenssy/p/3372798.html" target="_blank" rel="external">http://www.cnblogs.com/chenssy/p/3372798.html</a></p>
+</blockquote>
+</li>
+<li><p>实现多线程的几种方法：</p>
+<blockquote>
+<p>Thread与Runable</p>
+<p><strong>使用ExecutorService、Callable、Future实现有返回结果的多线程。</strong>（实现Callable接口）</p>
+</blockquote>
+</li>
+<li><p>线程同步的方法</p>
+<blockquote>
+<p>sychronized、lock、reentrantLock等。</p>
+</blockquote>
+</li>
+<li><p>锁的等级：方法锁、对象锁、类锁。</p>
+<blockquote>
+<p>synchronized修饰方法时候是方法锁，<strong>方法一旦执行，就独占该锁</strong>，直到从该方法返回时才将锁释放</p>
+<p>当一个对象中有synchronized method或synchronized block的时候调用此对象的同步方法或进入其同步区域时，就必须先获得对象锁。如果此对象的对象锁已被其他调用者占用</p>
+<p>由于一个class不论被实例化多少次，其中的静态方法和静态变量在内存中都<strong>只有一份</strong>。所以，一旦一个静态的方法被申明为synchronized。此类所有的实例化对象在调用此方法，共用同一把锁，我们称之为类锁</p>
+</blockquote>
+</li>
+<li><p>写出生产者消费者模式。</p>
+<blockquote>
+<p>最简单的是使用LinkedBlockingQueue<strong>阻塞队列方法</strong>，他提供2个方法</p>
+<p>put()方法：类似于我们上面的生产者线程，容量达到最大时，自动阻塞。</p>
+<p>take()方法：类似于我们上面的消费者线程，容量为0时，自动阻塞。</p>
+</blockquote>
+</li>
+<li><p>ThreadLocal的设计理念与作用。</p>
+<blockquote>
+<p>ThreadLocal是Java语言提供的用于支持线程局部变量的类。所谓的线程局部变量，就是仅仅只能被本线程访问，不能在线程之间进行共享访问的变量(每个线程一个拷贝)</p>
+</blockquote>
+</li>
+<li><p>ThreadPool用法与优势。</p>
+<blockquote>
+<p>直接new一个，然后把你要共享的变量set进去。源码分析：既然ThreadLocal里面有一个Map也是用Entry来存储对象，这里我们看到Entry集成了WeakReference类，泛型声明了ThreadLocal，即每一个Entry对象都保留了对 ThreadLocal实例的弱引用，之所以这么干的原因是，线程在结束之后需要将ThreadLocal实例从map中remove调，以便回收内存空间</p>
+</blockquote>
+</li>
+<li><p>Concurrent包里的其他东西</p>
+<blockquote>
+<p>BlockingQueue、ArrayBlockingQueue（有界缓存，FIFO，支持公平访问策略）</p>
+<p>LinkedBlockingQueue（无界）</p>
+</blockquote>
+</li>
+<li><p>wait()和sleep()的区别。</p>
+<blockquote>
+<p>Thread.sleep不会导致锁行为的改变，如果当前线程是拥有锁的，那么Thread.sleep不会让线程释放锁，wait是object的一个方法，会释放锁</p>
+</blockquote>
+</li>
+<li><p>foreach与正常for循环效率对比。</p>
+<blockquote>
+<p>for效率最高，foreach内部是使用迭代器实现</p>
+</blockquote>
+</li>
+<li><p>Java IO与NIO。</p>
+<blockquote>
+<p>Java IO的各种流是阻塞的。这意味着，当一个线程调用read() 或 write()时，该线程被阻塞，直到有一些数据被读取，或数据完全写入。该线程在此期间不能再干任何事情了。 Java NIO的非阻塞模式，使一个线程从某通道发送请求读取数据，但是它仅能得到目前可用的数据，如果目前没有数据可用时，就什么都不会获取。而不是保持线程阻塞，所以直至数据变的可以读取之前，该线程可以继续做其他的事情</p>
+</blockquote>
+</li>
+<li><p>反射的作用与原理，反射创建类的3种实例是什么</p>
+<blockquote>
+<p>Java的反射机制是在编译并不确定是哪个类被加载了，而是在程序运行的时候才加载、探知、自审</p>
+<p>对Object进行反射，对类名（全限定名）进行反射，对class文件进行反射</p>
+</blockquote>
+</li>
+<li><p>泛型常用特点，List<string>能否转为List<object>。</object></string></p>
+<blockquote>
+<p>可以，用泛型就可以在编译器转换过来，如果强制转换会丢失了String的特性</p>
+</blockquote>
+</li>
+<li><p>解析XML的几种方式的原理与特点：DOM、SAX、PULL。</p>
+<blockquote>
+<p>DOM通过树形结构存取xml文档</p>
+<p>SAX解析xml是<strong>基于事件流的处理方式的</strong>适合移动端</p>
+<p>SAX解析器的工作方式是自动将事件推入注册的事件处理器进行处理</p>
+</blockquote>
+</li>
+<li><p>Java与C++对比。</p>
+<blockquote>
+<p>Java是完全面向对象的，所有方法都必须写在类中，java没有指针</p>
+</blockquote>
+</li>
+<li><p>Java1.7与1.8新特性。</p>
+<blockquote>
+<p>lambda表达式，函数式编程</p>
+</blockquote>
+</li>
+<li><p>设计模式有哪些</p>
+<blockquote>
+<p>单例、工厂、适配器、责任链、观察者、代理模式等等</p>
+</blockquote>
+</li>
+<li><p>JNI的使用。</p>
+<blockquote>
+<p>NI全称是<code>Java Native Interface</code>是在JAVA和Native层（包括但不限于C/C++）相互调用的接口规范</p>
+<ol>
+<li>写一个Java类，在其中声明对应要调用的native方法，用<code>native</code>关键字修饰。 比如<code>private static native int native_newInstance();</code></li>
+<li>通过<code>javah</code>命令生成java类对应的C/C++头文件。<code>javah -encoding utf-8 -cp src com.young.soundtouch.SoundTouch</code></li>
+<li>在C/C++中实现头文件中声明的函数</li>
+<li>编译C/C++代码为动态库（Windows中的dll，linux(Android)中的so，MAC OSX中的dylib）。</li>
+<li>在java代码中加载动态库，即可像调用Java方法一样，调用到native函数。</li>
+</ol>
+</blockquote>
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2017/03/01/JAVA面试题之基础篇/" data-id="cj35rl38f001xdcj3shihsjis" class="article-share-link" data-share="baidu" data-title="JAVA面试题之基础篇">分享到</a>
+      
+
+      
+        <a href="http://yoursite.com/2017/03/01/JAVA面试题之基础篇/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/面试题/">面试题</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/03/01/如何找到占用CPU和内存最高的线程/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          如何找到占用CPU和内存最高的线程
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/02/28/Logstash学习笔记/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">Logstash学习经验</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+  <section id="comments">
+    <div id="ds-thread" class="ds-thread" data-thread-key="2017/03/01/JAVA面试题之基础篇/" data-title="JAVA面试题之基础篇" data-url="http://yoursite.com/2017/03/01/JAVA面试题之基础篇/"></div>
+  </section>
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/05/26/高并发的核心技术-幂等的实现方案/">高并发的核心技术-幂等的实现方案</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/面试大全/">初级面试必备教程</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/自己收集的面试题/">自己收集的面试题</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/自定义注解/">自定义注解</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/耳鸣疗法/">耳鸣疗法</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://arvinxiang.com" target="_blank">主题作者</a>
+          </li>
+        
+          <li>
+            <a href="http://reqianduan.com" target="_blank">热前端</a>
+          </li>
+        
+          <li>
+            <a href="http://yuancheng.work" target="_blank">远程.work</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!-- 多说公共js代码 start -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"reqianduan"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共js代码 end -->
+
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+</div>
+</body>
+</html>

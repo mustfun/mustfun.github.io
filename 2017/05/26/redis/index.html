@@ -1,0 +1,343 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>redis安装配置 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="本文详细介绍redis单机单实例安装与配置，服务及开机自启动。如有不对的地方，欢迎大家拍砖o(∩_∩)o（以下配置基于CentOS release 6.5 Final， redis版本3.0.2 [redis版本号中间位是偶数的是稳定版，奇数的为非稳定版]）">
+<meta name="keywords" content="reids">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis安装配置">
+<meta property="og:url" content="http://yoursite.com/2017/05/26/redis/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="本文详细介绍redis单机单实例安装与配置，服务及开机自启动。如有不对的地方，欢迎大家拍砖o(∩_∩)o（以下配置基于CentOS release 6.5 Final， redis版本3.0.2 [redis版本号中间位是偶数的是稳定版，奇数的为非稳定版]）">
+<meta property="og:updated_time" content="2017-01-10T11:41:20.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="redis安装配置">
+<meta name="twitter:description" content="本文详细介绍redis单机单实例安装与配置，服务及开机自启动。如有不对的地方，欢迎大家拍砖o(∩_∩)o（以下配置基于CentOS release 6.5 Final， redis版本3.0.2 [redis版本号中间位是偶数的是稳定版，奇数的为非稳定版]）">
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="yoursite.com">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-redis" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/05/26/redis/" class="article-date">
+  <time datetime="2017-05-26T11:14:31.015Z" itemprop="datePublished">2017-05-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      redis安装配置
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文详细介绍redis单机单实例安装与配置，服务及开机自启动。如有不对的地方，欢迎大家拍砖o(∩_∩)o<br>（以下配置基于CentOS release 6.5 Final， redis版本3.0.2 [redis版本号中间位是偶数的是稳定版，奇数的为非稳定版]）</p>
+<a id="more"></a>
+<p>一．安装redis<br>1)     下载redis安装包<br>可去官网<a href="http://redis.io" target="_blank" rel="external">http://redis.io</a> ，也可通过wget命令，<br>wget <a href="http://download.redis.io/redis-stable.tar.gz" target="_blank" rel="external">http://download.redis.io/redis-stable.tar.gz</a></p>
+<p>2)     解压<br>tar –zxvf redis-stable.tar.gz</p>
+<p>3)     编译、安装<br>cd redis-stable</p>
+<p>make<br>如果提示gcc command不识别，请自行安装gcc;<br>如果提示couldn’t execute tcl : no such file or dicrectory，请自行安装tcl;<br>如果提示</p>
+<p>请执行make distclean，然后再make</p>
+<p>Make成功之后，会在src目录下多出一些文件，如下</p>
+<p>可手动拷贝redis-server、redis-cli、redis-check-aof、redis-check-dump等至/usr/local/bin目录下，也可执行make install，此处执行make install</p>
+<p>可查看，/usr/local/bin下已有这些文件。<br>注意：若此时执行redis-server –v (查看版本命令)，若提示redis-server command not found，则需要将/usr/local/bin目录加到环境变量，如何添加，此处不做详细介绍，可查看修改/etc/profile，(查看环境变量命令：echo $PATH)<br>正常如下</p>
+<p>至此，redis安装完成，接着配置。</p>
+<p>二．修改配置文件.conf<br>1)     创建配置文件目录，dump file 目录，进程pid目录，log目录等<br>配置文件一般放在/etc/下，创建redis目录<br>cd /etc/<br>mkdir redis</p>
+<p>ll 查看创建的redis目录<br>~<br>dump file、进程pid、log目录等，一般放在/var/目录下，<br>cd /var/<br>mkdir redis<br>cd redis<br>mkdir data log run</p>
+<p>至此，目录创建完毕<br>2)     修改配置文件，配置参数<br>首先拷贝解压包下的redis.conf文件至/etc/redis</p>
+<p>查看/etc/redis/redis.conf<br>cd /etc/redis/<br>ll</p>
+<p>打开redis.conf文件<br>修改端口(默认6379)</p>
+<p>修改pid目录为新建目录</p>
+<p>修改dump目录为新建目录</p>
+<p>修改log存储目录为新建目录</p>
+<p>3)     持久化<br>默认rdb，可选择是否开启aof，若开启，修改配置文件appendonly<br>4)     启动redis，查看各目录下文件</p>
+<p>查看进程</p>
+<p>redis已启动<br>查看dump, log, pid等</p>
+<p>发现只有日志，没有dump和pid信息，是因为当前redis服务仍然是console模式运行的，且没有数据存储操作<br>停止redis服务，修改配置文件使得redis在background运行</p>
+<p>改成yes，保存，重启redis服务<br>查看pid信息，如下</p>
+<p>查看dump信息</p>
+<p>若配置了aof持久化方式，data目录下还会有aof的相关文件<br>5)     客户端连接redis</p>
+<p>默认端口6379<br>6)     至此，redis基础配置完毕，若有其他相关配置调整，可查找文档再修改</p>
+<p>三．服务及开机自启动<br>1)     创建redis启动脚本<br>拷贝解压包下utils下redis启动脚本至/etc/init.d/<br>cp redis_init_script /etc/init.d/<br>修改脚本名称(也可不修改)为redis<br>查看ll</p>
+<p>修改脚本pid及conf路径为实际路径</p>
+<p>生产环境下，配置时，配置文件、pid等最好加上端口标识，以便区分，如</p>
+<p>保存<br>退出<br>至此，在/etc/init.d/目录下，已经可以通过service redis start/stop 命令启动和关闭redis</p>
+<p>若在其他目录下，不能够使用这2个命令，请继续配置2)，添加权限<br>2)     给启动脚本添加权限<br>chmod +x /etc/init.d/redis</p>
+<p>实际命令，根据目录的不同，会不一样<br>相应的删除权限是<br>chmod –x /etc/init.d/redis<br>如果需要在开机的时候，redis服务自动启动，可继续3)<br>3)     设置自启动<br>chkconfig redis on<br>如果运行报错，提示</p>
+<p>是因为没有在启动脚本里加入redis启动优先级信息，可添加如下</p>
+<p>再次执行chkconfig redis on，成功</p>
+<p>至此，自启动配置完毕</p>
+<p>如有不对的地方，欢迎大家拍砖o(∩_∩)o</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2017/05/26/redis/" data-id="cj35rl37n0014dcj346osee2f" class="article-share-link" data-share="baidu" data-title="redis安装配置">分享到</a>
+      
+
+      
+        <a href="http://yoursite.com/2017/05/26/redis/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/reids/">reids</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/05/26/RocketMq/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          RocketMq小解
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/05/26/netty/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">netty相关</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+  <section id="comments">
+    <div id="ds-thread" class="ds-thread" data-thread-key="2017/05/26/redis/" data-title="redis安装配置" data-url="http://yoursite.com/2017/05/26/redis/"></div>
+  </section>
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/05/26/高并发的核心技术-幂等的实现方案/">高并发的核心技术-幂等的实现方案</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/面试大全/">初级面试必备教程</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/自己收集的面试题/">自己收集的面试题</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/自定义注解/">自定义注解</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/耳鸣疗法/">耳鸣疗法</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://arvinxiang.com" target="_blank">主题作者</a>
+          </li>
+        
+          <li>
+            <a href="http://reqianduan.com" target="_blank">热前端</a>
+          </li>
+        
+          <li>
+            <a href="http://yuancheng.work" target="_blank">远程.work</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!-- 多说公共js代码 start -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"reqianduan"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共js代码 end -->
+
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+</div>
+</body>
+</html>

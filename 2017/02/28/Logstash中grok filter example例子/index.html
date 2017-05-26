@@ -1,0 +1,369 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Logstash中grok filter example例子 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="一、Logstash 本文适合有部分Logstash经验的人阅读，如果不懂Logstash是什么，请看我另外一篇博文  1、filtersLogstash核心组成部分就包括filters，这是个过滤器。一般日志中还是有很多有用信息的，利用Logstash的filter机制可以将这些信息抽取出来 1）、JSON Filter​          这种方式对于日志数据源是json格式的比较有效，这里我">
+<meta name="keywords" content="大数据">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Logstash中grok filter example例子">
+<meta property="og:url" content="http://yoursite.com/2017/02/28/Logstash中grok filter example例子/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="一、Logstash 本文适合有部分Logstash经验的人阅读，如果不懂Logstash是什么，请看我另外一篇博文  1、filtersLogstash核心组成部分就包括filters，这是个过滤器。一般日志中还是有很多有用信息的，利用Logstash的filter机制可以将这些信息抽取出来 1）、JSON Filter​          这种方式对于日志数据源是json格式的比较有效，这里我">
+<meta property="og:updated_time" content="2017-02-28T10:34:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Logstash中grok filter example例子">
+<meta name="twitter:description" content="一、Logstash 本文适合有部分Logstash经验的人阅读，如果不懂Logstash是什么，请看我另外一篇博文  1、filtersLogstash核心组成部分就包括filters，这是个过滤器。一般日志中还是有很多有用信息的，利用Logstash的filter机制可以将这些信息抽取出来 1）、JSON Filter​          这种方式对于日志数据源是json格式的比较有效，这里我">
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="yoursite.com">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-Logstash中grok filter example例子" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/02/28/Logstash中grok filter example例子/" class="article-date">
+  <time datetime="2017-02-27T16:00:00.000Z" itemprop="datePublished">2017-02-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Logstash中grok filter example例子
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="一、Logstash"><a href="#一、Logstash" class="headerlink" title="一、Logstash"></a>一、Logstash</h1><blockquote>
+<p>本文适合有部分Logstash经验的人阅读，如果不懂Logstash是什么，请看我另外一篇博文</p>
+</blockquote>
+<h3 id="1、filters"><a href="#1、filters" class="headerlink" title="1、filters"></a>1、filters</h3><p>Logstash核心组成部分就包括filters，这是个过滤器。一般日志中还是有很多有用信息的，利用Logstash的filter机制可以将这些信息抽取出来</p>
+<h4 id="1）、JSON-Filter"><a href="#1）、JSON-Filter" class="headerlink" title="1）、JSON Filter"></a>1）、JSON Filter</h4><p>​          这种方式对于日志数据源是json格式的比较有效，这里我不多讲，一般人日志不会特意弄成json格式的吧…</p>
+<a id="more"></a>
+<h4 id="2-、Grok-Filter"><a href="#2-、Grok-Filter" class="headerlink" title="2)、Grok Filter"></a>2)、Grok Filter</h4><pre><code>这种方式是我今天重点记录的，Grok是一种数据格式化工具，利用它就可以进行定制我们的格式化请求了。
+</code></pre><p>​    我们先来看一段实例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">input &#123;stdin&#123;&#125;&#125;</div><div class="line">filter&#123;</div><div class="line">    grok &#123;</div><div class="line">        match =&gt; &#123;</div><div class="line">           "message"=&gt;"20%&#123;YEAR:year&#125;-%&#123;MONTHNUM:month&#125;-%&#123;MONTHDAY:day&#125; %&#123;HOUR:hour&#125;:?%&#123;MINUTE:minutes&#125;(?::?%&#123;SECOND:second&#125;) \[%&#123;LOGLEVEL:level&#125;\] appname._log%&#123;NAGIOSTIME:linenumber&#125;: (.*)"</div><div class="line">        &#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">output &#123;stdout&#123;&#125;&#125;</div></pre></td></tr></table></figure>
+<p>​    input和output我省略了，这段代码重点看的是filter部分。其实就是一些类似正则表达式的东西，然后去匹配我们的log，然后转成一个个json，然后发给output，output我设置的es。</p>
+<h5 id="看了上面的匹配例子，大概心里有个底，长什么样子，下面来解析"><a href="#看了上面的匹配例子，大概心里有个底，长什么样子，下面来解析" class="headerlink" title="看了上面的匹配例子，大概心里有个底，长什么样子，下面来解析"></a><strong>看了上面的匹配例子，大概心里有个底，长什么样子，下面来解析</strong></h5><ul>
+<li><p>牢记，每一个小表达式的样子就是<code>%{IP:client}</code>这种</p>
+<blockquote>
+<p>辣么IP是什么？client是什么？IP是一种模式的名称，能够自动去匹配你log中的部分，这里IP顾名思义，看到了ip地址如127.0.0.1就会给这一条log起个key值，key是client，所以json里面就会多一条数据，多一条client=&gt;127.0.0.1这样的</p>
+</blockquote>
+</li>
+<li><p>现有的模式我去哪里找？</p>
+<blockquote>
+<p>这个问题问得比较好，官方其实是支持很多的，让我们来看看<a href="https://github.com/elastic/logstash/tree/v1.4.2/patterns" target="_blank" rel="external">支持列表点击这里</a></p>
+<p>上面的这个是Logstash1.4.2支持的，为什么没有新版的呢？？？这个问题下面回答</p>
+</blockquote>
+</li>
+<li><p>为什么没有新版的Logstash支持的patterns</p>
+<blockquote>
+<p><strong>在新版本的logstash里面，pattern目录已经为空，最后一个commit提示core patterns将会由logstash-patterns-core gem来提供，该目录可供用户存放自定义patterns</strong>，啥意思？也就是说用户可以自定义一些pattern然后保存在本地</p>
+</blockquote>
+</li>
+<li><p>怎么自定义</p>
+<blockquote>
+<p>这里先留着，官方文档有，以后补充</p>
+</blockquote>
+</li>
+<li><p>这么麻烦，还有没有现成的？</p>
+<blockquote>
+<p>答案是有，很多人帮你封装好了，<a href="https://github.com/logstash-plugins/logstash-patterns-core" target="_blank" rel="external">地址在这里</a> ,这个是别人整理好的一些pattern，你可以按照他的安装方法，然后直接调用，里面有一些非常实用的表达式，比如可以直接解析tomcat打印出来的日志，直接一个表达式就搞定<code>TOMCATLOG</code></p>
+</blockquote>
+</li>
+</ul>
+<h5 id="下面我们来看一下grok的实例"><a href="#下面我们来看一下grok的实例" class="headerlink" title="下面我们来看一下grok的实例"></a><strong>下面我们来看一下grok的实例</strong></h5><ol>
+<li><p>我有一段thinkphp这样的日志：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">2016-12-19 14:36:26,298 [INFO] appname._log[95]: send sms use channel :6 </div><div class="line">2016-12-19 14:36:26,338 [INFO] appname._log[95]: send email use channel :4 </div><div class="line">2016-12-19 14:36:26,498 [INFO] appname._log[95]: send email use channel :6</div></pre></td></tr></table></figure>
+<p>首先要分析一下日志结构，才能写出相应的解析代码</p>
+<p>日志结构：日期+[日志级别]+appname._log[行号]：详情</p>
+<p>日期用年月日表示<code>20%{YEAR:year}-%{MONTHNUM:month}-%{MONTHDAY:day} %{HOUR:hour}:?%{MINUTE:minutes}(?::?%{SECOND:second})</code></p>
+<p>日志级别：<code>%{LOGLEVEL:level}</code></p>
+<p>详情：  (.*) 直接这个表达式搞定</p>
+<p>其他特殊符号：比如说逗号，- 号等，我们可以原样写出即可，部分可能需要转义</p>
+<p>所以整体上面是这样的</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">match =&gt; &#123;</div><div class="line">           "message"=&gt;"20%&#123;YEAR:year&#125;-%&#123;MONTHNUM:month&#125;-%&#123;MONTHDAY:day&#125; %&#123;HOUR:hour&#125;:?%&#123;MINUTE:minutes&#125;(?::?%&#123;SECOND:second&#125;) \[%&#123;LOGLEVEL:level&#125;\] appname._log%&#123;NAGIOSTIME:linenumber&#125;: (.*)"</div><div class="line">        &#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>我有一段tomcat的日志</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">2016-12-28 14:55:05,062 INFO |XmlWebApplicationContext                |Closing Root WebApplicationContext: startup date [Wed Dec 28 14:46:44 CST 2016]; root of context hierarchy</div><div class="line">2016-12-28 14:55:06,062 INFO |XmlWebApplicationContext                |Closing Root WebApplicationContext: startup date [Wed Dec 28 14:46:44 CST 2016]; root of context hierarchy</div><div class="line">2016-12-28 14:55:07,062 INFO |XmlWebApplicationContext                |Closing Root WebApplicationContext: startup date [Wed Dec 28 14:46:44 CST 2016]; root of context hierarchy</div><div class="line">2016-12-28 14:55:08,062 INFO |XmlWebApplicationContext                |Closing Root WebApplicationContext: startup date [Wed Dec 28 14:46:44 CST 2016]; root of context hierarchy</div></pre></td></tr></table></figure>
+<p>同样分析结构，如果安装了上面说的那个插件的话，就可以直接<code>match =&gt; {&quot;message&quot; =&gt; &quot;%{TOMCATLOG}&quot;}</code>这样一句话搞定，</p>
+</li>
+<li><p>我有一段nginx的日志</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">55.3.244.1 GET /index.html 15824 0.043</div></pre></td></tr></table></figure>
+<p>表达式可以像下面那样写</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">%&#123;IP:client&#125; %&#123;WORD:method&#125; %&#123;URIPATHPARAM:request&#125; %&#123;NUMBER:bytes&#125; %&#123;NUMBER:duration&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>验证你写的表达式是否正确</p>
+<p>可以到这个<a href="http://grokdebug.herokuapp.com/" target="_blank" rel="external">验证网站</a>验证一下你写的是否正确</p>
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2017/02/28/Logstash中grok filter example例子/" data-id="cj35rl36f0003dcj3tv9cs7r1" class="article-share-link" data-share="baidu" data-title="Logstash中grok filter example例子">分享到</a>
+      
+
+      
+        <a href="http://yoursite.com/2017/02/28/Logstash中grok filter example例子/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/大数据/">大数据</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/02/28/Logstash学习笔记/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          Logstash学习经验
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/02/24/按位逻辑操作符那些事儿/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">按位逻辑操作符那些事儿</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+  <section id="comments">
+    <div id="ds-thread" class="ds-thread" data-thread-key="2017/02/28/Logstash中grok filter example例子/" data-title="Logstash中grok filter example例子" data-url="http://yoursite.com/2017/02/28/Logstash中grok filter example例子/"></div>
+  </section>
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/05/26/高并发的核心技术-幂等的实现方案/">高并发的核心技术-幂等的实现方案</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/面试大全/">初级面试必备教程</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/自己收集的面试题/">自己收集的面试题</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/自定义注解/">自定义注解</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/耳鸣疗法/">耳鸣疗法</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://arvinxiang.com" target="_blank">主题作者</a>
+          </li>
+        
+          <li>
+            <a href="http://reqianduan.com" target="_blank">热前端</a>
+          </li>
+        
+          <li>
+            <a href="http://yuancheng.work" target="_blank">远程.work</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!-- 多说公共js代码 start -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"reqianduan"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共js代码 end -->
+
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+</div>
+</body>
+</html>

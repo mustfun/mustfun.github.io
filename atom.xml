@@ -1,0 +1,1520 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Hexo</title>
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://yoursite.com/"/>
+  <updated>2017-01-10T11:21:46.000Z</updated>
+  <id>http://yoursite.com/</id>
+  
+  <author>
+    <name>John Doe</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>高并发的核心技术-幂等的实现方案</title>
+    <link href="http://yoursite.com/2017/05/26/%E9%AB%98%E5%B9%B6%E5%8F%91%E7%9A%84%E6%A0%B8%E5%BF%83%E6%8A%80%E6%9C%AF-%E5%B9%82%E7%AD%89%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88/"/>
+    <id>http://yoursite.com/2017/05/26/高并发的核心技术-幂等的实现方案/</id>
+    <published>2017-05-26T11:14:31.072Z</published>
+    <updated>2017-01-10T11:21:46.000Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="高并发的核心技术-幂等的实现方案"><a href="#高并发的核心技术-幂等的实现方案" class="headerlink" title="高并发的核心技术-幂等的实现方案"></a>高并发的核心技术-幂等的实现方案</h3><p>一、背景<br>我们实际系统中有很多操作，是不管做多少次，都应该产生一样的效果或返回一样的结果。<br>例如： </p>
+<ol>
+<li>前端重复提交选中的数据，应该后台只产生对应这个数据的一个反应结果。 </li>
+<li>我们发起一笔付款请求，应该只扣用户账户一次钱，当遇到网络重发或系统bug重发，也应该只扣一次钱； </li>
+<li>发送消息，也应该只发一次，同样的短信发给用户，用户会哭的； </li>
+<li>创建业务订单，一次业务请求只能创建一个，创建多个就会出大问题。 </li>
+</ol>
+<p>等等很多重要的情况，这些逻辑都需要幂等的特性来支持。 </p>
+<a id="more"></a>
+<p>二、幂等性概念<br>幂等（idempotent、idempotence）是一个数学与计算机学概念，常见于抽象代数中。 </p>
+<p>在编程中.一个幂等操作的特点是其任意多次执行所产生的影响均与一次执行的影响相同。幂等函数，或幂等方法，是指可以使用相同参数重复执行，并能获得相同结果的函数。这些函数不会影响系统状态，也不用担心重复执行会对系统造成改变。例如，“getUsername()和setTrue()”函数就是一个幂等函数. </p>
+<p>更复杂的操作幂等保证是利用唯一交易号(流水号)实现. </p>
+<p>我的理解：幂等就是一个操作，不论执行多少次，产生的效果和返回的结果都是一样的 </p>
+<p>三、技术方案 </p>
+<ol>
+<li><p>查询操作<br>查询一次和查询多次，在数据不变的情况下，查询结果是一样的。select是天然的幂等操作 </p>
+</li>
+<li><p>删除操作<br>删除操作也是幂等的，删除一次和多次删除都是把数据删除。(注意可能返回结果不一样，删除的数据不存在，返回0，删除的数据多条，返回结果多个) </p>
+</li>
+</ol>
+<p>3.唯一索引，防止新增脏数据<br>比如：支付宝的资金账户，支付宝也有用户账户，每个用户只能有一个资金账户，怎么防止给用户创建资金账户多个，那么给资金账户表中的用户ID加唯一索引，所以一个用户新增成功一个资金账户记录 </p>
+<p>要点：<br>唯一索引或唯一组合索引来防止新增数据存在脏数据<br>（当表存在唯一索引，并发时新增报错时，再查询一次就可以了，数据应该已经存在了，返回结果即可） </p>
+<ol>
+<li>token机制，防止页面重复提交<br>业务要求：<br>页面的数据只能被点击提交一次<br>发生原因：<br>由于重复点击或者网络重发，或者nginx重发等情况会导致数据被重复提交<br>解决办法：<br>集群环境：采用token加redis（redis单线程的，处理需要排队）<br>单JVM环境：采用token加redis或token加jvm内存<br>处理流程： </li>
+<li>数据提交前要向服务的申请token，token放到redis或jvm内存，token有效时间 </li>
+<li>提交后后台校验token，同时删除token，生成新的token返回<br>token特点：<br>要申请，一次有效性，可以限流 </li>
+</ol>
+<p>注意：redis要用删除操作来判断token，删除成功代表token校验通过，如果用select+delete来校验token，存在并发问题，不建议使用 </p>
+<ol>
+<li><p>悲观锁<br>获取数据的时候加锁获取<br>select * from table_xxx where id=’xxx’ for update;<br>注意：id字段一定是主键或者唯一索引，不然是锁表，会死人的<br>悲观锁使用时一般伴随事务一起使用，数据锁定时间可能会很长，根据实际情况选用 </p>
+</li>
+<li><p>乐观锁<br>乐观锁只是在更新数据那一刻锁表，其他时间不锁表，所以相对于悲观锁，效率更高。 </p>
+</li>
+</ol>
+<p>乐观锁的实现方式多种多样可以通过version或者其他状态条件： </p>
+<ol>
+<li>通过版本号实现<br>update table_xxx set name=#name#,version=version+1 where version=#version#<br>如下图(来自网上)： </li>
+</ol>
+<ol>
+<li>通过条件限制<br>update table_xxx set avai_amount=avai_amount-#subAmount# where avai_amount-#subAmount# &gt;= 0<br>要求：quality-#subQuality# &gt;= ，这个情景适合不用版本号，只更新是做数据安全校验，适合库存模型，扣份额和回滚份额，性能更高 </li>
+</ol>
+<p>注意：乐观锁的更新操作，最好用主键或者唯一索引来更新,这样是行锁，否则更新时会锁表，上面两个sql改成下面的两个更好<br>update table_xxx set name=#name#,version=version+1 where id=#id# and version=#version#<br>update table_xxx set avai_amount=avai_amount-#subAmount# where id=#id# and avai_amount-#subAmount# &gt;= 0 </p>
+<ol>
+<li>分布式锁<br>还是拿插入数据的例子，如果是分布是系统，构建全局唯一索引比较困难，例如唯一性的字段没法确定，这时候可以引入分布式锁，通过第三方的系统(redis或zookeeper)，在业务系统插入数据或者更新数据，获取分布式锁，然后做操作，之后释放锁，这样其实是把多线程并发的锁的思路，引入多多个系统，也就是分布式系统中得解决思路。 </li>
+</ol>
+<p>要点：某个长流程处理过程要求不能并发执行，可以在流程执行之前根据某个标志(用户ID+后缀等)获取分布式锁，其他流程执行时获取锁就会失败，也就是同一时间该流程只能有一个能执行成功，执行完成后，释放分布式锁(分布式锁要第三方系统提供) </p>
+<ol>
+<li><p>select + insert<br>并发不高的后台系统，或者一些任务JOB，为了支持幂等，支持重复执行，简单的处理方法是，先查询下一些关键数据，判断是否已经执行过，在进行业务处理，就可以了<br>注意：核心高并发流程不要用这种方法 </p>
+</li>
+<li><p>状态机幂等<br>在设计单据相关的业务，或者是任务相关的业务，肯定会涉及到状态机(状态变更图)，就是业务单据上面有个状态，状态在不同的情况下会发生变更，一般情况下存在有限状态机，这时候，如果状态机已经处于下一个状态，这时候来了一个上一个状态的变更，理论上是不能够变更的，这样的话，保证了有限状态机的幂等。 </p>
+</li>
+</ol>
+<p>注意：订单等单据类业务，存在很长的状态流转，一定要深刻理解状态机，对业务系统设计能力提高有很大帮助 </p>
+<ol>
+<li>对外提供接口的api如何保证幂等<br>如银联提供的付款接口：需要接入商户提交付款请求时附带：source来源，seq序列号<br>source+seq在数据库里面做唯一索引，防止多次付款，(并发时，只能处理一个请求) </li>
+</ol>
+<p>重点：<br>对外提供接口为了支持幂等调用，接口有两个字段必须传，一个是来源source，一个是来源方序列号seq，这个两个字段在提供方系统里面做联合唯一索引，这样当第三方调用时，先在本方系统里面查询一下，是否已经处理过，返回相应处理结果；没有处理过，进行相应处理，返回结果。注意，为了幂等友好，一定要先查询一下，是否处理过该笔业务，不查询直接插入业务系统，会报错，但实际已经处理了。 </p>
+<p>总结：<br>幂等性应该是合格程序员的一个基因，在设计系统时，是首要考虑的问题，尤其是在像支付宝，银行，互联网金融公司等涉及的都是钱的系统，既要高效，数据也要准确，所以不能出现多扣款，多打款等问题，这样会很难处理，用户体验也不好 </p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;高并发的核心技术-幂等的实现方案&quot;&gt;&lt;a href=&quot;#高并发的核心技术-幂等的实现方案&quot; class=&quot;headerlink&quot; title=&quot;高并发的核心技术-幂等的实现方案&quot;&gt;&lt;/a&gt;高并发的核心技术-幂等的实现方案&lt;/h3&gt;&lt;p&gt;一、背景&lt;br&gt;我们实际系统中有很多操作，是不管做多少次，都应该产生一样的效果或返回一样的结果。&lt;br&gt;例如： &lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;前端重复提交选中的数据，应该后台只产生对应这个数据的一个反应结果。 &lt;/li&gt;
+&lt;li&gt;我们发起一笔付款请求，应该只扣用户账户一次钱，当遇到网络重发或系统bug重发，也应该只扣一次钱； &lt;/li&gt;
+&lt;li&gt;发送消息，也应该只发一次，同样的短信发给用户，用户会哭的； &lt;/li&gt;
+&lt;li&gt;创建业务订单，一次业务请求只能创建一个，创建多个就会出大问题。 &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;等等很多重要的情况，这些逻辑都需要幂等的特性来支持。 &lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="高并发" scheme="http://yoursite.com/tags/%E9%AB%98%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>初级面试必备教程</title>
+    <link href="http://yoursite.com/2017/05/26/%E9%9D%A2%E8%AF%95%E5%A4%A7%E5%85%A8/"/>
+    <id>http://yoursite.com/2017/05/26/面试大全/</id>
+    <published>2017-05-26T11:14:31.067Z</published>
+    <updated>2017-01-10T11:18:38.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>## </p>
+<p>##一、初级面试必备</p>
+<p>####（1）基础部分    </p>
+<ul>
+<li>1、Hmac加密算法</li>
+</ul>
+<p>user_info表被锁住，有哪些数据库操作会锁表，因为只有update、delete这些操作会锁表，所以打算整改这些语句，有子查询的全部整改</p>
+<a id="more"></a>
+<ul>
+<li>日志表数据过大，查询起来比较慢，你如何处理（分表？归档？solr ? 分次查询）</li>
+<li>ConcurrentMap<thread, object="">来保存多线程里面对象</thread,></li>
+<li>如何验证bean参数是否为空（Bean Validation配置框架，拦截器）</li>
+<li>排序中最快的是什么 ，快排原理</li>
+<li>Struts利用同步令牌(Token)的方式来解决Web应用中重复提交的问题,如果公司用的springMVC而不是struts你如何解决这个问题呢？（在springmvc配置文件中加入拦截器的配置，拦截两类请求，一类是到页面的，一类是提交表单的。当转到页面的请求到来时，生成token的名字和token值，一份放到redis缓存中，一份放传给页面表单的隐藏域）</li>
+</ul>
+<h4 id="基础与框架："><a href="#基础与框架：" class="headerlink" title="基础与框架："></a>基础与框架：</h4><ul>
+<li>String类能被继承吗，为什么</li>
+<li>String，Stringbuffer，StringBuilder的区别？</li>
+<li>ArrayList和LinkedList有什么区别</li>
+<li>类的实例化顺序，比如父类静态数据，构造函数，字段，子类静态数据，构造函数，字段，他们的执行顺序</li>
+<li>用过哪些Map，都有什么区别，HashMap是线程安全的吗,并发下使用的Map是什么，他们内部原理分别是什么，比如hashcode，扩容等</li>
+<li>HashMap为什么get和set那么快，concurrentHashMap为什么能提高并发</li>
+<li>抽象类和接口的区别，类可以继承多个类么，接口可以继承多个接口么,类可以实现多个接口么</li>
+<li>什么情况下会发生栈内存溢出</li>
+<li>什么是nio，原理</li>
+<li>反射中，Class.forName和ClassLoader区别</li>
+<li>tomcat结构，类加载器流程</li>
+<li>讲讲Spring事务的传播属性,AOP原理，动态代理与cglib实现的区别，AOP有哪几种实现方式</li>
+<li>Spring的beanFactory和factoryBean的区别</li>
+<li>Spring加载流程-</li>
+<li>Spring如何管理事务的</li>
+</ul>
+<p>####多线程：<br>线城池的最大线程数目根据什么确定<br>多线程的几种实现方式，什么是线程安全，什么是重排序<br>volatile的原理，作用，能代替锁么<br>sleep和wait的区别，以及wait的实现原理<br>Lock与synchronized 的区别，synchronized 的原理，什么是自旋锁，偏向锁，轻量级锁，什么叫可重入锁，什么叫公平锁和非公平锁<br>用过哪些原子类，他们的参数以及原理是什么<br>用过哪些线程池，他们的原理简单概括下，构造函数的各个参数的含义，比如coreSize，maxsize等<br>有一个第三方接口，有很多个线程去调用获取数据，现在规定每秒钟最多有10个线程同时调用它，如何做到。<br>spring的controller是单例还是多例，怎么保证并发的安全<br>用三个线程按顺序循环打印abc三个字母，比如abcabcabc<br>ThreadLocal用过么，原理是什么，用的时候要注意什么<br>如果让你实现一个并发安全的链表，你会怎么做</p>
+<p>####JVM相关：<br>jvm中一次完整的GC流程（从ygc到fgc）是怎样的，重点讲讲对象如何晋升到老年代，几种主要的jvm参数等<br>你知道哪几种垃圾收集器，各自的优缺点，重点讲下cms<br>当出现了内存溢出，你怎么排错<br>JVM内存模型的相关知识了解多少<br>简单说说你了解的类加载器<br>JAVA的反射机制</p>
+<p>####网络：<br>http1.0和http1.1有什么区别<br>TCP三次握手和四次挥手的流程，为什么断开连接要4次,如果握手只有两次，会出现什么<br>TIME_WAIT和CLOSE_WAIT的区别<br>说说你知道的几种HTTP响应码<br>当你用浏览器打开一个链接的时候，计算机做了哪些工作步骤<br>Linux下IO模型有几种，各自的含义是什么<br>TCP/IP如何保证可靠性，数据包有哪些数据组成</p>
+<p>####架构设计与分布式：<br>tomcat如何调优，各种参数的意义<br>常见的缓存策略有哪些，你们项目中用到了什么缓存系统，如何设计的，Redis的使用要注意什么，持久化方式，内存设置，集群等<br>用java自己实现一个LRU<br>分布式集群下如何做到唯一序列号<br>设计一个秒杀系统，30分钟没付款就自动关闭交易<br>如何做一个分布式锁<br>用过哪些MQ，怎么用的，和其他mq比较有什么优缺点，MQ的连接是线程安全的吗<br>MQ系统的数据如何保证不丢失<br>分布式事务的原理，如何使用分布式事务<br>什么是一致性hash<br>什么是restful，讲讲你理解的restful<br>如何设计建立和保持100w的长连接？<br>解释什么是MESI协议(缓存一致性)<br>说说你知道的几种HASH算法，简单的也可以<br>什么是paxos算法<br>redis和memcached 的内存管理的区别<br>一个在线文档系统，文档可以被编辑，如何防止多人同时对同一份文档进行编辑更新</p>
+<p>####算法：<br>10亿个数字里里面找最小的10个<br>有1亿个数字，其中有2个是重复的，快速找到它，时间和空间要最优<br>2亿个随机生成的无序整数,找出中间大小的值<br>遍历二叉树</p>
+<p>####数据库：<br>数据库隔离级别有哪些，各自的含义是什么，MYsql默认的隔离级别是是什么，各个存储引擎优缺点<br>高并发下，如何做到安全的修改同一行数据，乐观锁和悲观锁是什么，INNODB的行级锁有哪2种，解释其含义<br>SQL优化的一般步骤是什么，怎么看执行计划，如何理解其中各个字段的含义，索引的原理？<br>数据库会死锁吗，举一个死锁的例子，mysql怎么解决死锁<br>MYsql的索引实现方式<br>聚集索引和非聚集索引的区别<br>数据库中 BTREE和B+tree区别</p>
+<p>####J2SE基础</p>
+<ol>
+<li><p>九种基本数据类型的大小，以及他们的封装类。</p>
+</li>
+<li><p>Switch能否用string做参数？</p>
+</li>
+<li><p>equals与==的区别。</p>
+</li>
+<li><p>Object有哪些公用方法？</p>
+</li>
+<li><p>Java的四种引用，强弱软虚，用到的场景。</p>
+</li>
+<li><p>Hashcode的作用。</p>
+</li>
+<li><p>ArrayList、LinkedList、Vector的区别。</p>
+</li>
+<li><p>String、StringBuffer与StringBuilder的区别。</p>
+</li>
+<li><p>Map、Set、List、Queue、Stack的特点与用法。</p>
+</li>
+<li><p>HashMap和HashTable的区别。</p>
+</li>
+<li><p>HashMap和ConcurrentHashMap的区别，HashMap的底层源码。</p>
+</li>
+<li><p>TreeMap、HashMap、LindedHashMap的区别。</p>
+</li>
+<li><p>Collection包结构，与Collections的区别。</p>
+</li>
+<li><p>try catch finally，try里有return，finally还执行么？</p>
+</li>
+<li><p>Excption与Error包结构。OOM你遇到过哪些情况，SOF你遇到过哪些情况。</p>
+</li>
+<li><p>Java面向对象的三个特征与含义。</p>
+</li>
+<li><p>Override和Overload的含义去区别。</p>
+</li>
+<li><p>Interface与abstract类的区别。</p>
+</li>
+<li><p>Static class 与non static class的区别。</p>
+</li>
+<li><p>java多态的实现原理。</p>
+</li>
+<li><p>实现多线程的两种方法：Thread与Runable。</p>
+</li>
+<li><p>线程同步的方法：sychronized、lock、reentrantLock等。</p>
+</li>
+<li><p>锁的等级：方法锁、对象锁、类锁。</p>
+</li>
+<li><p>写出生产者消费者模式。</p>
+</li>
+<li><p>ThreadLocal的设计理念与作用。</p>
+</li>
+<li><p>ThreadPool用法与优势。</p>
+</li>
+<li><p>Concurrent包里的其他东西：ArrayBlockingQueue、CountDownLatch等等。</p>
+</li>
+<li><p>wait()和sleep()的区别。</p>
+</li>
+<li><p>foreach与正常for循环效率对比。</p>
+</li>
+<li><p>Java IO与NIO。</p>
+</li>
+<li><p>反射的作用于原理。</p>
+</li>
+<li><p>泛型常用特点，List<string>能否转为List<object>。</object></string></p>
+</li>
+<li><p>解析XML的几种方式的原理与特点：DOM、SAX、PULL。</p>
+</li>
+<li><p>Java与C++对比。</p>
+</li>
+<li><p>Java1.7与1.8新特性。</p>
+</li>
+<li><p>设计模式：单例、工厂、适配器、责任链、观察者等等。</p>
+</li>
+<li><p>JNI的使用。</p>
+</li>
+</ol>
+<p>JVM</p>
+<ol>
+<li>内存模型以及分区，需要详细到每个区放什么。</li>
+<li>堆里面的分区：Eden，survival from to，老年代，各自的特点。</li>
+<li>对象创建方法，对象的内存分配，对象的访问定位。</li>
+<li>GC的两种判定方法：引用计数与引用链。</li>
+<li>GC的三种收集方法：标记清除、标记整理、复制算法的原理与特点，分别用在什么地方，如果让你优化收集方法，有什么思路？</li>
+<li>GC收集器有哪些？CMS收集器与G1收集器的特点。</li>
+<li>Minor GC与Full GC分别在什么时候发生？</li>
+<li>几种常用的内存调试工具：jmap、jstack、jconsole。</li>
+<li>类加载的五个过程：加载、验证、准备、解析、初始化。</li>
+<li>双亲委派模型：Bootstrap ClassLoader、Extension ClassLoader、ApplicationClassLoader。</li>
+<li>分派：静态分派与动态分派。</li>
+</ol>
+<p>##操作系统</p>
+<ol>
+<li><p>进程和线程的区别。</p>
+</li>
+<li><p>死锁的必要条件，怎么处理死锁。</p>
+</li>
+<li><p>Window内存管理方式：段存储，页存储，段页存储。</p>
+</li>
+<li><p>进程的几种状态。</p>
+</li>
+<li><p>IPC几种通信方式。</p>
+</li>
+<li><p>什么是虚拟内存。</p>
+</li>
+<li><p>虚拟地址、逻辑地址、线性地址、物理地址的区别。</p>
+</li>
+</ol>
+<p>##Tcp/IP</p>
+<ol>
+<li><p>OSI与TCP/IP各层的结构与功能，都有哪些协议。</p>
+</li>
+<li><p>TCP与UDP的区别。</p>
+</li>
+<li><p>TCP报文结构。</p>
+</li>
+<li><p>TCP的三次握手与四次挥手过程，各个状态名称与含义，TIMEWAIT的作用。</p>
+</li>
+<li><p>TCP拥塞控制。</p>
+</li>
+<li><p>TCP滑动窗口与回退N针协议。</p>
+</li>
+<li><p>Http的报文结构。</p>
+</li>
+<li><p>Http的状态码含义。</p>
+</li>
+<li><p>Http request的几种类型。</p>
+</li>
+<li><p>Http1.1和Http1.0的区别</p>
+</li>
+<li><p>Http怎么处理长连接。</p>
+</li>
+<li><p>Cookie与Session的作用于原理。</p>
+</li>
+<li><p>电脑上访问一个网页，整个过程是怎么样的：DNS、HTTP、TCP、OSPF、IP、ARP。</p>
+</li>
+<li><p>Ping的整个过程。ICMP报文是什么。</p>
+</li>
+<li><p>C/S模式下使用socket通信，几个关键函数。</p>
+</li>
+<li><p>IP地址分类。</p>
+</li>
+<li><p>路由器与交换机区别。</p>
+</li>
+</ol>
+<p>##数据结构与算法</p>
+<ol>
+<li><p>链表与数组。</p>
+</li>
+<li><p>队列和栈，出栈与入栈。</p>
+</li>
+<li><p>链表的删除、插入、反向。</p>
+</li>
+<li><p>字符串操作。</p>
+</li>
+<li><p>Hash表的hash函数，冲突解决方法有哪些。</p>
+</li>
+<li><p>各种排序：冒泡、选择、插入、希尔、归并、快排、堆排、桶排、基数的原理、平均时间复杂度、最坏时间复杂度、空间复杂度、是否稳定。</p>
+</li>
+<li><p>快排的partition函数与归并的Merge函数。</p>
+</li>
+<li><p>对冒泡与快排的改进。</p>
+</li>
+<li><p>二分查找，与变种二分查找。</p>
+</li>
+<li><p>二叉树、B+树、AVL树、红黑树、哈夫曼树。</p>
+</li>
+<li><p>二叉树的前中后续遍历：递归与非递归写法，层序遍历算法。</p>
+</li>
+<li><p>图的BFS与DFS算法，最小生成树prim算法与最短路径Dijkstra算法。</p>
+</li>
+<li><p>KMP算法。</p>
+</li>
+<li><p>排列组合问题。</p>
+</li>
+<li><p>动态规划、贪心算法、分治算法。（一般不会问到）</p>
+</li>
+<li><p>大数据处理：类似10亿条数据找出最大的1000个数………等等   </p>
+</li>
+</ol>
+<p>###GC<br>1、什么时候开始GC:<br>当新生代满了会进行Minor GC，升到老年代的对象大于老年代剩余空间时会进行Major GC<br>2、GC做什么<br>新生代采用复制算法，老年代采用标记-清除或标记-整理算法  </p>
+<p>3、线程安全的HashMap  </p>
+<p>HashMap，Hashtable，ConcurrentHashMap和synchronized Map的原理和区别。当时有些紧张只是简单说了下HashMap不是线程安全的；Hashtable线程安全，但效率低，因为是Hashtable是使用synchronized的，所有线程竞争同一把锁；而ConcurrentHashMap不仅线程安全而且效率高，因为它包含一个segment数组，将数据分段存储，给每一段数据配一把锁，也就是所谓的锁分段技术。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;## &lt;/p&gt;
+&lt;p&gt;##一、初级面试必备&lt;/p&gt;
+&lt;p&gt;####（1）基础部分    &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1、Hmac加密算法&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;user_info表被锁住，有哪些数据库操作会锁表，因为只有update、delete这些操作会锁表，所以打算整改这些语句，有子查询的全部整改&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="面试准备" scheme="http://yoursite.com/tags/%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>自己收集的面试题</title>
+    <link href="http://yoursite.com/2017/05/26/%E8%87%AA%E5%B7%B1%E6%94%B6%E9%9B%86%E7%9A%84%E9%9D%A2%E8%AF%95%E9%A2%98/"/>
+    <id>http://yoursite.com/2017/05/26/自己收集的面试题/</id>
+    <published>2017-05-26T11:14:31.064Z</published>
+    <updated>2017-01-12T07:02:06.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>1、描述一下你最近的的一个项目架构</p>
+<p>资金平台平台重构+后台对账业务？</p>
+<p>如何快速接入银行、怎么保证可扩展性</p>
+<p>针对银行接口的变化有哪些考虑</p>
+<p>怎么考虑调单情况？</p>
+<p>2、描述一下http请求到服务器返回发生了哪些过程</p>
+<p>3、数据库死锁？线上怎么定位？怎么解决</p>
+<p>4、为什么mysql中主键要自增？</p>
+<p>5、你了解哪些sql优化</p>
+<a id="more"></a>
+<p>6、联合索引？where c=x and b=x and a=x是否还会用到索引，where c=x  and b&gt;x and a=x是否还会用到索引</p>
+<p>7、b树是什么</p>
+<p>8、线上如何利用jvm命令排查问题</p>
+<p>9、java线程池常用参数及如何进行设置?</p>
+<p>10、AQS锁机制</p>
+<p>11、讲一讲你最近印象比较深刻的一件事情</p>
+<p>​        在进行放款匹配债权的时候，总是出问题，后台我就打了很多日志，发现是在生成债权协议的时候，文件平凡读写导致执行超时，后来把它单列了一个计划任务</p>
+<h3 id="多线程类别"><a href="#多线程类别" class="headerlink" title="多线程类别"></a>多线程类别</h3><p>1、线城池的最大线程数目根据什么确定<br>2、多线程的几种实现方式，什么是线程安全，什么是重排序<br>3、volatile的原理，作用，能代替锁么<br>4、sleep和wait的区别，以及wait的实现原理<br>5、Lock与synchronized 的区别，synchronized 的原理，什么是自旋锁，偏向锁，轻量级锁，什么叫可重入锁，什么叫公平锁和非公平锁<br>6、用过哪些原子类，他们的参数以及原理是什么<br>7、用过哪些线程池，他们的原理简单概括下，构造函数的各个参数的含义，比如coreSize，maxsize等<br>8、有一个第三方接口，有很多个线程去调用获取数据，现在规定每秒钟最多有10个线程同时调用它，如何做到。<br>9、spring的controller是单例还是多例，怎么保证并发的安全<br>10、用三个线程按顺序循环打印abc三个字母，比如abcabcabc<br>12、ThreadLocal用过么，原理是什么，用的时候要注意些什么</p>
+<p>13、jvm中一次完整的GC流程（从ygc到fgc）是怎样的，重点讲讲对象如何晋升到老年代，几种主要的jvm参数等</p>
+<p>14、你知道哪几种垃圾收集器，各自的优缺点，重点讲下cms<br>15、当出现了内存溢出，你怎么排错<br>16、JVM内存模型的相关知识了解多少<br>17、简单说说你了解的类加载器<br>18、JAVA的反射机制</p>
+<p><strong>当变量的值由自身的上一个决定时，如n=n+1、n++等，volatile关键字将失效，只有当变量的值和自身上一个值无关时对该变量的操作才是原子级别的，如n = m + 1，这个就是原级别的。所以在使用volatile关键时一定要谨慎，如果自己没有把握，可以使用synchronized来代替volatile。</strong></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;1、描述一下你最近的的一个项目架构&lt;/p&gt;
+&lt;p&gt;资金平台平台重构+后台对账业务？&lt;/p&gt;
+&lt;p&gt;如何快速接入银行、怎么保证可扩展性&lt;/p&gt;
+&lt;p&gt;针对银行接口的变化有哪些考虑&lt;/p&gt;
+&lt;p&gt;怎么考虑调单情况？&lt;/p&gt;
+&lt;p&gt;2、描述一下http请求到服务器返回发生了哪些过程&lt;/p&gt;
+&lt;p&gt;3、数据库死锁？线上怎么定位？怎么解决&lt;/p&gt;
+&lt;p&gt;4、为什么mysql中主键要自增？&lt;/p&gt;
+&lt;p&gt;5、你了解哪些sql优化&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="面试题" scheme="http://yoursite.com/tags/%E9%9D%A2%E8%AF%95%E9%A2%98/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>自定义注解</title>
+    <link href="http://yoursite.com/2017/05/26/%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B3%A8%E8%A7%A3/"/>
+    <id>http://yoursite.com/2017/05/26/自定义注解/</id>
+    <published>2017-05-26T11:14:31.060Z</published>
+    <updated>2017-01-10T11:23:52.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>1、先上代码（定义注解）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Constraint</span>(validatedBy = DecimalValidator.class) <span class="comment">//具体的实现</span></div><div class="line"><span class="meta">@Target</span>( &#123; java.lang.annotation.ElementType.METHOD,</div><div class="line">    java.lang.annotation.ElementType.FIELD &#125;)</div><div class="line"><span class="meta">@Retention</span>(java.lang.annotation.RetentionPolicy.RUNTIME)</div><div class="line"><span class="meta">@Documented</span></div><div class="line"><span class="keyword">public</span> <span class="meta">@interface</span> IsDecimal &#123;</div><div class="line">	java.lang.<span class="function">String <span class="title">message</span><span class="params">()</span> <span class="keyword">default</span> ""</span>;</div><div class="line">	Class&lt;?&gt;[] groups() <span class="keyword">default</span> &#123;&#125;;</div><div class="line">	Class&lt;? extends Payload&gt;[] payload() <span class="keyword">default</span> &#123;&#125;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>2、实现代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DecimalValidator</span> <span class="keyword">implements</span> <span class="title">ConstraintValidator</span>&lt;<span class="title">IsDecimal</span>, <span class="title">Map</span>&lt;<span class="title">String</span>,<span class="title">Object</span>&gt;&gt; </span>&#123;</div><div class="line"></div><div class="line">	String pointPrefix = <span class="string">"(\\-|\\+)&#123;0,1&#125;\\d*\\.\\d+"</span>;<span class="comment">// 浮点数的正则表达式-小数点在中间与前面</span></div><div class="line">	String pointSuffix = <span class="string">"(\\-|\\+)&#123;0,1&#125;\\d+\\."</span>;<span class="comment">// 浮点数的正则表达式-小数点在后面</span></div><div class="line">	String pointPrefixWithoutPoint = <span class="string">"\\-&#123;0,1&#125;\\d+"</span>;<span class="comment">// 整数的正则表达式</span></div><div class="line">	</div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initialize</span><span class="params">(IsDecimal constraintAnnotation)</span> </span>&#123;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isValid</span><span class="params">(Map&lt;String,Object&gt; map, ConstraintValidatorContext arg1)</span> </span>&#123;</div><div class="line">		String value = (String)map.get(Constants.KEY);</div><div class="line">		<span class="keyword">if</span> (StringUtils.isEmpty(value) &amp;&amp; (<span class="keyword">boolean</span>)(map.get(Constants.REQUIRED)))</div><div class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">		<span class="keyword">return</span> value.matches(pointPrefix) || value.matches(pointSuffix) || value.matches(pointPrefixWithoutPoint);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h3><p>1、</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;1、先上代码（定义注解）&lt;/p&gt;
+&lt;figure class=&quot;highlight java&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;@Constraint&lt;/span&gt;(validatedBy = DecimalValidator.class) &lt;span class=&quot;comment&quot;&gt;//具体的实现&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;@Target&lt;/span&gt;( &amp;#123; java.lang.annotation.ElementType.METHOD,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    java.lang.annotation.ElementType.FIELD &amp;#125;)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;@Retention&lt;/span&gt;(java.lang.annotation.RetentionPolicy.RUNTIME)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;@Documented&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;meta&quot;&gt;@interface&lt;/span&gt; IsDecimal &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;	java.lang.&lt;span class=&quot;function&quot;&gt;String &lt;span class=&quot;title&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;default&lt;/span&gt; &quot;&quot;&lt;/span&gt;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;	Class&amp;lt;?&amp;gt;[] groups() &lt;span class=&quot;keyword&quot;&gt;default&lt;/span&gt; &amp;#123;&amp;#125;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;	Class&amp;lt;? extends Payload&amp;gt;[] payload() &lt;span class=&quot;keyword&quot;&gt;default&lt;/span&gt; &amp;#123;&amp;#125;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+    
+      <category term="spring" scheme="http://yoursite.com/tags/spring/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>耳鸣疗法</title>
+    <link href="http://yoursite.com/2017/05/26/%E8%80%B3%E9%B8%A3%E7%96%97%E6%B3%95/"/>
+    <id>http://yoursite.com/2017/05/26/耳鸣疗法/</id>
+    <published>2017-05-26T11:14:31.056Z</published>
+    <updated>2017-01-13T07:30:54.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>（1）梳头抹耳法：双手十指由前发际向后梳头，梳到头后部时，两掌心贴住耳廓后部，两手分别向左右两侧抹耳廓至面颊部为1次，连续108次。</p>
+<p>（2）鸣天鼓法：两掌搓热，用两掌心分别贴住左右两耳，手指托住后脑部，食指压在中指上，使食指从中指上重重地滑落，经此弹击后颈发际处，可听到“咚咚”之声，如击天鼓，共击108次。</p>
+<p>（3）掌心震耳（自行鼓膜按摩法）：两手掌搓热，用搓热的两手掌心捂住两耳．手掌与耳朵完全封闭，然后两掌突然松开，听到“叭”的一声，起到震耳的作用。共108次。</p>
+<a id="more"></a>
+<p>（4）过顶提耳：先右臂弯曲过头顶，用右手拇指、食指和中指捏住左耳耳尖向上提拉，拉108次。再换左手提拉右耳，也拉108次。此动作对<a href="http://www.haodf.com/jibing/jianzhouyan.htm" target="_blank" rel="external">肩周炎</a>也有防治作用。</p>
+<p>（5）双手拉耳：双手握空拳，用拇指、食指捏住耳垂向下拉。拇指在后，食指弯曲在前，共拉1O8次。然后两手的食指、中指叉开，中指在前，食指在后搓耳根．一上一下为1次，共搓108次。</p>
+<p>（6）用食指或大拇指轻柔按揉听会穴(耳屏间切迹的前方，下颌骨髁突的后缘，张口有凹陷处)5分钟左右。</p>
+<p>（7）用食指和大拇指，先从上至下按捏耳廓，然后从下至上按捏，这样反复按捏至双耳有<a href="http://www.haodf.com/jibing/fashao.htm" target="_blank" rel="external">发热</a>感，共按捏耳廓100次。</p>
+<p>（8）按摩合谷穴(一手的拇指第一个关节横纹正对另一手的虎口边．拇指屈曲按下，指尖所指处)80次。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;（1）梳头抹耳法：双手十指由前发际向后梳头，梳到头后部时，两掌心贴住耳廓后部，两手分别向左右两侧抹耳廓至面颊部为1次，连续108次。&lt;/p&gt;
+&lt;p&gt;（2）鸣天鼓法：两掌搓热，用两掌心分别贴住左右两耳，手指托住后脑部，食指压在中指上，使食指从中指上重重地滑落，经此弹击后颈发际处，可听到“咚咚”之声，如击天鼓，共击108次。&lt;/p&gt;
+&lt;p&gt;（3）掌心震耳（自行鼓膜按摩法）：两手掌搓热，用搓热的两手掌心捂住两耳．手掌与耳朵完全封闭，然后两掌突然松开，听到“叭”的一声，起到震耳的作用。共108次。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="生活" scheme="http://yoursite.com/tags/%E7%94%9F%E6%B4%BB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>搭建SS服务器教程</title>
+    <link href="http://yoursite.com/2017/05/26/%E6%90%AD%E5%BB%BASS%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%95%99%E7%A8%8B/"/>
+    <id>http://yoursite.com/2017/05/26/搭建SS服务器教程/</id>
+    <published>2017-05-26T11:14:31.053Z</published>
+    <updated>2017-01-11T04:49:24.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="安装脚本"><a href="#安装脚本" class="headerlink" title="安装脚本"></a>安装脚本</h2><p>首先我们下载脚本</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">wget --no-check-certificate</div><div class="line">https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks.sh</div></pre></td></tr></table></figure>
+<p>更改权限</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chmod +x shadowsocks.sh</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>执行脚本</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./shadowsocks.sh 2&gt;&amp;1 | tee shadowsocks.log</div></pre></td></tr></table></figure>
+<p>添加多用户：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi/ etc/shadowsocks.json</div></pre></td></tr></table></figure>
+<p>本来是这样的</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line"> "server":"0.0.0.0",</div><div class="line"> "server_port":8989,</div><div class="line"> "local_address":"127.0.0.1",</div><div class="line"> "local_port":1080,</div><div class="line"> "password":"yourpassword",</div><div class="line"> "timeout":300,</div><div class="line"> "method":"aes-256-cfb",</div><div class="line"> "fast_open": false</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>改为这样的，其实就是添加端口</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line"> "server":"0.0.0.0",</div><div class="line"> "local_address":"127.0.0.1",</div><div class="line"> "local_port":1080,</div><div class="line"> "port_password":&#123;</div><div class="line"> "8989":"password0",</div><div class="line"> "9001":"password1",</div><div class="line"> "9002":"password2",</div><div class="line"> "9003":"password3",</div><div class="line"> "9004":"password4" //几个用户就加几个，最后一个用户冒号后面不要逗号，不然会报错</div><div class="line"> &#125;,</div><div class="line"> "timeout":300,</div><div class="line"> "method":"aes-256-cfb",</div><div class="line"> "fast_open": false</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后重启一下服务就好了</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/etc/init.d/shadowsocks restart</div></pre></td></tr></table></figure>
+<p>发现还是不能使用</p>
+<p>centos7继续往下面看</p>
+<p>先进入firewalled的配置端口目录，路径为etc/firewalled/zones/。打开public.xml文件进行端口的编辑。例如加入8080端口的tcp和ump</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"> &lt;port protocol="tcp" port="8080"/&gt;   </div><div class="line"> &lt;port protocol="udp" port="8080"/&gt;</div></pre></td></tr></table></figure>
+<p>重启防火墙</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">systemctl restart firewalld.service</div></pre></td></tr></table></figure>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;安装脚本&quot;&gt;&lt;a href=&quot;#安装脚本&quot; class=&quot;headerlink&quot; title=&quot;安装脚本&quot;&gt;&lt;/a&gt;安装脚本&lt;/h2&gt;&lt;p&gt;首先我们下载脚本&lt;/p&gt;
+&lt;figure class=&quot;highlight shell&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;wget --no-check-certificate&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks.sh&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;更改权限&lt;/p&gt;
+&lt;figure class=&quot;highlight shell&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;chmod +x shadowsocks.sh&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+    
+      <category term="服务器" scheme="http://yoursite.com/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>如何利用apidoc编写rest风格的文档</title>
+    <link href="http://yoursite.com/2017/05/26/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8apidoc%E7%BC%96%E5%86%99rest%E9%A3%8E%E6%A0%BC%E7%9A%84%E6%96%87%E6%A1%A3/"/>
+    <id>http://yoursite.com/2017/05/26/如何使用apidoc编写rest风格的文档/</id>
+    <published>2017-05-26T11:14:31.030Z</published>
+    <updated>2017-01-13T01:55:24.000Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="一、ApiDoc是什么"><a href="#一、ApiDoc是什么" class="headerlink" title="一、ApiDoc是什么"></a>一、ApiDoc是什么</h3><p>事实上我们大多时候说的apidoc实际上是apidoc.js，是使用nodejs命令行模块来生成文档的</p>
+<p><img src="https://blog.jscrambler.com/content/images/2016/12/site-apidocjs.png" alt=""></p>
+<a id="more"></a>
+<p>首先你需要安装nodejs，mac上直接使用brew安装很简单,执行下面命令即可</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">brew install node</div></pre></td></tr></table></figure>
+<h3 id="二、安装ApiDoc"><a href="#二、安装ApiDoc" class="headerlink" title="二、安装ApiDoc"></a>二、安装ApiDoc</h3><p>然后安装apidoc吧</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm install apidoc -g</div></pre></td></tr></table></figure>
+<h3 id="三、生成API"><a href="#三、生成API" class="headerlink" title="三、生成API"></a>三、生成API</h3><p>首先，我们创建一个task-api目录来初始化目录</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">mkdir task-api</div><div class="line">cd task-api</div><div class="line">npm init</div></pre></td></tr></table></figure>
+<p>执行npm init之后就会让你填写很多信息，name，version，main，repository，keywords，author，懂的就填写一下，不懂的直接回车,系统会帮你创建一个package.json文件。</p>
+<p>为了建立我们的api代码，我们创建一个index.js</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>);  </div><div class="line"><span class="keyword">var</span> app = express();</div><div class="line"></div><div class="line"><span class="comment">// 为了public文件夹服务</span></div><div class="line">app.use(express.static(<span class="string">'public'</span>));</div><div class="line"></div><div class="line">app.get(<span class="string">'/tasks'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for list all tasks...</span></div><div class="line">&#125;);</div><div class="line">app.get(<span class="string">'/tasks/:id'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for find a task...</span></div><div class="line">&#125;);</div><div class="line">app.post(<span class="string">'/tasks'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for create a task...</span></div><div class="line">&#125;);</div><div class="line">app.put(<span class="string">'/tasks/:id'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for update a task...</span></div><div class="line">&#125;);</div><div class="line">app.delete(<span class="string">'/tasks/:id'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for delete a task...</span></div><div class="line">&#125;);</div><div class="line">app.listen(<span class="number">3000</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;  </div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'Task api up and running...'</span>);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>这行代码<code>app.use(express.static(&#39;public&#39;))</code>将启用public文件夹的静态服务，这个目录将成所有的文档文件。</p>
+<h3 id="四、API路由"><a href="#四、API路由" class="headerlink" title="四、API路由"></a>四、API路由</h3><p>OK，准备完毕，我们可以开始写我们的api了，我们需要使用apidoc提供的一些简单参数</p>
+<p>然后你需要创建一个apidoc.json文件，在根目录，包括这些参数，也可以直接把apidoc这些属性直接放到上面package.json目录下。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    "name": "Task API documentation",//文档名称</div><div class="line">    "version": "1.0.0",//文档版本号</div><div class="line">    "description": "API task list manager",//文档描述</div><div class="line">    "template": &#123;</div><div class="line">        "forceLanguage": "en"//语言</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>设置template下面的forceLanguage可以屏蔽浏览器的语言检测，强制使用英语</p>
+<p>有这些参数可以设置：</p>
+<ul>
+<li>name：项目名称 </li>
+<li>version：项目版本 </li>
+<li>description：项目介绍 </li>
+<li>title：浏览器显示的标题内容 </li>
+<li>url：endpoints的前缀，例如<a href="https://api.github.com/v1" target="_blank" rel="external">https://api.github.com/v1</a> </li>
+<li>sampleUrl：如果设置了，则在api文档中出现一个<a href="http://lib.csdn.net/base/softwaretest" target="_blank" rel="external">测试</a>用的from表单 </li>
+<li>header </li>
+<li>title：导航文字包含header.md文件 </li>
+<li>filename：markdown-file 文件名 </li>
+<li>footer </li>
+<li>title：导航文字包含header.md文件 </li>
+<li>filename：markdown-file 文件名 </li>
+<li>order：用于配置输出 api-names/group-names 排序，在列表中的将按照列表中的顺序排序，不在列表中的名称将自动显示。</li>
+</ul>
+<hr>
+<p>OK，下面我们开始文档的编写。</p>
+<p>编辑index.js，首先我们在<code>app.get(&#39;/tasks&#39;)</code>方法上面编辑，我们可以加入下面这些参数</p>
+<ul>
+<li><code>@api</code>: http方法 、地址和方法名称;</li>
+<li><code>@apiGroup</code>: 属于哪一个路由组;</li>
+<li><code>@apiSuccess</code>: 描述成功返回</li>
+<li><code>@apiSuccessExample</code>: 展示返回值</li>
+<li><code>@apiErrorExample</code>: 展示失败值</li>
+</ul>
+<p>直接看下代码吧。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * @api &#123;get&#125; /tasks 展示所有的任务</div><div class="line"> * @apiGroup Tasks   //属于task组</div><div class="line"> * @apiSuccess &#123;Object[]&#125; tasks Task's list</div><div class="line"> * @apiSuccess &#123;Number&#125; tasks.id Task id</div><div class="line"> * @apiSuccess &#123;String&#125; tasks.title Task title</div><div class="line"> * @apiSuccess &#123;Boolean&#125; tasks.done Task is done?</div><div class="line"> * @apiSuccess &#123;Date&#125; tasks.updated_at Update's date</div><div class="line"> * @apiSuccess &#123;Date&#125; tasks.created_at Register's date</div><div class="line"> * @apiSuccessExample &#123;json&#125; Success</div><div class="line"> *    HTTP/1.1 200 OK</div><div class="line"> *    [&#123;</div><div class="line"> *      "id": 1,</div><div class="line"> *      "title": "Study",</div><div class="line"> *      "done": false</div><div class="line"> *      "updated_at": "2016-02-10T15:46:51.778Z",</div><div class="line"> *      "created_at": "2016-02-10T15:46:51.778Z"</div><div class="line"> *    &#125;]</div><div class="line"> * @apiErrorExample &#123;json&#125; List error</div><div class="line"> *    HTTP/1.1 500 Internal Server Error</div><div class="line"> */</div><div class="line">app.get(<span class="string">'/tasks'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for listing all tasks...</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>下一个路由路径、我们加入了一个新的参数</p>
+<ul>
+<li><code>@apiParam</code>: 描述路径下的参数</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * @api &#123;get&#125; /tasks/:id Find a task</div><div class="line"> * @apiGroup Tasks</div><div class="line"> * @apiParam &#123;id&#125; id Task id</div><div class="line"> * @apiSuccess &#123;Number&#125; id Task id</div><div class="line"> * @apiSuccess &#123;String&#125; title Task title</div><div class="line"> * @apiSuccess &#123;Boolean&#125; done Task is done?</div><div class="line"> * @apiSuccess &#123;Date&#125; updated_at Update's date</div><div class="line"> * @apiSuccess &#123;Date&#125; created_at Register's date</div><div class="line"> * @apiSuccessExample &#123;json&#125; Success</div><div class="line"> *    HTTP/1.1 200 OK</div><div class="line"> *    &#123;</div><div class="line"> *      "id": 1,</div><div class="line"> *      "title": "Study",</div><div class="line"> *      "done": false</div><div class="line"> *      "updated_at": "2016-02-10T15:46:51.778Z",</div><div class="line"> *      "created_at": "2016-02-10T15:46:51.778Z"</div><div class="line"> *    &#125;</div><div class="line"> * @apiErrorExample &#123;json&#125; Task not found</div><div class="line"> *    HTTP/1.1 404 Not Found</div><div class="line"> * @apiErrorExample &#123;json&#125; Find error</div><div class="line"> *    HTTP/1.1 500 Internal Server Error</div><div class="line"> */</div><div class="line">app.get(<span class="string">'/tasks/:id'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for finding a task...</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>辣么如何使用post方法呢？</p>
+<p>就会用到<code>@apiParam</code> 和 <code>@apiParamExample</code> ，为了解释body里面返回的参数，done=false表示默认值。看下面</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * @api &#123;post&#125; /tasks Register a new task</div><div class="line"> * @apiGroup Tasks</div><div class="line"> * @apiParam &#123;String&#125; title Task title</div><div class="line"> * @apiParamExample &#123;json&#125; Input</div><div class="line"> *    &#123;</div><div class="line"> *      "title": "Study"</div><div class="line"> *    &#125;</div><div class="line"> * @apiSuccess &#123;Number&#125; id Task id</div><div class="line"> * @apiSuccess &#123;String&#125; title Task title</div><div class="line"> * @apiSuccess &#123;Boolean&#125; done=false Task is done?</div><div class="line"> * @apiSuccess &#123;Date&#125; updated_at Update date</div><div class="line"> * @apiSuccess &#123;Date&#125; created_at Register date</div><div class="line"> * @apiSuccessExample &#123;json&#125; Success</div><div class="line"> *    HTTP/1.1 200 OK</div><div class="line"> *    &#123;</div><div class="line"> *      "id": 1,</div><div class="line"> *      "title": "Study",</div><div class="line"> *      "done": false,</div><div class="line"> *      "updated_at": "2016-02-10T15:46:51.778Z",</div><div class="line"> *      "created_at": "2016-02-10T15:46:51.778Z"</div><div class="line"> *    &#125;</div><div class="line"> * @apiErrorExample &#123;json&#125; Register error</div><div class="line"> *    HTTP/1.1 500 Internal Server Error</div><div class="line"> */</div><div class="line">app.post(<span class="string">'/tasks'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for creating a task...</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>下面展示put和delete方法</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * @api &#123;put&#125; /tasks/:id Update a task</div><div class="line"> * @apiGroup Tasks</div><div class="line"> * @apiParam &#123;id&#125; id Task id</div><div class="line"> * @apiParam &#123;String&#125; title Task title</div><div class="line"> * @apiParam &#123;Boolean&#125; done Task is done?</div><div class="line"> * @apiParamExample &#123;json&#125; Input</div><div class="line"> *    &#123;</div><div class="line"> *      "title": "Work",</div><div class="line"> *      "done": true</div><div class="line"> *    &#125;</div><div class="line"> * @apiSuccessExample &#123;json&#125; Success</div><div class="line"> *    HTTP/1.1 204 No Content</div><div class="line"> * @apiErrorExample &#123;json&#125; Update error</div><div class="line"> *    HTTP/1.1 500 Internal Server Error</div><div class="line"> */</div><div class="line">app.put(<span class="string">'/tasks/:id'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for update a task</span></div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * @api &#123;delete&#125; /tasks/:id Remove a task</div><div class="line"> * @apiGroup Tasks</div><div class="line"> * @apiParam &#123;id&#125; id Task id</div><div class="line"> * @apiSuccessExample &#123;json&#125; Success</div><div class="line"> *    HTTP/1.1 204 No Content</div><div class="line"> * @apiErrorExample &#123;json&#125; Delete error</div><div class="line"> *    HTTP/1.1 500 Internal Server Error</div><div class="line"> */</div><div class="line">app.delete(<span class="string">'/tasks/:id'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;  </div><div class="line">    <span class="comment">// business logic for deleting a task</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>ok ,可以生产文档了，使用下面的命令(i 是input代表输入文件夹，o是output代表输出文件夹)</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">apidoc  -i public / -o  apidoc  </div><div class="line">node index.js  //(你没有这个js就不要执行这个咯，这个是我上面js用的，监听3000端口的)</div></pre></td></tr></table></figure>
+<p>你就可以访问localhost:3000/apidoc，赶紧自己动手试试吧</p>
+<p><img src="https://blog.jscrambler.com/content/images/2016/12/api-documented.png" alt="图片例子"></p>
+<p>OK，我们已经完成了所有的任务</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;一、ApiDoc是什么&quot;&gt;&lt;a href=&quot;#一、ApiDoc是什么&quot; class=&quot;headerlink&quot; title=&quot;一、ApiDoc是什么&quot;&gt;&lt;/a&gt;一、ApiDoc是什么&lt;/h3&gt;&lt;p&gt;事实上我们大多时候说的apidoc实际上是apidoc.js，是使用nodejs命令行模块来生成文档的&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://blog.jscrambler.com/content/images/2016/12/site-apidocjs.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="java" scheme="http://yoursite.com/tags/java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>单例模式大比拼</title>
+    <link href="http://yoursite.com/2017/05/26/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/"/>
+    <id>http://yoursite.com/2017/05/26/单例模式/</id>
+    <published>2017-05-26T11:14:31.027Z</published>
+    <updated>2017-01-10T11:23:04.000Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="单例模式大比拼"><a href="#单例模式大比拼" class="headerlink" title="单例模式大比拼"></a>单例模式大比拼</h1><h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><ul>
+<li>1、饱汉模式</li>
+<li>2、懒汉模式</li>
+<li>3、最佳模式（多线程安全）</li>
+</ul>
+<p>1、饱汉模式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Singleton instance = <span class="keyword">new</span> Singleton();</div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span> </span>&#123;&#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> instance;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>2、懒汉模式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"> <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">//一个静态的实例</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Singleton singleton;</div><div class="line">    <span class="comment">//私有化构造函数</span></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span></span>&#123;&#125;</div><div class="line">    <span class="comment">//给出一个公共的静态方法返回一个单一实例</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span></span>&#123;</div><div class="line">        <span class="keyword">if</span> (singleton == <span class="keyword">null</span>) &#123;</div><div class="line">            singleton = <span class="keyword">new</span> Singleton();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> singleton;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面2种情况在单线程的时候运行良好，多线程模式下会出现问题</p>
+<p><strong>解决办法：</strong></p>
+<p>（1）、你可以在方法上面加入synchronized关键字（性能低下，及其不推荐）</p>
+<p>（2）、同步的地方只是需要发生在单例的实例还未创建的时候，在实例创建以后，获取实例的方法就没必要再进行同步控制了，所以我们将上面的示例改为很多教科书中标准的单例模式版本，也称为<strong>双重加锁</strong>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SynchronizedSingleton</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">//一个静态的实例</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> SynchronizedSingleton synchronizedSingleton;</div><div class="line">    <span class="comment">//私有化构造函数</span></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="title">SynchronizedSingleton</span><span class="params">()</span></span>&#123;&#125;</div><div class="line">    <span class="comment">//给出一个公共的静态方法返回一个单一实例</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> SynchronizedSingleton <span class="title">getInstance</span><span class="params">()</span></span>&#123;</div><div class="line">        <span class="keyword">if</span> (synchronizedSingleton == <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">synchronized</span> (SynchronizedSingleton.class) &#123;</div><div class="line">                <span class="keyword">if</span> (synchronizedSingleton == <span class="keyword">null</span>) &#123;</div><div class="line">                    synchronizedSingleton = <span class="keyword">new</span> SynchronizedSingleton();</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> synchronizedSingleton;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面的双重加锁模式在语言层面是ok的，但是jvm层面还是会出问题的</p>
+<p>下面一种方法不会出现多线程问题，保证一个实例</p>
+<p>3、</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">InnerClassSingleton</span> </span>&#123;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span></span>&#123;</div><div class="line">        <span class="keyword">return</span> Singleton.singleton;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span></span>&#123;</div><div class="line">        </div><div class="line">        <span class="keyword">protected</span> <span class="keyword">static</span> Singleton singleton = <span class="keyword">new</span> Singleton();</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;单例模式大比拼&quot;&gt;&lt;a href=&quot;#单例模式大比拼&quot; class=&quot;headerlink&quot; title=&quot;单例模式大比拼&quot;&gt;&lt;/a&gt;单例模式大比拼&lt;/h1&gt;&lt;h2 id=&quot;分类&quot;&gt;&lt;a href=&quot;#分类&quot; class=&quot;headerlink&quot; title=&quot;分类&quot;&gt;&lt;/a&gt;分类&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;1、饱汉模式&lt;/li&gt;
+&lt;li&gt;2、懒汉模式&lt;/li&gt;
+&lt;li&gt;3、最佳模式（多线程安全）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;1、饱汉模式&lt;/p&gt;
+&lt;figure class=&quot;highlight java&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;Singleton&lt;/span&gt; &lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;final&lt;/span&gt; Singleton instance = &lt;span class=&quot;keyword&quot;&gt;new&lt;/span&gt; Singleton();&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;Singleton&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;()&lt;/span&gt; &lt;/span&gt;&amp;#123;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;static&lt;/span&gt; Singleton &lt;span class=&quot;title&quot;&gt;getInstance&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;()&lt;/span&gt; &lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; instance;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+    
+      <category term="多线程" scheme="http://yoursite.com/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>RocketMq小解</title>
+    <link href="http://yoursite.com/2017/05/26/RocketMq/"/>
+    <id>http://yoursite.com/2017/05/26/RocketMq/</id>
+    <published>2017-05-26T11:14:31.019Z</published>
+    <updated>2017-01-10T11:39:08.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>notify是淘宝的一个消息中间件，它用创新地方式解决了分布式事务的问题，用相对较低的成本，实现了跨微服务的最终一致性</p>
+<p>消息系统的核心作用就是三点：<strong>解耦，异步和并行</strong></p>
+<a id="more"></a>
+<p>假设我们有这么一个应用场景，为了完成一个用户注册淘宝的操作，可能需要将用户信息写入到用户库中，然后通知给红包中心给用户发新手红包，然后还需要通知支付宝给用户准备对应的支付宝账号，进行合法性验证，告知sns系统给用户导入新的用户等10步操作。</p>
+<p><a href="http://segmentfault.com/img/bVm0uI" target="_blank" rel="external">串行设计</a></p>
+<p><img src="http://segmentfault.com/img/bVm0uI" alt="串行设计"></p>
+<p>这种方式的最大问题是，随着后端流程越来越多，每步流程都需要额外的耗费很多时间，从而会导致用户更长的等待延迟。自然的，我们可以采用并行的方式来完成业务，能够极大的减少延迟</p>
+<p><img src="http://segmentfault.com/img/bVm0uK" alt="串行设计"></p>
+<p>但是其实这样也是有问题的，在用户注册这一步，系统并行请求发起4个请求，如果说通知SNS这一步需要时间比较长，即使其他步骤再快，用户任然需要等待10秒才能注册，假如说发红包服务器宕机了，那就不能注册了。</p>
+<p>通过业务分析我们能够得知，用户的实际的核心流程其实只有一个，就是用户注册。而后续的准备支付宝，通知sns等操作虽然必须要完成，但却是不需要让用户等待的。</p>
+<p>这种模式有个专业的名词，就叫最终一致。为了达到最终一致，我们引入了MQ系统</p>
+<p><img src="http://segmentfault.com/img/bVm0uL" alt="主流程"></p>
+<p>异步流程如下：</p>
+<p><img src="http://segmentfault.com/img/bVm0uM" alt="异步流程"></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;notify是淘宝的一个消息中间件，它用创新地方式解决了分布式事务的问题，用相对较低的成本，实现了跨微服务的最终一致性&lt;/p&gt;
+&lt;p&gt;消息系统的核心作用就是三点：&lt;strong&gt;解耦，异步和并行&lt;/strong&gt;&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="消息中间件" scheme="http://yoursite.com/tags/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>redis安装配置</title>
+    <link href="http://yoursite.com/2017/05/26/redis/"/>
+    <id>http://yoursite.com/2017/05/26/redis/</id>
+    <published>2017-05-26T11:14:31.015Z</published>
+    <updated>2017-01-10T11:41:20.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文详细介绍redis单机单实例安装与配置，服务及开机自启动。如有不对的地方，欢迎大家拍砖o(∩_∩)o<br>（以下配置基于CentOS release 6.5 Final， redis版本3.0.2 [redis版本号中间位是偶数的是稳定版，奇数的为非稳定版]）</p>
+<a id="more"></a>
+<p>一．安装redis<br>1)     下载redis安装包<br>可去官网<a href="http://redis.io" target="_blank" rel="external">http://redis.io</a> ，也可通过wget命令，<br>wget <a href="http://download.redis.io/redis-stable.tar.gz" target="_blank" rel="external">http://download.redis.io/redis-stable.tar.gz</a></p>
+<p>2)     解压<br>tar –zxvf redis-stable.tar.gz</p>
+<p>3)     编译、安装<br>cd redis-stable</p>
+<p>make<br>如果提示gcc command不识别，请自行安装gcc;<br>如果提示couldn’t execute tcl : no such file or dicrectory，请自行安装tcl;<br>如果提示</p>
+<p>请执行make distclean，然后再make</p>
+<p>Make成功之后，会在src目录下多出一些文件，如下</p>
+<p>可手动拷贝redis-server、redis-cli、redis-check-aof、redis-check-dump等至/usr/local/bin目录下，也可执行make install，此处执行make install</p>
+<p>可查看，/usr/local/bin下已有这些文件。<br>注意：若此时执行redis-server –v (查看版本命令)，若提示redis-server command not found，则需要将/usr/local/bin目录加到环境变量，如何添加，此处不做详细介绍，可查看修改/etc/profile，(查看环境变量命令：echo $PATH)<br>正常如下</p>
+<p>至此，redis安装完成，接着配置。</p>
+<p>二．修改配置文件.conf<br>1)     创建配置文件目录，dump file 目录，进程pid目录，log目录等<br>配置文件一般放在/etc/下，创建redis目录<br>cd /etc/<br>mkdir redis</p>
+<p>ll 查看创建的redis目录<br>~<br>dump file、进程pid、log目录等，一般放在/var/目录下，<br>cd /var/<br>mkdir redis<br>cd redis<br>mkdir data log run</p>
+<p>至此，目录创建完毕<br>2)     修改配置文件，配置参数<br>首先拷贝解压包下的redis.conf文件至/etc/redis</p>
+<p>查看/etc/redis/redis.conf<br>cd /etc/redis/<br>ll</p>
+<p>打开redis.conf文件<br>修改端口(默认6379)</p>
+<p>修改pid目录为新建目录</p>
+<p>修改dump目录为新建目录</p>
+<p>修改log存储目录为新建目录</p>
+<p>3)     持久化<br>默认rdb，可选择是否开启aof，若开启，修改配置文件appendonly<br>4)     启动redis，查看各目录下文件</p>
+<p>查看进程</p>
+<p>redis已启动<br>查看dump, log, pid等</p>
+<p>发现只有日志，没有dump和pid信息，是因为当前redis服务仍然是console模式运行的，且没有数据存储操作<br>停止redis服务，修改配置文件使得redis在background运行</p>
+<p>改成yes，保存，重启redis服务<br>查看pid信息，如下</p>
+<p>查看dump信息</p>
+<p>若配置了aof持久化方式，data目录下还会有aof的相关文件<br>5)     客户端连接redis</p>
+<p>默认端口6379<br>6)     至此，redis基础配置完毕，若有其他相关配置调整，可查找文档再修改</p>
+<p>三．服务及开机自启动<br>1)     创建redis启动脚本<br>拷贝解压包下utils下redis启动脚本至/etc/init.d/<br>cp redis_init_script /etc/init.d/<br>修改脚本名称(也可不修改)为redis<br>查看ll</p>
+<p>修改脚本pid及conf路径为实际路径</p>
+<p>生产环境下，配置时，配置文件、pid等最好加上端口标识，以便区分，如</p>
+<p>保存<br>退出<br>至此，在/etc/init.d/目录下，已经可以通过service redis start/stop 命令启动和关闭redis</p>
+<p>若在其他目录下，不能够使用这2个命令，请继续配置2)，添加权限<br>2)     给启动脚本添加权限<br>chmod +x /etc/init.d/redis</p>
+<p>实际命令，根据目录的不同，会不一样<br>相应的删除权限是<br>chmod –x /etc/init.d/redis<br>如果需要在开机的时候，redis服务自动启动，可继续3)<br>3)     设置自启动<br>chkconfig redis on<br>如果运行报错，提示</p>
+<p>是因为没有在启动脚本里加入redis启动优先级信息，可添加如下</p>
+<p>再次执行chkconfig redis on，成功</p>
+<p>至此，自启动配置完毕</p>
+<p>如有不对的地方，欢迎大家拍砖o(∩_∩)o</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文详细介绍redis单机单实例安装与配置，服务及开机自启动。如有不对的地方，欢迎大家拍砖o(∩_∩)o&lt;br&gt;（以下配置基于CentOS release 6.5 Final， redis版本3.0.2 [redis版本号中间位是偶数的是稳定版，奇数的为非稳定版]）&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="reids" scheme="http://yoursite.com/tags/reids/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>netty相关</title>
+    <link href="http://yoursite.com/2017/05/26/netty/"/>
+    <id>http://yoursite.com/2017/05/26/netty/</id>
+    <published>2017-05-26T11:14:31.011Z</published>
+    <updated>2017-01-10T11:41:12.000Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="同步阻塞式IO（BIO）"><a href="#同步阻塞式IO（BIO）" class="headerlink" title="同步阻塞式IO（BIO）"></a>同步阻塞式IO（BIO）</h3><p>BIO主要的问题在于每次有一个新的客户端接入的时候，服务端必须创建一个新的线程处理新接入的链路，一个线程只能处理一个客户端连接</p>
+<a id="more"></a>
+<h3 id="伪异步I-O模型"><a href="#伪异步I-O模型" class="headerlink" title="伪异步I/O模型"></a>伪异步I/O模型</h3><p>伪异步I/O使用了线程池实现，避免了为每一个请求创建一个独立线程，而造成资源耗尽的问题，但是还是有问题，线程池采用阻塞队列实现，队列积满之后，后续入队列将会被阻塞</p>
+<h3 id="NIO-New-I-O或者Non-BlOCK-I-O"><a href="#NIO-New-I-O或者Non-BlOCK-I-O" class="headerlink" title="NIO(New-I/O或者Non-BlOCK I/O)"></a>NIO(New-I/O或者Non-BlOCK I/O)</h3><p>1、缓冲区buffer</p>
+<p>​     在NIO的库中，所有的数据都是通过缓冲区来处理的，在读取数据时候，他是直接读到缓冲区的，包含：ByteBuffer、CharBuffer、ShotBuffer、IntBuffer、LongBuffer、FloatBuffer、DoubleBuffer，都是实现Buffer接口</p>
+<p>2、Channel通道</p>
+<p>​    就像一个自来水管一样，网络数据通过Channel读取和写入，通道是双向的，流只是在一个方向上移动，channel是全双工通信，能够同时支持读写操作</p>
+<p>3、多路复用器Selector</p>
+<p>​    </p>
+<h3 id="AIO（NIO异步通道）"><a href="#AIO（NIO异步通道）" class="headerlink" title="AIO（NIO异步通道）"></a>AIO（NIO异步通道）</h3><p>是真正的异步非阻塞IO，对于时间驱动AIO，</p>
+<h3 id="TCP"><a href="#TCP" class="headerlink" title="TCP"></a>TCP</h3><p>TCP发生拆包粘包情况</p>
+<p>1、应用程序write写入字节大小大于套接扣发送缓冲区大小</p>
+<p>2、进行MSS(是网络传输数据最大值)大小的TCP分段</p>
+<p>3、以太网帧的payload（有效载荷:在一个数据包或者其它传输单元中运载的基本必要数据，httppost的有效数据）大于MTU（最大传输单元）进行IP分片</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;同步阻塞式IO（BIO）&quot;&gt;&lt;a href=&quot;#同步阻塞式IO（BIO）&quot; class=&quot;headerlink&quot; title=&quot;同步阻塞式IO（BIO）&quot;&gt;&lt;/a&gt;同步阻塞式IO（BIO）&lt;/h3&gt;&lt;p&gt;BIO主要的问题在于每次有一个新的客户端接入的时候，服务端必须创建一个新的线程处理新接入的链路，一个线程只能处理一个客户端连接&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="netty" scheme="http://yoursite.com/tags/netty/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Mybatis Plugin插件使用方法</title>
+    <link href="http://yoursite.com/2017/05/26/Mybatis%20Plugin/"/>
+    <id>http://yoursite.com/2017/05/26/Mybatis Plugin/</id>
+    <published>2017-05-26T11:14:31.007Z</published>
+    <updated>2017-01-10T13:23:10.000Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="Mybatis-Plugin"><a href="#Mybatis-Plugin" class="headerlink" title="Mybatis Plugin"></a>Mybatis Plugin</h3><h4 id="一、Mybatis-Plugin插件是什么"><a href="#一、Mybatis-Plugin插件是什么" class="headerlink" title="一、Mybatis Plugin插件是什么"></a>一、Mybatis Plugin插件是什么</h4><ul>
+<li>提供Mapper接口与配置文件中对应SQL的导航</li>
+<li>编辑XML文件时自动补全</li>
+<li>根据Mapper接口, 使用快捷键生成xml文件及SQL标签</li>
+<li>ResultMap中的property支持自动补全，支持级联(属性A.属性B.属性C)</li>
+<li>快捷键生成@Param注解</li>
+<li>XML中编辑SQL时, 括号自动补全</li>
+<li>XML中编辑SQL时, 支持参数自动补全(基于@Param注解识别参数)</li>
+<li>自动检查Mapper XML文件中ID冲突</li>
+<li>自动检查Mapper XML文件中错误的属性值</li>
+<li>支持Find Usage</li>
+<li>支持重构从命名</li>
+<li>支持别名</li>
+<li>自动生成ResultMap属性</li>
+<li>快捷键:   Option + Enter(Mac) | Alt + Enter(Windows) </li>
+</ul>
+<a id="more"></a>
+<h4 id="二、Mybatis-Plugin安装"><a href="#二、Mybatis-Plugin安装" class="headerlink" title="二、Mybatis Plugin安装"></a>二、Mybatis Plugin安装</h4><p>打开IDEA ， preference  -》 plugins-&gt;browse repository到达下面页面<br><img src="http://img.blog.csdn.net/20170105203651703?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTQxMDUyOQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="Mybatis Plugin安装"></p>
+<p>点击绿色的install，重启IDEA既可安装完成<br>好的，如果是土豪，辣么看到这里就可以去买激活码使用了</p>
+<h4 id="三、Mybatis-Plugin破解"><a href="#三、Mybatis-Plugin破解" class="headerlink" title="三、Mybatis Plugin破解"></a>三、Mybatis Plugin破解</h4><p>OK，如果你不是土豪，继续往下面看，辣么开始我们的破解工作。</p>
+<p>#####0、破解准备工作<br>不管你是哪种系统，先做一些准备工作。如下<br><a href="https://github.com/myoss/profile" target="_blank" rel="external">破解工具这里</a><br>OK点击上面链接，你看到了一个git仓库，先clone下来，不会clone的down下来，记住路径</p>
+<p>接下来进入这个路径，你看到一堆版本，选择你安装的mybatis_plugin版本号，比如我的是IDEA15版本的，我安装版本就是v2.64，进入v2.64你会看到一个com文件夹，牢牢记住这个文件夹有大作用<br><img src="http://img.blog.csdn.net/20170105205220499?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTQxMDUyOQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<h5 id="1、windows破解"><a href="#1、windows破解" class="headerlink" title="1、windows破解"></a>1、windows破解</h5><p>事实上Windows下面破解简单得多，难的是mac破解</p>
+<p><img src="http://img.blog.csdn.net/20170105210212331?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTQxMDUyOQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>借用一下别人的图，看懂了吧！其实就是要<strong><em>替换com文件夹</em></strong></p>
+<h5 id="2、mac下破解"><a href="#2、mac下破解" class="headerlink" title="2、mac下破解"></a>2、mac下破解</h5><p>mac下面就比较有意思了<br>使用find命令在你的用户目录下查找mybatis_plus.jar这个文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">find ~ -name &quot;mybatis_plus.jar&quot;</div></pre></td></tr></table></figure>
+<p>OK，拿到一个地址，然后进去</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cd /Users/XXXXX/Library/Application Support/IntelliJIdea15/mybatis_plus/lib</div></pre></td></tr></table></figure>
+<p>看到了2个文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">#创建一个文件夹</div><div class="line">mkdir m</div><div class="line">#进去 </div><div class="line">cd m</div><div class="line">#拷贝到m文件夹中 </div><div class="line">cp ../mybatis_plus.jar .</div><div class="line">#解压jar包</div><div class="line">jar xf mybatis_plus.jar </div><div class="line">#复制com文件夹到这里   路径根据你情况而定，版本号也根据你情况而定</div><div class="line">cp -r ~/Workspace/github/mybatis_plus/idea/plugin/MybatisPlugin/v2.7\~v2.83/com .</div><div class="line">#重新打为jar包</div><div class="line">jar cf mybatis_plus.jar *</div><div class="line">#复制到m的上层目录</div><div class="line">cp mybatis_plus.jar ../</div></pre></td></tr></table></figure>
+<p>重启你的IDEA，完毕，破解搞定</p>
+<h4 id="四、Mybatis-Plugin使用"><a href="#四、Mybatis-Plugin使用" class="headerlink" title="四、Mybatis Plugin使用"></a>四、Mybatis Plugin使用</h4><p>大家慢慢体验吧!</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;Mybatis-Plugin&quot;&gt;&lt;a href=&quot;#Mybatis-Plugin&quot; class=&quot;headerlink&quot; title=&quot;Mybatis Plugin&quot;&gt;&lt;/a&gt;Mybatis Plugin&lt;/h3&gt;&lt;h4 id=&quot;一、Mybatis-Plugin插件是什么&quot;&gt;&lt;a href=&quot;#一、Mybatis-Plugin插件是什么&quot; class=&quot;headerlink&quot; title=&quot;一、Mybatis Plugin插件是什么&quot;&gt;&lt;/a&gt;一、Mybatis Plugin插件是什么&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;提供Mapper接口与配置文件中对应SQL的导航&lt;/li&gt;
+&lt;li&gt;编辑XML文件时自动补全&lt;/li&gt;
+&lt;li&gt;根据Mapper接口, 使用快捷键生成xml文件及SQL标签&lt;/li&gt;
+&lt;li&gt;ResultMap中的property支持自动补全，支持级联(属性A.属性B.属性C)&lt;/li&gt;
+&lt;li&gt;快捷键生成@Param注解&lt;/li&gt;
+&lt;li&gt;XML中编辑SQL时, 括号自动补全&lt;/li&gt;
+&lt;li&gt;XML中编辑SQL时, 支持参数自动补全(基于@Param注解识别参数)&lt;/li&gt;
+&lt;li&gt;自动检查Mapper XML文件中ID冲突&lt;/li&gt;
+&lt;li&gt;自动检查Mapper XML文件中错误的属性值&lt;/li&gt;
+&lt;li&gt;支持Find Usage&lt;/li&gt;
+&lt;li&gt;支持重构从命名&lt;/li&gt;
+&lt;li&gt;支持别名&lt;/li&gt;
+&lt;li&gt;自动生成ResultMap属性&lt;/li&gt;
+&lt;li&gt;快捷键:   Option + Enter(Mac) | Alt + Enter(Windows) &lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+    
+      <category term="mybatis" scheme="http://yoursite.com/tags/mybatis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>linux相关</title>
+    <link href="http://yoursite.com/2017/05/26/linux/"/>
+    <id>http://yoursite.com/2017/05/26/linux/</id>
+    <published>2017-05-26T11:14:30.980Z</published>
+    <updated>2017-01-10T11:42:42.000Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="小葵花妈妈课堂又开课啦："><a href="#小葵花妈妈课堂又开课啦：" class="headerlink" title="小葵花妈妈课堂又开课啦："></a>小葵花妈妈课堂又开课啦：<img src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=82301314,1500636652&amp;fm=116&amp;gp=0.jpg" alt="小葵花妈妈课堂"></h3><p>​<strong>1、stb环境需要显示照片怎么办？</strong></p>
+<p>解决办法：将PHP和JAVA都挂载到nfs系统即可，我们stb环境的共有磁盘文件地址是192.168.3.109</p>
+<a id="more"></a>
+<p>JAVA stb服务器运行下面命令(如根目录)</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mount -t nfs 192.168.3.109:/NFS_Photos/Uploads  Uploads/</div></pre></td></tr></table></figure>
+<p>PHP stb 需要共享目录下运行下面命令（如到/usr/share/nginx/branch_db/Public/Files）</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mount -t nfs 192.168.3.109:/NFS_Photos/Uploads  Uploads/</div></pre></td></tr></table></figure>
+<p>这样传的照片就能在后台和前提显示了</p>
+<h3 id="小葵花妈妈周五最后一节课啦："><a href="#小葵花妈妈周五最后一节课啦：" class="headerlink" title="小葵花妈妈周五最后一节课啦："></a>小葵花妈妈周五最后一节课啦：<img src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=82301314,1500636652&amp;fm=116&amp;gp=0.jpg" alt="小葵花妈妈课堂"></h3><p>近期发现各位小伙伴本地PHP环境启动不起来，因为重构加入了大量的参数，请各位在配置文件里面加入下面4项即可，复制粘贴即可</p>
+<pre><code>static public $JAVA_LOAN_UPDATESTATUS=&quot;1&quot;;
+static public $mkt_url =&quot;www.stb.xxxxxx.com&quot;;
+static public $INVT_URL =&apos;www.stb.xxxxxxx.com&apos;;
+static public $PROD_URL=&quot;www.stb.xxxxxx.com&quot;;
+</code></pre>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;小葵花妈妈课堂又开课啦：&quot;&gt;&lt;a href=&quot;#小葵花妈妈课堂又开课啦：&quot; class=&quot;headerlink&quot; title=&quot;小葵花妈妈课堂又开课啦：&quot;&gt;&lt;/a&gt;小葵花妈妈课堂又开课啦：&lt;img src=&quot;https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=82301314,1500636652&amp;amp;fm=116&amp;amp;gp=0.jpg&quot; alt=&quot;小葵花妈妈课堂&quot;&gt;&lt;/h3&gt;&lt;p&gt;​&lt;strong&gt;1、stb环境需要显示照片怎么办？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;解决办法：将PHP和JAVA都挂载到nfs系统即可，我们stb环境的共有磁盘文件地址是192.168.3.109&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="linux" scheme="http://yoursite.com/tags/linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>kafka系列教程</title>
+    <link href="http://yoursite.com/2017/05/26/kafka/"/>
+    <id>http://yoursite.com/2017/05/26/kafka/</id>
+    <published>2017-05-26T11:14:30.964Z</published>
+    <updated>2017-01-10T11:37:30.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>#kafka系列教程  </p>
+<p>##安装配置  </p>
+<p>###1、安装配置<br>（1）、wget <a href="http://mirrors.cnnic.cn/apache/kafka/0.10.0.1/kafka_2.10-0.10.0.1.tgz" target="_blank" rel="external">http://mirrors.cnnic.cn/apache/kafka/0.10.0.1/kafka_2.10-0.10.0.1.tgz</a>    地址随时有可能改变  <a href="http://kafka.apache.org/downloads.html" target="_blank" rel="external">http://kafka.apache.org/downloads.html</a><br> (2)、tar -xzf kafka_2.10-0.10.0.1.tgz<br> (3)、export KAFKA_HOME=/usr/local/kafka……   视自己情况而定<br> (4)、export PATH=$PATH:$KAFKA_HOME/bin    </p>
+<a id="more"></a>
+<p>###2、启动<br>(1)、先启动zookeeper<br> bin/zookeeper-server-start.sh config/zookeeper.properties<br>(2)、启动zookeeper后，稍微等一会（30秒）再启动kafka，否则出错<br> $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server.properties &amp;<br>(3)、创建一个kafka topic    (名称是kafkatopic)<br>bin/kafka-topics.sh –create –zookeeper localhost:2181 –replication-factor 1 -partitions 1 –topic kafkatopic<br>(4)、列出topic<br> ./bin/kafka-topics.sh –list –zookeeper localhost:2181   </p>
+<p>###开始发送消息<br>（1）、开启控制台发送消息<br>./bin/kafka-console-producer.sh –broker-list localhost:9092 –top<br>ic kafkatopic  </p>
+<p>###开启消费消息<br>（2）、开启控制台消费消息<br>./bin/kafka-console-consumer.sh –zookeeper localhost:2181 –topic<br> kafkatopic –from-beginning  </p>
+<p>##配置单机多代理模式（一台机器多个broker）  </p>
+<p>###配置<br>1、kafka的每一个server-1.properties文件需要区别3个配置项目，分别是 broker.id  port   log.dir<br>比如说默认配置是这样的：</p>
+<ul>
+<li>brokder.id  1                       </li>
+<li>port        9093                    </li>
+<li>log.dir     /tmp/kafka-logs-1<br>加一个broker既可以单独配置一个server-2.properties </li>
+<li>broker.id 2</li>
+<li>prot 9094   </li>
+<li>log.dir /tmp/kafka-logs-2   </li>
+</ul>
+<p>2、OK,配置完成之后就可以用命令启动2个broker了<br>/bin/kafka-server-start.sh /config/server-1.properties<br>/bin/kafka-server-start.sh /config/server-1.properties     </p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;#kafka系列教程  &lt;/p&gt;
+&lt;p&gt;##安装配置  &lt;/p&gt;
+&lt;p&gt;###1、安装配置&lt;br&gt;（1）、wget &lt;a href=&quot;http://mirrors.cnnic.cn/apache/kafka/0.10.0.1/kafka_2.10-0.10.0.1.tgz&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://mirrors.cnnic.cn/apache/kafka/0.10.0.1/kafka_2.10-0.10.0.1.tgz&lt;/a&gt;    地址随时有可能改变  &lt;a href=&quot;http://kafka.apache.org/downloads.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://kafka.apache.org/downloads.html&lt;/a&gt;&lt;br&gt; (2)、tar -xzf kafka_2.10-0.10.0.1.tgz&lt;br&gt; (3)、export KAFKA_HOME=/usr/local/kafka……   视自己情况而定&lt;br&gt; (4)、export PATH=$PATH:$KAFKA_HOME/bin    &lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="消息队列" scheme="http://yoursite.com/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JVM参数详解</title>
+    <link href="http://yoursite.com/2017/05/26/JVM%E5%8F%82%E6%95%B0/"/>
+    <id>http://yoursite.com/2017/05/26/JVM参数/</id>
+    <published>2017-05-26T11:14:30.960Z</published>
+    <updated>2017-01-10T11:29:12.000Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="JVM参数详解"><a href="#JVM参数详解" class="headerlink" title="JVM参数详解"></a>JVM参数详解</h3><p>不管是YGC还是Full GC,GC过程中都会对导致程序运行中中断,正确的选择<a href="http://www.cnblogs.com/redcreen/archive/2011/05/04/2037029.html" target="_blank" rel="external">不同的GC策略</a>,调整JVM、GC的参数，可以极大的减少由于GC工作，而导致的程序运行中断方面的问题，进而适当的提高Java程序的工作效率。但是调整GC是以个极为复杂的过程，由于各个程序具备不同的特点，如：web和GUI程序就有很大区别（Web可以适当的停顿，但GUI停顿是客户无法接受的），而且由于跑在各个机器上的配置不同（主要cup个数，内存不同），所以使用的GC种类也会不同(如何选择见<a href="http://www.cnblogs.com/redcreen/archive/2011/05/04/2037029.html" target="_blank" rel="external">GC种类及如何选择</a>)。本文将注重介绍JVM、GC的一些重要参数的设置来提高系统的性能。</p>
+<pre><code>JVM内存组成及GC相关内容请见之前的文章:[JVM内存组成](http://www.cnblogs.com/redcreen/archive/2011/05/04/2036387.html) [GC策略&amp;内存申请](http://www.cnblogs.com/redcreen/archive/2011/05/04/2037056.html)。
+</code></pre><a id="more"></a>
+<p><strong>JVM参数的含义 </strong>实例见<a href="http://www.cnblogs.com/redcreen/archive/2011/05/05/2038331.html" target="_blank" rel="external">实例分析</a></p>
+<table>
+<thead>
+<tr>
+<th><strong>参数名称</strong></th>
+<th><strong>含义</strong></th>
+<th><strong>默认值</strong></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-Xms</td>
+<td>初始堆大小</td>
+<td>物理内存的1/64(&lt;1GB)</td>
+<td>默认(MinHeapFreeRatio参数可以调整)空余堆内存小于40%时，JVM就会增大堆直到-Xmx的最大限制.</td>
+</tr>
+<tr>
+<td>-Xmx</td>
+<td>最大堆大小</td>
+<td>物理内存的1/4(&lt;1GB)</td>
+<td>默认(MaxHeapFreeRatio参数可以调整)空余堆内存大于70%时，JVM会减少堆直到 -Xms的最小限制</td>
+</tr>
+<tr>
+<td>-Xmn</td>
+<td>年轻代大小(1.4or lator)</td>
+<td></td>
+<td><strong>注意</strong>：此处的大小是（eden+ 2 survivor space).与jmap -heap中显示的New gen是不同的。整个堆大小=年轻代大小 + 年老代大小 + 持久代大小.增大年轻代后,将会减小年老代大小.此值对系统性能影响较大,Sun官方推荐配置为整个堆的3/8</td>
+</tr>
+<tr>
+<td>-XX:NewSize</td>
+<td>设置年轻代大小(for 1.3/1.4)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>-XX:MaxNewSize</td>
+<td>年轻代最大值(for 1.3/1.4)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>-XX:PermSize</td>
+<td>设置持久代(perm gen)初始值</td>
+<td>物理内存的1/64</td>
+<td></td>
+</tr>
+<tr>
+<td>-XX:MaxPermSize</td>
+<td>设置持久代最大值</td>
+<td>物理内存的1/4</td>
+<td></td>
+</tr>
+<tr>
+<td>-Xss</td>
+<td>每个线程的堆栈大小</td>
+<td></td>
+<td>JDK5.0以后每个线程堆栈大小为1M,以前每个线程堆栈大小为256K.更具应用的线程所需内存大小进行 调整.在相同物理内存下,减小这个值能生成更多的线程.但是操作系统对一个进程内的线程数还是有限制的,不能无限生成,经验值在3000~5000左右一般小的应用， 如果栈不是很深， 应该是128k够用的 大的应用建议使用256k。这个选项对性能影响比较大，需要严格的测试。（校长）和threadstacksize选项解释很类似,官方文档似乎没有解释,在论坛中有这样一句话:””-Xss is translated in a VM flag named ThreadStackSize”一般设置这个值就可以了。</td>
+</tr>
+<tr>
+<td>-<em>XX:ThreadStackSize</em></td>
+<td>Thread Stack Size</td>
+<td></td>
+<td>(0 means use default stack size) [Sparc: 512; Solaris x86: 320 (was 256 prior in 5.0 and earlier); Sparc 64 bit: 1024; Linux amd64: 1024 (was 0 in 5.0 and earlier); all others 0.]</td>
+</tr>
+<tr>
+<td>-XX:NewRatio</td>
+<td>年轻代(包括Eden和两个Survivor区)与年老代的比值(除去持久代)</td>
+<td></td>
+<td>-XX:NewRatio=4表示年轻代与年老代所占比值为1:4,年轻代占整个堆栈的1/5Xms=Xmx并且设置了Xmn的情况下，该参数不需要进行设置。</td>
+</tr>
+<tr>
+<td>-XX:SurvivorRatio</td>
+<td>Eden区与Survivor区的大小比值</td>
+<td></td>
+<td>设置为8,则两个Survivor区与一个Eden区的比值为2:8,一个Survivor区占整个年轻代的1/10</td>
+</tr>
+<tr>
+<td>-XX:LargePageSizeInBytes</td>
+<td>内存页的大小不可设置过大， 会影响Perm的大小</td>
+<td></td>
+<td>=128m</td>
+</tr>
+<tr>
+<td>-XX:+UseFastAccessorMethods</td>
+<td>原始类型的快速优化</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>-XX:+DisableExplicitGC</td>
+<td>关闭System.gc()</td>
+<td></td>
+<td>这个参数需要严格的测试</td>
+</tr>
+<tr>
+<td>-XX:MaxTenuringThreshold</td>
+<td>垃圾最大年龄</td>
+<td></td>
+<td>如果设置为0的话,则年轻代对象不经过Survivor区,直接进入年老代. 对于年老代比较多的应用,可以提高效率.如果将此值设置为一个较大值,则年轻代对象会在Survivor区进行多次复制,这样可以增加对象再年轻代的存活 时间,增加在年轻代即被回收的概率该参数只有在串行GC时才有效.</td>
+</tr>
+<tr>
+<td>-XX:+AggressiveOpts</td>
+<td>加快编译</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>-XX:+UseBiasedLocking</td>
+<td>锁机制的性能改善</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>-Xnoclassgc</td>
+<td>禁用垃圾回收</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>-XX:SoftRefLRUPolicyMSPerMB</td>
+<td>每兆堆空闲空间中SoftReference的存活时间</td>
+<td>1s</td>
+<td>softly reachable objects will remain alive for some amount of time after the last time they were referenced. The default value is one second of lifetime per free megabyte in the heap</td>
+</tr>
+<tr>
+<td>-XX:PretenureSizeThreshold</td>
+<td>对象超过多大是直接在旧生代分配</td>
+<td>0</td>
+<td>单位字节 新生代采用Parallel Scavenge GC时无效另一种直接在旧生代分配的情况是大的数组对象,且数组中无外部引用对象.</td>
+</tr>
+<tr>
+<td>-XX:TLABWasteTargetPercent</td>
+<td>TLAB占eden区的百分比</td>
+<td>1%</td>
+<td></td>
+</tr>
+<tr>
+<td>-XX:+<em>CollectGen0First</em></td>
+<td>FullGC时是否先YGC</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<p><strong>并行收集器相关参数</strong></p>
+<table>
+<thead>
+<tr>
+<th>-XX:+UseParallelGC</th>
+<th>Full GC采用parallel MSC(此项待验证)</th>
+<th></th>
+<th>选择垃圾收集器为并行收集器.此配置仅对年轻代有效.即上述配置下,年轻代使用并发收集,而年老代仍旧使用串行收集.(此项待验证)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-XX:+UseParNewGC</td>
+<td>设置年轻代为并行收集</td>
+<td></td>
+<td>可与CMS收集同时使用JDK5.0以上,JVM会根据系统配置自行设置,所以无需再设置此值</td>
+</tr>
+<tr>
+<td>-XX:ParallelGCThreads</td>
+<td>并行收集器的线程数</td>
+<td></td>
+<td>此值最好配置与处理器数目相等 同样适用于CMS</td>
+</tr>
+<tr>
+<td>-XX:+UseParallelOldGC</td>
+<td>年老代垃圾收集方式为并行收集(Parallel Compacting)</td>
+<td></td>
+<td>这个是JAVA 6出现的参数选项</td>
+</tr>
+<tr>
+<td>-XX:MaxGCPauseMillis</td>
+<td>每次年轻代垃圾回收的最长时间(最大暂停时间)</td>
+<td></td>
+<td>如果无法满足此时间,JVM会自动调整年轻代大小,以满足此值.</td>
+</tr>
+<tr>
+<td>-XX:+UseAdaptiveSizePolicy</td>
+<td>自动选择年轻代区大小和相应的Survivor区比例</td>
+<td></td>
+<td>设置此选项后,并行收集器会自动选择年轻代区大小和相应的Survivor区比例,以达到目标系统规定的最低相应时间或者收集频率等,此值建议使用并行收集器时,一直打开.</td>
+</tr>
+<tr>
+<td>-XX:GCTimeRatio</td>
+<td>设置垃圾回收时间占程序运行时间的百分比</td>
+<td></td>
+<td>公式为1/(1+n)</td>
+</tr>
+<tr>
+<td>-XX:+<em>ScavengeBeforeFullGC</em></td>
+<td>Full GC前调用YGC</td>
+<td>true</td>
+<td>Do young generation GC prior to a full GC. (Introduced in 1.4.1.)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>CMS相关参数</strong></p>
+<table>
+<thead>
+<tr>
+<th>-XX:+UseConcMarkSweepGC</th>
+<th>使用CMS内存收集</th>
+<th></th>
+<th>测试中配置这个以后,-XX:NewRatio=4的配置失效了,原因不明.所以,此时年轻代大小最好用-Xmn设置.???</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-XX:+AggressiveHeap</td>
+<td></td>
+<td></td>
+<td>试图是使用大量的物理内存长时间大内存使用的优化，能检查计算资源（内存， 处理器数量）至少需要256MB内存大量的CPU／内存， （在1.4.1在4CPU的机器上已经显示有提升）</td>
+</tr>
+<tr>
+<td>-XX:CMSFullGCsBeforeCompaction</td>
+<td>多少次后进行内存压缩</td>
+<td></td>
+<td>由于并发收集器不对内存空间进行压缩,整理,所以运行一段时间以后会产生”碎片”,使得运行效率降低.此值设置运行多少次GC以后对内存空间进行压缩,整理.</td>
+</tr>
+<tr>
+<td>-XX:+CMSParallelRemarkEnabled</td>
+<td>降低标记停顿</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>-XX+UseCMSCompactAtFullCollection</td>
+<td>在FULL GC的时候， 对年老代的压缩</td>
+<td></td>
+<td>CMS是不会移动内存的， 因此， 这个非常容易产生碎片， 导致内存不够用， 因此， 内存的压缩这个时候就会被启用。 增加这个参数是个好习惯。可能会影响性能,但是可以消除碎片</td>
+</tr>
+<tr>
+<td>-XX:+UseCMSInitiatingOccupancyOnly</td>
+<td>使用手动定义初始化定义开始CMS收集</td>
+<td></td>
+<td>禁止hostspot自行触发CMS GC</td>
+</tr>
+<tr>
+<td>-XX:CMSInitiatingOccupancyFraction=70</td>
+<td>使用cms作为垃圾回收使用70％后开始CMS收集</td>
+<td>92</td>
+<td>为了保证不出现promotion failed(见下面介绍)错误,该值的设置需要满足以下公式<strong>CMSInitiatingOccupancyFraction计算公式</strong></td>
+</tr>
+<tr>
+<td>-XX:CMSInitiatingPermOccupancyFraction</td>
+<td>设置Perm Gen使用到达多少比率时触发</td>
+<td>92</td>
+<td></td>
+</tr>
+<tr>
+<td>-XX:+CMSIncrementalMode</td>
+<td>设置为增量模式</td>
+<td></td>
+<td>用于单CPU情况</td>
+</tr>
+<tr>
+<td>-XX:+CMSClassUnloadingEnabled</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>辅助信息</strong></p>
+<table>
+<thead>
+<tr>
+<th>-XX:+PrintGC</th>
+<th></th>
+<th></th>
+<th>输出形式:[GC 118250K-&gt;113543K(130112K), 0.0094143 secs][Full GC 121376K-&gt;10414K(130112K), 0.0650971 secs]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-XX:+PrintGCDetails</td>
+<td></td>
+<td></td>
+<td>输出形式:[GC [DefNew: 8614K-&gt;781K(9088K), 0.0123035 secs] 118250K-&gt;113543K(130112K), 0.0124633 secs][GC [DefNew: 8614K-&gt;8614K(9088K), 0.0000665 secs][Tenured: 112761K-&gt;10414K(121024K), 0.0433488 secs] 121376K-&gt;10414K(130112K), 0.0436268 secs]</td>
+</tr>
+<tr>
+<td>-XX:+PrintGCTimeStamps</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>-XX:+PrintGC:PrintGCTimeStamps</td>
+<td></td>
+<td></td>
+<td>可与-XX:+PrintGC -XX:+PrintGCDetails混合使用输出形式:11.851: [GC 98328K-&gt;93620K(130112K), 0.0082960 secs]</td>
+</tr>
+<tr>
+<td>-XX:+PrintGCApplicationStoppedTime</td>
+<td>打印垃圾回收期间程序暂停的时间.可与上面混合使用</td>
+<td></td>
+<td>输出形式:Total time for which application threads were stopped: 0.0468229 seconds</td>
+</tr>
+<tr>
+<td>-XX:+PrintGCApplicationConcurrentTime</td>
+<td>打印每次垃圾回收前,程序未中断的执行时间.可与上面混合使用</td>
+<td></td>
+<td>输出形式:Application time: 0.5291524 seconds</td>
+</tr>
+<tr>
+<td>-XX:+PrintHeapAtGC</td>
+<td>打印GC前后的详细堆栈信息</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>-Xloggc:filename</td>
+<td>把相关日志信息记录到文件以便分析.与上面几个配合使用</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>-XX:+PrintClassHistogram</td>
+<td>garbage collects before printing the histogram.</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>-XX:+PrintTLAB</td>
+<td>查看TLAB空间的使用情况</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>XX:+PrintTenuringDistribution</td>
+<td>查看每次minor GC后新的存活周期的阈值</td>
+<td></td>
+<td>Desired survivor size 1048576 bytes, new threshold 7 (max 15)new threshold 7即标识新的存活周期的阈值为7。</td>
+</tr>
+</tbody>
+</table>
+<p><strong>GC性能方面的考虑</strong></p>
+<pre><code>对于GC的性能主要有2个方面的指标：吞吐量throughput（工作时间不算gc的时间占总的时间比）和暂停pause（gc发生时app对外显示的无法响应）。
+</code></pre><p>\1. Total Heap</p>
+<pre><code>默认情况下，vm会增加/减少heap大小以维持free space在整个vm中占的比例，这个比例由MinHeapFreeRatio和MaxHeapFreeRatio指定。
+</code></pre><p>一般而言，server端的app会有以下规则：</p>
+<ul>
+<li>对vm分配尽可能多的memory；</li>
+<li>将Xms和Xmx设为一样的值。如果虚拟机启动时设置使用的内存比较小，这个时候又需要初始化很多对象，虚拟机就必须重复地增加内存。</li>
+<li>处理器核数增加，内存也跟着增大。</li>
+</ul>
+<p>\2. The Young Generation</p>
+<pre><code>另外一个对于app流畅性运行影响的因素是young generation的大小。young generation越大，minor collection越少；但是在固定heap size情况下，更大的young generation就意味着小的tenured generation，就意味着更多的major collection(major collection会引发minor collection)。
+
+NewRatio反映的是young和tenured generation的大小比例。NewSize和MaxNewSize反映的是young generation大小的下限和上限，将这两个值设为一样就固定了young generation的大小（同Xms和Xmx设为一样）。
+
+如果希望，SurvivorRatio也可以优化survivor的大小，不过这对于性能的影响不是很大。SurvivorRatio是eden和survior大小比例。
+</code></pre><p>一般而言，server端的app会有以下规则：</p>
+<ul>
+<li>首先决定能分配给vm的最大的heap size，然后设定最佳的young generation的大小；</li>
+<li>如果heap size固定后，增加young generation的大小意味着减小tenured generation大小。让tenured generation在任何时候够大，能够容纳所有live的data（留10%-20%的空余）。</li>
+</ul>
+<p><strong>经验&amp;&amp;规则</strong></p>
+<ol>
+<li>年轻代大小选择<ul>
+<li>响应时间优先的应用:尽可能设大,直到接近系统的最低响应时间限制(根据实际情况选择).在此种情况下,年轻代收集发生的频率也是最小的.同时,减少到达年老代的对象.</li>
+<li>吞吐量优先的应用:尽可能的设置大,可能到达Gbit的程度.因为对响应时间没有要求,垃圾收集可以并行进行,一般适合8CPU以上的应用.</li>
+<li>避免设置过小.当新生代设置过小时会导致:1.YGC次数更加频繁 2.可能导致YGC对象直接进入旧生代,如果此时旧生代满了,会触发FGC.</li>
+</ul>
+</li>
+<li>年老代大小选择<ol>
+<li>响应时间优先的应用:年老代使用并发收集器,所以其大小需要小心设置,一般要考虑并发会话率和会话持续时间等一些参数.如果堆设置小了,可以会造成内存碎 片,高回收频率以及应用暂停而使用传统的标记清除方式;如果堆大了,则需要较长的收集时间.最优化的方案,一般需要参考以下数据获得:<br>并发垃圾收集信息、持久代并发收集次数、传统GC信息、花在年轻代和年老代回收上的时间比例。</li>
+<li>吞吐量优先的应用:一般吞吐量优先的应用都有一个很大的年轻代和一个较小的年老代.原因是,这样可以尽可能回收掉大部分短期对象,减少中期的对象,而年老代尽存放长期存活对象.</li>
+</ol>
+</li>
+<li>较小堆引起的碎片问题<br>因为年老代的并发收集器使用标记,清除算法,所以不会对堆进行压缩.当收集器回收时,他会把相邻的空间进行合并,这样可以分配给较大的对象.但是,当堆空间较小时,运行一段时间以后,就会出现”碎片”,如果并发收集器找不到足够的空间,那么并发收集器将会停止,然后使用传统的标记,清除方式进行回收.如果出现”碎片”,可能需要进行如下配置:<br>-XX:+UseCMSCompactAtFullCollection:使用并发收集器时,开启对年老代的压缩.<br>-XX:CMSFullGCsBeforeCompaction=0:上面配置开启的情况下,这里设置多少次Full GC后,对年老代进行压缩</li>
+<li>用64位操作系统，Linux下64位的jdk比32位jdk要慢一些，但是吃得内存更多，吞吐量更大</li>
+<li>XMX和XMS设置一样大，MaxPermSize和MinPermSize设置一样大，这样可以减轻伸缩堆大小带来的压力</li>
+<li><em>**</em>使用CMS的好处是用尽量少的新生代，经验值是128M－256M， 然后老生代利用CMS并行收集， 这样能保证系统低延迟的吞吐效率。 实际上cms的收集停顿时间非常的短，2G的内存， 大约20－80ms的应用程序停顿时间</li>
+<li>系统停顿的时候可能是GC的问题也可能是程序的问题，多用jmap和jstack查看，或者killall -3 java，然后查看java控制台日志，能看出很多问题。(相关工具的使用方法将在后面的blog中介绍)</li>
+<li>仔细了解自己的应用，如果用了缓存，那么年老代应该大一些，缓存的HashMap不应该无限制长，建议采用LRU算法的Map做缓存，LRUMap的最大长度也要根据实际情况设定。</li>
+<li>采用并发回收时，年轻代小一点，年老代要大，因为年老大用的是并发回收，即使时间长点也不会影响其他程序继续运行，网站不会停顿</li>
+<li>JVM参数的设置(特别是 –Xmx –Xms –Xmn -XX:SurvivorRatio  -XX:MaxTenuringThreshold等参数的设置没有一个固定的公式，需要根据PV old区实际数据 YGC次数等多方面来衡量。为了避免promotion faild可能会导致xmn设置偏小，也意味着YGC的次数会增多，处理并发访问的能力下降等问题。每个参数的调整都需要经过详细的性能测试，才能找到特定应用的最佳配置。</li>
+</ol>
+<p><strong>promotion failed:</strong></p>
+<p>垃圾回收时promotion failed是个很头痛的问题，一般可能是两种原因产生，第一个原因是救助空间不够，救助空间里的对象还不应该被移动到年老代，但年轻代又有很多对象需要放入救助空间；第二个原因是年老代没有足够的空间接纳来自年轻代的对象；这两种情况都会转向Full GC，网站停顿时间较长。</p>
+<p>解决方方案一：</p>
+<p><em>第一个原因我的最终解决办法是去掉救助空间，设置-XX:SurvivorRatio=65536 -XX:MaxTenuringThreshold=0即可，第二个原因我的解决办法是设置CMSInitiatingOccupancyFraction为某个值（假设70），这样年老代空间到70%时就开始执行CMS，年老代有足够的空间接纳来自年轻代的对象。</em></p>
+<p>解决方案一的改进方案：</p>
+<p><em>又有改进了，上面方法不太好，因为没有用到救助空间，所以年老代容易满，CMS执行会比较频繁。我改善了一下，还是用救助空间，但是把救助空间加大，这样也不会有promotion failed。具体操作上，32位Linux和64位Linux好像不一样，64位系统似乎只要配置MaxTenuringThreshold参数，CMS还是有暂停。为了解决暂停问题和promotion failed问题，最后我设置-XX:SurvivorRatio=1 ，并把MaxTenuringThreshold去掉，这样即没有暂停又不会有promotoin failed，而且更重要的是，年老代和永久代上升非常慢（因为好多对象到不了年老代就被回收了），所以CMS执行频率非常低，好几个小时才执行一次，这样，服务器都不用重启了。</em></p>
+<p>-Xmx4000M -Xms4000M -Xmn600M -XX:PermSize=500M -XX:MaxPermSize=500M -Xss256K -XX:+DisableExplicitGC -XX:SurvivorRatio=1 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:CMSFullGCsBeforeCompaction=0 -XX:+CMSClassUnloadingEnabled -XX:LargePageSizeInBytes=128M -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=80 -XX:SoftRefLRUPolicyMSPerMB=0 -XX:+PrintClassHistogram -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintHeapAtGC -Xloggc:log/gc.log</p>
+<p><strong>CMSInitiatingOccupancyFraction值与Xmn的关系公式</strong></p>
+<p>上面介绍了promontion faild产生的原因是EDEN空间不足的情况下将EDEN与From survivor中的存活对象存入To survivor区时,To survivor区的空间不足，再次晋升到old gen区，而old gen区内存也不够的情况下产生了promontion faild从而导致full gc.那可以推断出：eden+from survivor &lt; old gen区剩余内存时，不会出现promontion faild的情况，即：<br>(Xmx-Xmn)*(1-CMSInitiatingOccupancyFraction/100)&gt;=(Xmn-Xmn/(SurvivorRatior+2))  进而推断出：</p>
+<p>CMSInitiatingOccupancyFraction &lt;=((Xmx-Xmn)-(Xmn-Xmn/(SurvivorRatior+2)))/(Xmx-Xmn)*100</p>
+<p>例如：</p>
+<p>当xmx=128 xmn=36 SurvivorRatior=1时 CMSInitiatingOccupancyFraction&lt;=((128.0-36)-(36-36/(1+2)))/(128-36)*100 =73.913</p>
+<p>当xmx=128 xmn=24 SurvivorRatior=1时 CMSInitiatingOccupancyFraction&lt;=((128.0-24)-(24-24/(1+2)))/(128-24)*100=84.615…</p>
+<p>当xmx=3000 xmn=600 SurvivorRatior=1时  CMSInitiatingOccupancyFraction&lt;=((3000.0-600)-(600-600/(1+2)))/(3000-600)*100=83.33</p>
+<p>CMSInitiatingOccupancyFraction低于70% 需要调整xmn或SurvivorRatior值。</p>
+<p>令：</p>
+<p><a href="http://bbs.weblogicfans.net/archiver/tid-2835.html" target="_blank" rel="external">网上一童鞋</a>推断出的公式是：:(Xmx-Xmn)*(100-CMSInitiatingOccupancyFraction)/100&gt;=Xmn 这个公式个人认为不是很严谨，在内存小的时候会影响xmn的计算。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;JVM参数详解&quot;&gt;&lt;a href=&quot;#JVM参数详解&quot; class=&quot;headerlink&quot; title=&quot;JVM参数详解&quot;&gt;&lt;/a&gt;JVM参数详解&lt;/h3&gt;&lt;p&gt;不管是YGC还是Full GC,GC过程中都会对导致程序运行中中断,正确的选择&lt;a href=&quot;http://www.cnblogs.com/redcreen/archive/2011/05/04/2037029.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;不同的GC策略&lt;/a&gt;,调整JVM、GC的参数，可以极大的减少由于GC工作，而导致的程序运行中断方面的问题，进而适当的提高Java程序的工作效率。但是调整GC是以个极为复杂的过程，由于各个程序具备不同的特点，如：web和GUI程序就有很大区别（Web可以适当的停顿，但GUI停顿是客户无法接受的），而且由于跑在各个机器上的配置不同（主要cup个数，内存不同），所以使用的GC种类也会不同(如何选择见&lt;a href=&quot;http://www.cnblogs.com/redcreen/archive/2011/05/04/2037029.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;GC种类及如何选择&lt;/a&gt;)。本文将注重介绍JVM、GC的一些重要参数的设置来提高系统的性能。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;JVM内存组成及GC相关内容请见之前的文章:[JVM内存组成](http://www.cnblogs.com/redcreen/archive/2011/05/04/2036387.html) [GC策略&amp;amp;内存申请](http://www.cnblogs.com/redcreen/archive/2011/05/04/2037056.html)。
+&lt;/code&gt;&lt;/pre&gt;
+    
+    </summary>
+    
+    
+      <category term="JVM" scheme="http://yoursite.com/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JAVA排查问题</title>
+    <link href="http://yoursite.com/2017/05/26/java%E6%8E%92%E6%9F%A5%E9%97%AE%E9%A2%98/"/>
+    <id>http://yoursite.com/2017/05/26/java排查问题/</id>
+    <published>2017-05-26T11:14:30.941Z</published>
+    <updated>2017-01-10T11:42:12.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>问题排查除了最重要的解决思路和逻辑推导能力外，工具也是不可缺少的一部分，一个好用的工具可以事半功倍，甚至在某些情况下会因为没有相应的工具而压根就没法继续进行下去，这篇文章就来讲讲在排查Java问题时通常要用到的一些工具</p>
+<a id="more"></a>
+<h3 id="日志相关工具"><a href="#日志相关工具" class="headerlink" title="日志相关工具"></a>日志相关工具</h3><p>查问题的时候会非常依赖日志，因此看日志的相关工具非常重要，通常的话掌握好tail,find,fgrep,awk这几个常用工具的方法就可以，说到这个就必须说关键的异常和信息日志输出是多么的重要（看过太多异常的随意处理，例如很典型的是应用自己的ServletContextListener实现，很多的Listener实现都会变成往外抛RuntimeException，然后直接导致tomcat退出，而tomcat这个时候也不会输出这个异常信息，这种时候要查原因真的是让人很郁闷，尽管也有办法）。</p>
+<p>日志的标准化也非常重要，日志的标准化一方面方便像我这种要查各种系统问题的人，不标准的话连日志在哪都找不到；另一方面对于分布式系统而言，如果标准化的话是很容易做日志tracing的，对问题定位会有很大帮助。</p>
+<h3 id="CPU相关工具"><a href="#CPU相关工具" class="headerlink" title="CPU相关工具"></a>CPU相关工具</h3><p>碰到一些CPU相关的问题时，通常需要用到的工具：</p>
+<p>top (-H)</p>
+<p>top可以实时的观察cpu的指标状况，尤其是每个core的指标状况，可以更有效的来帮助解决问题，-H则有助于看是什么线程造成的CPU消耗，这对解决一些简单的耗CPU的问题会有很大帮助。</p>
+<p>sar</p>
+<p>sar有助于查看历史指标数据，除了CPU外，其他内存，磁盘，网络等等各种指标都可以查看，毕竟大部分时候问题都发生在过去，所以翻历史记录非常重要。</p>
+<p>jstack</p>
+<p>jstack可以用来查看Java进程里的线程都在干什么，这通常对于应用没反应，非常慢等等场景都有不小的帮助，jstack默认只能看到Java栈，而jstack -m则可以看到线程的Java栈和native栈，但如果Java方法被编译过，则看不到（然而大部分经常访问的Java方法其实都被编译过）。</p>
+<p>pstack</p>
+<p>pstack可以用来看Java进程的native栈。</p>
+<p>perf</p>
+<p>一些简单的CPU消耗的问题靠着top -H + jstack通常能解决，复杂的话就需要借助perf这种超级利器了。</p>
+<p>cat /proc/interrupts</p>
+<p>之所以提这个是因为对于分布式应用而言，频繁的网络访问造成的网络中断处理消耗也是一个关键，而这个时候网卡的多队列以及均衡就非常重要了，所以如果观察到cpu的si指标不低，那么看看interrupts就有必要了。</p>
+<h3 id="内存相关工具"><a href="#内存相关工具" class="headerlink" title="内存相关工具"></a>内存相关工具</h3><p>碰到一些内存相关的问题时，通常需要用到的工具：</p>
+<p>jstat</p>
+<p>jstat -gcutil或-gc等等有助于实时看gc的状况，不过我还是比较习惯看gc log。</p>
+<p>jmap</p>
+<p>在需要dump内存看看内存里都是什么的时候，jmap -dump可以帮助你；在需要强制执行fgc的时候（在CMS GC这种一定会产生碎片化的GC中，总是会找到这样的理由的），jmap -histo:live可以帮助你（显然，不要随便执行）。</p>
+<p>gcore</p>
+<p>相比jmap -dump，其实我更喜欢gcore，因为感觉就是更快，不过由于某些jdk版本貌似和gcore配合的不是那么好，所以那种时候还是要用jmap -dump的。</p>
+<p>mat</p>
+<p>有了内存dump后，没有分析工具的话然并卵，mat是个非常赞的工具，好用的没什么可说的。</p>
+<p>btrace</p>
+<p>少数的问题可以mat后直接看出，而多数会需要再用btrace去动态跟踪，btrace绝对是Java中的超级神器，举个简单例子，如果要你去查下一个运行的Java应用，哪里在创建一个数组大小&gt;1000的ArrayList，你要怎么办呢，在有btrace的情况下，那就是秒秒钟搞定的事，:)</p>
+<p>gperf</p>
+<p>Java堆内的内存消耗用上面的一些工具基本能搞定，但堆外就悲催了，目前看起来还是只有gperf还算是比较好用的一个，或者从经验上来说Direct ByteBuffer、Deflater/Inflater这些是常见问题。</p>
+<p>除了上面的工具外，同样内存信息的记录也非常重要，就如日志一样，所以像GC日志是一定要打开的，确保在出问题后可以翻查GC日志来对照是否GC有问题，所以像-XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:<gc log="" file=""> 这样的参数必须是启动参数的标配。</gc></p>
+<h3 id="ClassLoader相关工具"><a href="#ClassLoader相关工具" class="headerlink" title="ClassLoader相关工具"></a>ClassLoader相关工具</h3><p>作为Java程序员，不碰到ClassLoader问题那基本是不可能的，在排查此类问题时，最好办的还是-XX:+TraceClassLoading，或者如果知道是什么类的话，我的建议就是把所有会装载的lib目录里的jar用jar -tvf *.jar这样的方式来直接查看冲突的class，再不行的话就要呼唤btrace神器去跟踪Classloader.defineClass之类的了。</p>
+<h3 id="其他工具"><a href="#其他工具" class="headerlink" title="其他工具"></a>其他工具</h3><p>jinfo</p>
+<p>Java有N多的启动参数，N多的默认值，而任何文档都不一定准确，只有用jinfo -flags看到的才靠谱，甚至你还可以看看jinfo -flag，你会发现更好玩的。</p>
+<p>dmesg</p>
+<p>你的java进程突然不见了？ 也许可以试试dmesg先看看。</p>
+<p>systemtap</p>
+<p>有些问题排查到java层面是不够的，当需要trace更底层的os层面的函数调用的时候，systemtap神器就可以派上用场了。</p>
+<p>gdb</p>
+<p>更高级的玩家们，拿着core dump可以用gdb来排查更诡异的一些问题。</p>
+<p>io类型的问题我排查的很少，所以尽管知道一些工具，还是不在这里写</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;问题排查除了最重要的解决思路和逻辑推导能力外，工具也是不可缺少的一部分，一个好用的工具可以事半功倍，甚至在某些情况下会因为没有相应的工具而压根就没法继续进行下去，这篇文章就来讲讲在排查Java问题时通常要用到的一些工具&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="java" scheme="http://yoursite.com/tags/java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JAVA基础</title>
+    <link href="http://yoursite.com/2017/05/26/java%E5%9F%BA%E7%A1%80/"/>
+    <id>http://yoursite.com/2017/05/26/java基础/</id>
+    <published>2017-05-26T11:14:30.934Z</published>
+    <updated>2017-01-10T11:36:38.000Z</updated>
+    
+    <content type="html"><![CDATA[<h4 id="fianl关键字"><a href="#fianl关键字" class="headerlink" title="fianl关键字"></a>fianl关键字</h4><p>final修饰的变量初始化之后就不能更改</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">final</span> Integer a=<span class="keyword">new</span> Integer(<span class="number">10</span>);</div><div class="line">a=<span class="number">20</span>;      <span class="comment">//a不可继续更改，错误写法</span></div></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>如果是一个引用，那么该引用指向的对象无法更改</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Integer b=<span class="keyword">new</span> Integer(<span class="number">10</span>);</div><div class="line"><span class="keyword">final</span> Integer a=b;</div><div class="line">a=<span class="keyword">new</span> Integer(<span class="number">20</span>);   <span class="comment">//错误写法</span></div><div class="line">b++;   <span class="comment">//正确写法，这样是允许的</span></div></pre></td></tr></table></figure>
+<h4 id="HashMap原理"><a href="#HashMap原理" class="headerlink" title="HashMap原理"></a>HashMap原理</h4><p>hashMap冲撞等</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;fianl关键字&quot;&gt;&lt;a href=&quot;#fianl关键字&quot; class=&quot;headerlink&quot; title=&quot;fianl关键字&quot;&gt;&lt;/a&gt;fianl关键字&lt;/h4&gt;&lt;p&gt;final修饰的变量初始化之后就不能更改&lt;/p&gt;
+&lt;figure class=&quot;highlight java&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;final&lt;/span&gt; Integer a=&lt;span class=&quot;keyword&quot;&gt;new&lt;/span&gt; Integer(&lt;span class=&quot;number&quot;&gt;10&lt;/span&gt;);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;a=&lt;span class=&quot;number&quot;&gt;20&lt;/span&gt;;      &lt;span class=&quot;comment&quot;&gt;//a不可继续更改，错误写法&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+    
+      <category term="java" scheme="http://yoursite.com/tags/java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>GIT常用指令集合</title>
+    <link href="http://yoursite.com/2017/05/26/GIT%E6%8C%87%E5%8D%97/"/>
+    <id>http://yoursite.com/2017/05/26/GIT指南/</id>
+    <published>2017-05-26T11:14:30.928Z</published>
+    <updated>2017-01-10T11:26:48.000Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="GIT常用指令集合"><a href="#GIT常用指令集合" class="headerlink" title="GIT常用指令集合"></a>GIT常用指令集合</h3><p><strong>1、创建本地分支 local_branch</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git branch local_branch</div></pre></td></tr></table></figure>
+<p><strong>2、创建本地分支local_branch 并切换到local_branch分支</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"> git checkout -b local_branch</div></pre></td></tr></table></figure>
+<p><strong>3、切换到分支local_branch</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">  git checkout local_branch</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<p><strong>4、推送本地分支local_branch到远程分支 remote_branch并建立关联关系</strong></p>
+<pre><code>a.远程已有remote_branch分支并且已经关联本地分支local_branch且本地已经切换到local_branch
+
+     git push
+
+b.远程已有remote_branch分支但未关联本地分支local_branch且本地已经切换到local_branch
+
+    git push -u origin/remote_branch
+
+c.远程没有有remote_branch分支并，本地已经切换到local_branch
+
+   git push origin local_branch:remote_branch
+</code></pre><p><strong>5、删除本地分支local_branch</strong></p>
+<pre><code>git branch -d local_branch
+</code></pre><p><strong>6、删除远程分支remote_branch</strong></p>
+<pre><code> git push origin  :remote_branch
+
+ git branch -m | -M oldbranch newbranch 重命名分支，如果newbranch名字分支已经存在，则需要使用-M强制重命名，否则，使用-m进行重命名。
+ git branch -d | -D branchname 删除branchname分支（本地）
+git branch -d -r branchname 删除远程branchname分支
+</code></pre><p><strong>7、查看本地分支</strong></p>
+<pre><code>git branch
+</code></pre><p><strong>8、查看远程和本地分支</strong></p>
+<pre><code>git branch -a
+</code></pre><p><strong>9、回滚本地未提交代码</strong></p>
+<p>​      git checkout .</p>
+<p><strong>10、回滚本地已经提交代码</strong></p>
+<p>​      git reset —hard HEAD^     (一个表示上一个版本^^表示上2个版本)</p>
+<p><strong>11、本地分支关联远程分支</strong></p>
+<p>​     git branch –set-upstream local origin/local</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;GIT常用指令集合&quot;&gt;&lt;a href=&quot;#GIT常用指令集合&quot; class=&quot;headerlink&quot; title=&quot;GIT常用指令集合&quot;&gt;&lt;/a&gt;GIT常用指令集合&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;1、创建本地分支 local_branch&lt;/strong&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight shell&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;git branch local_branch&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;&lt;strong&gt;2、创建本地分支local_branch 并切换到local_branch分支&lt;/strong&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight shell&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt; git checkout -b local_branch&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;&lt;strong&gt;3、切换到分支local_branch&lt;/strong&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight shell&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;  git checkout local_branch&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+    
+      <category term="git" scheme="http://yoursite.com/tags/git/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>sql相关</title>
+    <link href="http://yoursite.com/2017/05/26/day7/"/>
+    <id>http://yoursite.com/2017/05/26/day7/</id>
+    <published>2017-05-26T11:14:30.920Z</published>
+    <updated>2017-01-10T11:34:08.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>##学习总结</p>
+<p>###1、sql优化<br>（1）、EXISTS 方案代替IN<br>（2）、不用is null、is not null等操作符，可以用a&gt;0或者a&gt;’’代替<br>（3）、对查询的表加别名<br>（4）、用TRUNCATE替代DELETE<br>（5）、用where代替having<br>（6）、建立索引提高效率<br>（7）、用exists替换distinct<br>（8）、sql语句用大写代替小写<br>（9）、用&gt;=代替&gt;<br>（10）、用Union替换or<br><a id="more"></a></p>
+<p>###2、主从复制、读写分离</p>
+<p>###3、拉姆达表达式<br>   公司里面最常见的作用就是筛选列表<br>   list.stream().filter(x-&gt;isnull()).filter()……….</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;##学习总结&lt;/p&gt;
+&lt;p&gt;###1、sql优化&lt;br&gt;（1）、EXISTS 方案代替IN&lt;br&gt;（2）、不用is null、is not null等操作符，可以用a&amp;gt;0或者a&amp;gt;’’代替&lt;br&gt;（3）、对查询的表加别名&lt;br&gt;（4）、用TRUNCATE替代DELETE&lt;br&gt;（5）、用where代替having&lt;br&gt;（6）、建立索引提高效率&lt;br&gt;（7）、用exists替换distinct&lt;br&gt;（8）、sql语句用大写代替小写&lt;br&gt;（9）、用&amp;gt;=代替&amp;gt;&lt;br&gt;（10）、用Union替换or&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="sql" scheme="http://yoursite.com/tags/sql/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>linux相关</title>
+    <link href="http://yoursite.com/2017/05/26/day6/"/>
+    <id>http://yoursite.com/2017/05/26/day6/</id>
+    <published>2017-05-26T11:14:30.905Z</published>
+    <updated>2017-01-10T11:33:50.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>##安装linux</p>
+<p>###解决虚拟机中centos不能上网问题<br>1、首先将virtualbox设置为桥接网络，设置网卡为静态的，然后就可以了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">设置IP和掩码</div><div class="line">ifconfig eth0 192.168.5.40 netmask 255.255.255.0</div><div class="line">最好编辑这个文件：</div><div class="line">/etc/sysconfig/network-scripts/ifcfg-eth0   后面网卡可能不一样</div><div class="line">设置网关</div><div class="line">route add default gw 192.168.5.1</div><div class="line">如果这样不行的话，永久修改网关</div><div class="line">/etc/sysconfig/network   加入GATEWAY=192.168.1.1</div><div class="line">vi /etc/resolv.conf</div><div class="line">nameserver 8.8.8.8  #google域名服务器</div><div class="line">nameserver 8.8.4.4  #google域名服务器</div></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<p>如设置命令行级别方法:<br>ln -sf /lib/systemd/system/runlevel3.target /etc/systemd/system/default.target<br>或<br>ln -sf /lib/systemd/system/multi-user.target /etc/systemd/system/default.target<br>或<br>systemctl set-default multi-user.target<br>设置窗口级别方法:<br>ln -sf /lib/systemd/system/runlevel5.target /etc/systemd/system/default.target<br>或<br>ln -sf /lib/systemd/system/graphical.target /etc/systemd/system/default.target<br>或<br>systemctl set-default graphical.target</p>
+<p><strong>如果每次开机之后丢失网络，需要手动每次把桥接网卡来回切换一下即可</strong></p>
+<p>###linux常用命令<br>1、查看占用端口<br>netstat –tunpl | grep 6379<br>2、查看某一个服务是否启动<br>     ps –aux | grep redis<br>3、<br>    /etc/init.d/redis-server stop<br>    /etc/init.d/redis-server start<br>4、复制文件到远程服务器<br>scp /home/space/music/1.mp3 root@www.dzy.cn:/home/root/others/music/001.mp3<br>5、sudo : 暂时切换到超级用户模式以执行超级用户权限，提示输入密码时该密码为当前用户的密码，而不是超级账户的密码。不过有时间限制，Ubuntu默认为一次时长15分钟。<br>6、su ： 切换到某某用户模式，提示输入密码时该密码为切换后账户的密码，用法为“su 账户名称”。如果后面不加账户时系统默认为root账户，密码也为超级账户的密码。没有时间限制。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;##安装linux&lt;/p&gt;
+&lt;p&gt;###解决虚拟机中centos不能上网问题&lt;br&gt;1、首先将virtualbox设置为桥接网络，设置网卡为静态的，然后就可以了&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;设置IP和掩码&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;ifconfig eth0 192.168.5.40 netmask 255.255.255.0&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;最好编辑这个文件：&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;/etc/sysconfig/network-scripts/ifcfg-eth0   后面网卡可能不一样&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;设置网关&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;route add default gw 192.168.5.1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;如果这样不行的话，永久修改网关&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;/etc/sysconfig/network   加入GATEWAY=192.168.1.1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;vi /etc/resolv.conf&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;nameserver 8.8.8.8  #google域名服务器&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;nameserver 8.8.4.4  #google域名服务器&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="linux" scheme="http://yoursite.com/tags/linux/"/>
+    
+  </entry>
+  
+</feed>

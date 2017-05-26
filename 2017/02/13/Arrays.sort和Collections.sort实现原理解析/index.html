@@ -4,14 +4,14 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Array.sort和Collections.sort实现原理解析 | �����Ǽ�ƷƷ�����к���</title>
+  <title>Array.sort和Collections.sort实现原理解析 | yesterday once more</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="Arrays.sort和Collections.sort实现原理解析1、使用 排序  2、原理 事实上Collections.sort方法底层就是调用的array.sort方法，而且不论是Collections.sort或者是Arrays.sort方法，  跟踪下源代码吧，首先我们写个demo 12345678910public static void main(String[] args) &amp;#">
 <meta name="keywords" content="java基础">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Array.sort和Collections.sort实现原理解析">
 <meta property="og:url" content="http://yoursite.com/2017/02/13/Arrays.sort和Collections.sort实现原理解析/index.html">
-<meta property="og:site_name" content="�����Ǽ�ƷƷ�����к���">
+<meta property="og:site_name" content="yesterday once more">
 <meta property="og:description" content="Arrays.sort和Collections.sort实现原理解析1、使用 排序  2、原理 事实上Collections.sort方法底层就是调用的array.sort方法，而且不论是Collections.sort或者是Arrays.sort方法，  跟踪下源代码吧，首先我们写个demo 12345678910public static void main(String[] args) &amp;#">
 <meta property="og:image" content="http://img.blog.csdn.net/20170223115159596?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTQxMDUyOQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
 <meta property="og:image" content="http://img.blog.csdn.net/20170223115251191?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTQxMDUyOQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
@@ -23,7 +23,7 @@
 <meta name="twitter:description" content="Arrays.sort和Collections.sort实现原理解析1、使用 排序  2、原理 事实上Collections.sort方法底层就是调用的array.sort方法，而且不论是Collections.sort或者是Arrays.sort方法，  跟踪下源代码吧，首先我们写个demo 12345678910public static void main(String[] args) &amp;#">
 <meta name="twitter:image" content="http://img.blog.csdn.net/20170223115159596?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTQxMDUyOQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
   
-    <link rel="alternative" href="/atom.xml" title="�����Ǽ�ƷƷ�����к���" type="application/atom+xml">
+    <link rel="alternative" href="/atom.xml" title="yesterday once more" type="application/atom+xml">
   
   
     <link rel="icon" href="/favicon.png">
@@ -40,8 +40,12 @@
   <div id="header-outer" class="outer">
     <div id="header-title" class="inner">
       <h1 id="logo-wrap">
-        <a href="/" id="logo">�����Ǽ�ƷƷ�����к���</a>
+        <a href="/" id="logo">yesterday once more</a>
       </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">�����Ǽ�ƷƷ�����к���</a>
+        </h2>
       
     </div>
     <div id="header-inner" class="inner">
@@ -139,7 +143,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/02/13/Arrays.sort和Collections.sort实现原理解析/" data-id="cj35rvcub0000ycj3px1an6zd" class="article-share-link" data-share="baidu" data-title="Array.sort和Collections.sort实现原理解析">Share</a>
+        <a data-url="http://yoursite.com/2017/02/13/Arrays.sort和Collections.sort实现原理解析/" data-id="cj35rxppo00003wj3xkxn0nie" class="article-share-link" data-share="baidu" data-title="Array.sort和Collections.sort实现原理解析">Share</a>
       
 
       

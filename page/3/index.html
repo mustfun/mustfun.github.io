@@ -69,6 +69,56 @@
     <div class="outer">
       <section id="main">
   
+    <article id="post-day6" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/05/26/day6/" class="article-date">
+  <time datetime="2017-05-26T11:14:30.905Z" itemprop="datePublished">2017-05-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/05/26/day6/">linux相关</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>##安装linux</p>
+<p>###解决虚拟机中centos不能上网问题<br>1、首先将virtualbox设置为桥接网络，设置网卡为静态的，然后就可以了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">设置IP和掩码</div><div class="line">ifconfig eth0 192.168.5.40 netmask 255.255.255.0</div><div class="line">最好编辑这个文件：</div><div class="line">/etc/sysconfig/network-scripts/ifcfg-eth0   后面网卡可能不一样</div><div class="line">设置网关</div><div class="line">route add default gw 192.168.5.1</div><div class="line">如果这样不行的话，永久修改网关</div><div class="line">/etc/sysconfig/network   加入GATEWAY=192.168.1.1</div><div class="line">vi /etc/resolv.conf</div><div class="line">nameserver 8.8.8.8  #google域名服务器</div><div class="line">nameserver 8.8.4.4  #google域名服务器</div></pre></td></tr></table></figure></p>
+        
+          <p class="article-more-link">
+            <a href="/2017/05/26/day6/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2017/05/26/day6/" data-id="cj3phtkvu000yu4j3hfm2oxxg" class="article-share-link" data-share="baidu" data-title="linux相关">Share</a>
+      
+
+      
+        <a href="http://yoursite.com/2017/05/26/day6/#ds-thread" class="article-comment-link">Comments</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-day5" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/05/26/day5/" class="article-date">
@@ -102,7 +152,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/day5/" data-id="cj35scf72000tgoj3iywvhbo0" class="article-share-link" data-share="baidu" data-title="smarty相关">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/day5/" data-id="cj3phtkvr000tu4j3nmtv0572" class="article-share-link" data-share="baidu" data-title="smarty相关">Share</a>
       
 
       
@@ -149,7 +199,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/day4/" data-id="cj35scf72000pgoj324t4cosf" class="article-share-link" data-share="baidu" data-title="smarty语法详解">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/day4/" data-id="cj3phtkvs000uu4j3pnnold0h" class="article-share-link" data-share="baidu" data-title="smarty语法详解">Share</a>
       
 
       
@@ -200,7 +250,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/day3/" data-id="cj35scf72000qgoj3dwtd375l" class="article-share-link" data-share="baidu" data-title="JAVA常用验证方法">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/day3/" data-id="cj3phtkvq000qu4j34guruzzp" class="article-share-link" data-share="baidu" data-title="JAVA常用验证方法">Share</a>
       
 
       
@@ -250,7 +300,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/day2/" data-id="cj35scf72000mgoj3uxu1bpfd" class="article-share-link" data-share="baidu" data-title="spring知识整合">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/day2/" data-id="cj3phtkvp000pu4j37n6nc5l6" class="article-share-link" data-share="baidu" data-title="spring知识整合">Share</a>
       
 
       
@@ -301,7 +351,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/day14/" data-id="cj35scf6m000lgoj3s8vgfkwk" class="article-share-link" data-share="baidu" data-title="ThreadLocal使用">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/day14/" data-id="cj3phtkvm000lu4j349ihlfju" class="article-share-link" data-share="baidu" data-title="ThreadLocal使用">Share</a>
       
 
       
@@ -349,7 +399,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/day13/" data-id="cj35scf6m000jgoj3gdf65hxd" class="article-share-link" data-share="baidu" data-title="锁相关">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/day13/" data-id="cj3phtkvo000nu4j3tubmihw4" class="article-share-link" data-share="baidu" data-title="锁相关">Share</a>
       
 
       
@@ -410,7 +460,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/day12/" data-id="cj35scf6m000hgoj3638l8h13" class="article-share-link" data-share="baidu" data-title="dubbo相关">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/day12/" data-id="cj3phtkvi000hu4j3h3eih529" class="article-share-link" data-share="baidu" data-title="dubbo相关">Share</a>
       
 
       
@@ -461,7 +511,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/day11/" data-id="cj35scf6m000fgoj3q65nxi92" class="article-share-link" data-share="baidu" data-title="读写所相关">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/day11/" data-id="cj3phtkvk000ju4j3415gphnl" class="article-share-link" data-share="baidu" data-title="读写所相关">Share</a>
       
 
       
@@ -513,7 +563,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/day1/" data-id="cj35scf6m000dgoj34dfcquxj" class="article-share-link" data-share="baidu" data-title="maven相关">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/day1/" data-id="cj3phtkvh000fu4j3ez2qfnle" class="article-share-link" data-share="baidu" data-title="maven相关">Share</a>
       
 
       
@@ -522,90 +572,6 @@
 
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/maven/">maven</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-windows hexo 搭建教程" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/05/26/windows hexo 搭建教程/" class="article-date">
-  <time datetime="2017-05-26T03:11:11.000Z" itemprop="datePublished">2017-05-26</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/05/26/windows hexo 搭建教程/">windows hexo 搭建个人博客教程</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="windows-hexo-搭建教程"><a href="#windows-hexo-搭建教程" class="headerlink" title="windows hexo 搭建教程"></a>windows hexo 搭建教程</h3><h4 id="安装nodejs"><a href="#安装nodejs" class="headerlink" title="安装nodejs"></a>安装nodejs</h4><ul>
-<li>自己到<a href="http://nodejs.cn/" target="_blank" rel="external"><strong>nodejs</strong></a>官网下载安装吧</li>
-</ul>
-<h4 id="安装git"><a href="#安装git" class="headerlink" title="安装git"></a>安装git</h4><ul>
-<li>先本地安装git客户端</li>
-<li>注册一个git账号</li>
-</ul>
-<h4 id="安装Hexo"><a href="#安装Hexo" class="headerlink" title="安装Hexo"></a>安装Hexo</h4><ul>
-<li><p>在D盘创建一个目录 <code>D:\testblog</code> ，目录自己定义</p>
-</li>
-<li><p>安装git之后，右键上会有一个git bash标签，点击会出现git bash 界面如下图</p>
-<p><img src="http://ojkdckcc1.bkt.clouddn.com/微信截图_20170526182646.png" alt="Hexo初始化"></p>
-</li>
-<li><p>依次执行下面命令</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">npm install hexo-cli -g</div><div class="line">npm install hexo --save</div><div class="line">//如果上面的命令由于网络原因，安装失败，那么可以切换一下npm源，执行一下下面命令</div><div class="line"></div><div class="line">npm install -g cnpm --registry=https://registry.npm.taobao.org</div><div class="line">//然后执行</div><div class="line">cnpm install hexo --save</div></pre></td></tr></table></figure>
-<p><img src="http://ojkdckcc1.bkt.clouddn.com/微信截图_20170526183233.png" alt=""></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">//然后执行</div><div class="line">hexo init</div><div class="line">//然后装一下hexo的一些插件，建议全部安装</div><div class="line">npm install hexo-generator-index --save #索引生成器</div><div class="line">npm install hexo-generator-archive --save #归档生成器</div><div class="line">npm install hexo-generator-category --save #分类生成器</div><div class="line">npm install hexo-generator-tag --save #标签生成器</div><div class="line">npm install hexo-server --save #本地服务</div><div class="line">npm install hexo-deployer-git --save #hexo通过git发布（必装）</div><div class="line">npm install hexo-renderer-marked@0.2.7--save #渲染器</div><div class="line">npm install hexo-renderer-stylus@0.3.0 --save #渲染器</div></pre></td></tr></table></figure>
-</li>
-<li><p>安装完成之后跑起来试试</p>
-<p>运行 <code>hexo server</code> 或者 <code>hexo s</code></p>
-</li>
-</ul>
-<p><img src="http://ojkdckcc1.bkt.clouddn.com/微信截图_20170526185724.png" alt=""></p>
-<h4 id="GIT配置"><a href="#GIT配置" class="headerlink" title="GIT配置"></a>GIT配置</h4><h3 id="HEXO配置"><a href="#HEXO配置" class="headerlink" title="HEXO配置"></a>HEXO配置</h3><h4 id="配置文件介绍"><a href="#配置文件介绍" class="headerlink" title="配置文件介绍"></a>配置文件介绍</h4><ul>
-<li>全局配置文件<code>_config.yml</code></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">index_generator:</div><div class="line">  per_page: 10 ##首页默认10篇文章标题 如果值为0不分页</div><div class="line">archive_generator:</div><div class="line">	per_page: 10 ##归档页面默认10篇文章标题</div><div class="line">	yearly: true  ##生成年视图</div><div class="line">	monthly: true ##生成月视图</div><div class="line">tag_generator:</div><div class="line">	per_page: 10 ##标签分类页面默认10篇文章</div><div class="line">category_generator: </div><div class="line">	per_page: 10 ###分类页面默认10篇文章</div><div class="line">feed:</div><div class="line">	type: atom ##feed类型 atom或者rss2</div><div class="line">	path: atom.xml ##feed路径</div><div class="line">	limit: 20  ##feed文章最小数量</div><div class="line">deploy:</div><div class="line">	type: git ##部署类型 其他类型自行google之</div><div class="line">	repo: &lt;repository url&gt; ##git仓库地址</div><div class="line">	branch: [branch] ##git 页面分支</div><div class="line">	message: [message] ##git message建议默认字段update 可以自定义</div><div class="line">	-多部署</div><div class="line">			deploy:</div><div class="line">					type: git</div><div class="line">					message: update  ##git message建议默认字段update 可以自定义</div><div class="line">					repo: </div><div class="line">					github: &lt;repository url&gt;,[branch] ##github 仓库地址和分支</div><div class="line">					gitcafe: &lt;repository url&gt;,[branch] ##gitcafe 仓库地址和分支</div></pre></td></tr></table></figure>
-<p>主题配置文件<code>_config.yml</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"># Header</div><div class="line">menu:	#导航栏连接</div><div class="line">Home: /</div><div class="line">Archives: /archives #归档页面URL</div><div class="line">自定义页面标题: /自定义页面URL</div><div class="line">rss: /atom.xml  #rss地址  默认即可</div><div class="line"># Content</div><div class="line">excerpt_link: Read More #阅读更多的文字显示</div><div class="line">fancybox: true #开启fancybox效果</div><div class="line"># Sidebar  #侧边栏设置</div><div class="line">sidebar: right</div><div class="line">widgets:</div><div class="line">	- category</div><div class="line">	- tag</div><div class="line">	- tagcloud</div><div class="line">	- archive</div><div class="line">	- recent_posts</div><div class="line"># Miscellaneous #社交网络和统计连接地址</div><div class="line">google_analytics: #google analytics ID</div><div class="line">favicon: /favicon.png #网站的favicon</div><div class="line">twitter:</div><div class="line">google_plus:</div><div class="line">fb_admins:</div><div class="line">fb_app_id:</div></pre></td></tr></table></figure>
-<h4 id="配置主题"><a href="#配置主题" class="headerlink" title="配置主题"></a>配置主题</h4><p>这里介绍我自己修改的主题，炒鸡漂亮</p>
-<p>基于landscape-plus主题修改 ，<a href="https://github.com/mustfun/landscape-plus-x.git" target="_blank" rel="external">GIT地址</a></p>
-<p>演示<a href="https://mustfun.github.io" target="_blank" rel="external">地址</a></p>
-<p>使用方法，下载下来丢到<code>D:\testblog\themes</code> 文件夹下面就好了</p>
-<p>然后修改全局配置文件<code>_config.yml</code>文件里面theme字段</p>
-<p><img src="http://ojkdckcc1.bkt.clouddn.com/微信截图_20170526190608.png" alt=""></p>
-<h4 id="配置GIT发布"><a href="#配置GIT发布" class="headerlink" title="配置GIT发布"></a>配置GIT发布</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">deploy: </div><div class="line">    type: git   </div><div class="line">    repo: https://github.com/mustfun/mustfun.github.com.git</div><div class="line">     #我的github是mustfun 换成你本人的</div><div class="line">    branch: master</div></pre></td></tr></table></figure>
-<p>上图有哦~</p>
-<h4 id="HEXO部署"><a href="#HEXO部署" class="headerlink" title="HEXO部署"></a>HEXO部署</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">hexo clean #清除缓存 网页正常情况下可以忽略此条命令</div><div class="line">hexo g #生成静态网页</div><div class="line">hexo d #开始部署</div></pre></td></tr></table></figure>
-<h3 id="HEXO预览"><a href="#HEXO预览" class="headerlink" title="HEXO预览"></a>HEXO预览</h3><p>那么就成功啦，直接访问mustfun.github.io就可以访问啦，<strong>换成你的域名哦</strong></p>
-<hr>
-<h3 id="品品我宣你哦"><a href="#品品我宣你哦" class="headerlink" title="品品我宣你哦~ ^_^"></a>品品我宣你哦~ ^_^</h3>
-      
-    </div>
-    <footer class="article-footer">
-      
-        <a data-url="http://yoursite.com/2017/05/26/windows hexo 搭建教程/" data-id="cj35scf7h001bgoj3fsn7ag9w" class="article-share-link" data-share="baidu" data-title="windows hexo 搭建个人博客教程">Share</a>
-      
-
-      
-        <a href="http://yoursite.com/2017/05/26/windows hexo 搭建教程/#ds-thread" class="article-comment-link">Comments</a>
-      
-
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/其它/">其它</a></li></ul>
 
     </footer>
   </div>
@@ -629,7 +595,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -638,7 +604,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+      <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
     </div>
   </div>
 
@@ -647,7 +613,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
     </div>
   </div>
 
@@ -657,6 +623,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2017/06/09/Spring boot返回request、response log添加/">spring boot给接口返回添加输入输出日志</a>
+          </li>
         
           <li>
             <a href="/2017/05/26/高并发的核心技术-幂等的实现方案/">高并发的核心技术-幂等的实现方案</a>
@@ -672,10 +642,6 @@
         
           <li>
             <a href="/2017/05/26/自定义注解/">自定义注解</a>
-          </li>
-        
-          <li>
-            <a href="/2017/05/26/耳鸣疗法/">耳鸣疗法</a>
           </li>
         
       </ul>

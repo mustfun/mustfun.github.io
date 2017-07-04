@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-06-09T06:47:45.893Z</updated>
+  <updated>2017-07-04T11:02:09.556Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,75 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>高可用数据同步方案-SqlServer迁移Mysql实战</title>
+    <link href="http://yoursite.com/2017/07/04/%E9%AB%98%E5%8F%AF%E7%94%A8%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E6%96%B9%E6%A1%88-SqlServer%E8%BF%81%E7%A7%BBMysql%E5%AE%9E%E6%88%98/"/>
+    <id>http://yoursite.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/</id>
+    <published>2017-07-04T07:22:01.000Z</published>
+    <updated>2017-07-04T11:02:09.556Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="高可用数据同步方案-SqlServer迁移Mysql实战"><a href="#高可用数据同步方案-SqlServer迁移Mysql实战" class="headerlink" title="高可用数据同步方案-SqlServer迁移Mysql实战"></a>高可用数据同步方案-SqlServer迁移Mysql实战</h3><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>  随着业务量的上升，以前的架构已经不满足业务的发展，数据作为业务中最重要的一环，需要有更好的架构作为支撑。目前我司有sql server转mysql的需求，所以结合当前业务，我挑选了阿里云开源的一个很好用的同步工具DataX</p>
+<h5 id="DataX介绍"><a href="#DataX介绍" class="headerlink" title="DataX介绍"></a>DataX介绍</h5><blockquote>
+<p>DataX 是一个异构数据源离线同步工具，致力于实现包括关系型数据库(MySQL、Oracle等)、HDFS、Hive、MaxCompute(原ODPS)、HBase、FTP等各种异构数据源之间稳定高效的数据同步功能。</p>
+</blockquote>
+<h5 id="框架设计"><a href="#框架设计" class="headerlink" title="框架设计"></a>框架设计</h5><p><img src="https://cloud.githubusercontent.com/assets/1067175/17879884/ec7e36f4-6927-11e6-8f5f-ffc43d6a468b.png" alt="datax_framework_new"></p>
+<p>DataX本身作为离线数据同步框架，采用Framework + plugin架构构建。将数据源读取和写入抽象成为Reader/Writer插件，纳入到整个同步框架中。</p>
+<ul>
+<li>Reader：Reader为数据采集模块，负责采集数据源的数据，将数据发送给Framework。</li>
+<li>Writer： Writer为数据写入模块，负责不断向Framework取数据，并将数据写入到目的端。</li>
+<li>Framework：Framework用于连接reader和writer，作为两者的数据传输通道，并处理缓冲，流控，并发，数据转换等核心技术问题。</li>
+</ul>
+<h4 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h4><h5 id="下载安装部署"><a href="#下载安装部署" class="headerlink" title="下载安装部署"></a>下载安装部署</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> wget http://datax-opensource.oss-cn-hangzhou.aliyuncs.com/datax.tar.gz</div><div class="line"><span class="meta">$</span> tar zxvf datax.tar.gz</div><div class="line"><span class="meta">$</span> sudo chmod -R 755 &#123;YOUR_DATAX_HOME&#125;</div></pre></td></tr></table></figure>
+<p>也可以自己下载源码安装，不过需要安装maven</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> git clone git@github.com:alibaba/DataX.git</div><div class="line"><span class="meta">$</span> cd  &#123;DataX_source_code_home&#125;</div><div class="line"><span class="meta">$</span> mvn -U clean package assembly:assembly -Dmaven.test.skip=true</div></pre></td></tr></table></figure>
+<p>打包成功后的DataX包位于 {DataX_source_code_home}/target/datax/datax/ ，结构如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> cd  &#123;DataX_source_code_home&#125;</div><div class="line"><span class="meta">$</span> ls ./target/datax/datax/</div><div class="line">   bin		conf		job		lib		log		log_perf	plugin</div></pre></td></tr></table></figure>
+<h5 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h5><p>你需要编写一个基本信息配置文件，文件包括原库到写入库的表字段对应关系。基本信息包括</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  "job": &#123;</div><div class="line">    "content": [</div><div class="line">      &#123;</div><div class="line">        "reader": &#123;        //读入库配置，比如说是sql server</div><div class="line">          "name": "",      //数据源名称，别瞎写</div><div class="line">          "parameter": &#123;&#125;  //数据库配置信息</div><div class="line">        &#125;,</div><div class="line">        "writer": &#123;        //写入库配置，比如说是mysql</div><div class="line">          "name": "",      //数据源名称，别瞎写</div><div class="line">          "parameter": &#123;&#125;  //数据库配置信息</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">    ],</div><div class="line">    "setting": &#123;            //基本设置</div><div class="line">      "speed": &#123;            //流量控制</div><div class="line">        "channel": 1,       //同步时候的并发数</div><div class="line">        "byte": 104857600   //同步时候的字节大小，影响速度</div><div class="line">      &#125;,</div><div class="line">      "errorLimit": &#123;       //脏数据控制</div><div class="line">        "record": 10,       //脏数据最大记录数阈值</div><div class="line">        "percentage": 0.05  //脏数据占比阈值</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>下面给一个配置demo，大家根据自己的需要修改demo，然后使用</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">     "job": &#123;</div><div class="line">          "setting": &#123;</div><div class="line">               "speed": &#123;</div><div class="line">                    "byte": 1073741824</div><div class="line">               &#125;</div><div class="line">          &#125;,</div><div class="line">          "content": [</div><div class="line">               &#123;</div><div class="line">                    "reader": &#123;</div><div class="line">                         "name": "sqlserverreader",</div><div class="line">                         "parameter": &#123;</div><div class="line">                              "username": "root",  //自己根据需要修改数据库用户名</div><div class="line">                              "password": "admin", //密码</div><div class="line">                              "where": "",</div><div class="line">                              "connection": [</div><div class="line">                                   &#123;</div><div class="line">                                        "querySql": [</div><div class="line">                                             "SELECT Id,MyReasonId,MyProductType,MyReason FROM dbo.MyReason  WITH ( NOLOCK )"</div><div class="line">                                        ],//全量sql,根据自己需要写增量sql也可以</div><div class="line">                                        "jdbcUrl": [</div><div class="line">                                             "jdbc:sqlserver://192.168.1.1:1433;DatabaseName=XXXX"</div><div class="line">                                        ]//自己根据需要修改数据库连接</div><div class="line">                                   &#125;</div><div class="line">                              ]</div><div class="line">                         &#125;</div><div class="line">                    &#125;,</div><div class="line">                    "writer": &#123;</div><div class="line">                         "name": "mysqlwriter",</div><div class="line">                         "parameter": &#123;</div><div class="line">                              "writeMode": "insert",  //写入模式，这里写插入</div><div class="line">                              "username": "root",//自己根据需要修改数据库用户名</div><div class="line">                              "password": "admin",//密码</div><div class="line">                              "column": [</div><div class="line">                                    "id",       //注意与上面的列一一对应</div><div class="line">                                    "my_reason_id",</div><div class="line">                                    "my_product_type",</div><div class="line">                                    "my_reason" </div><div class="line">                                    ],</div><div class="line">                              "connection": [</div><div class="line">                                   &#123;</div><div class="line">                                        "jdbcUrl": "jdbc:mysql://192.168.1.2:3306/XXX?useUnicode=true&amp;characterEncoding=utf-8",</div><div class="line">                                        "table": [</div><div class="line">                                             "my_reason"</div><div class="line">                                        ]</div><div class="line">                                   &#125;</div><div class="line">                              ]</div><div class="line">                         &#125;</div><div class="line">                    &#125;</div><div class="line">               &#125;</div><div class="line">          ]</div><div class="line">     &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>编辑好之后，放到新建work目录里面，然后存为mssql_to_mysql.json，下面就可以运行了</p>
+<h5 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> cd  &#123;YOUR_DATAX_HOME&#125;/bin</div><div class="line"><span class="meta">$</span> python datax.py ../work/mssql_to_mysql.json</div></pre></td></tr></table></figure>
+<p>同步结束，显示日志如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line">2015-12-17 11:20:25.263 [job-0] INFO  JobContainer - </div><div class="line">任务启动时刻                    : 2015-12-17 11:20:15</div><div class="line">任务结束时刻                    : 2015-12-17 11:20:25</div><div class="line">任务总计耗时                    :                 10s</div><div class="line">任务平均流量                    :              205B/s</div><div class="line">记录写入速度                    :              5rec/s</div><div class="line">读出记录总数                    :                  50</div><div class="line">读写失败总数                    :                   0</div></pre></td></tr></table></figure>
+<p>这样就说明成功啦</p>
+<h4 id="进阶"><a href="#进阶" class="headerlink" title="进阶"></a>进阶</h4><h5 id="job配置"><a href="#job配置" class="headerlink" title="job配置"></a>job配置</h5><p>将你需要同步的增量数据放入到安装目录job下面，存为myjob.json，名称随意</p>
+<p>linux下通过crontab命令实现</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>查看crond服务是否启动，出现以下日志表示已启动</div><div class="line"><span class="meta">$</span>/sbin/service crond status</div><div class="line"> crond (pid  30742) is running...</div></pre></td></tr></table></figure>
+<ul>
+<li><p>第一步：创建作业的配置文件（json格式） 参考上节内容。这里假设已配置好MySQL到ODPS的配置文件mysql2odps.json</p>
+</li>
+<li><p>第二步：列出列出crontab文件，命令： crontab -l<br>（1）若出现以下日志，表示当前用户没有定时任务，用户需要新建crontab文件，并提交crontab文件，参考第三步。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$crontab -l</div><div class="line"> no crontab for xxx</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>（2）若出现以下日志，表示当前用户已经有正在运行的定时任务，用户只需用命令crontab -e 来编辑crontab文件，参考第四步。 <code>shell $ crontab -l 0,10,20,35,44,50 * * * * python /home/admin/datax3/bin/datax.py /home/admin/mysql2odps.json &gt;&gt;/home/hanfa.shf/log.</code>date +\%Y\%m\%d\%H\%M\%S<code>2&gt;&amp;1</code></p>
+<ul>
+<li><p>第三步：若当前用户没有定时任务（之前从未创建过crontab任务)</p>
+<p>​</p>
+<p>（1）创建一个新的crontab文件，如取名crondatax</p>
+<p>​</p>
+<p>示例1：每天13点5分进行同步作业，并把运行日志输出到目录/home/hanfa.shf/下log.运行时间 文件中,如定时运行是在2016-3-26 13:10:13运行的，产生的日志文件名为：log.20160326131023</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$ vim crondatax</div><div class="line">#输入以下内容</div><div class="line">5  13 * * *  python /home/admin/datax3/bin/datax.py /home/admin/mysql2odps.json  &gt;&gt;/home/hanfa.shf/log.`date +\%Y\%m\%d\%H\%M\%S`  2&gt;&amp;1</div><div class="line">#/home/admin/datax3/bin/datax.py 表示你安装的DataX datax.py所在目录（请替换为您真实的绝对路径目录）；</div><div class="line">#/home/admin/mysql2odps.json  表示作业的配置文件目录（请替换为您真实的绝对路径目录）；</div><div class="line">#/home/hanfa.shf/log.`date +\%Y\%m\%d\%H\%M\%S` 表示日志输出位置，并以log.当前时间 命名（请替换为您真实的绝对路径目录）</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>（2）提交你刚刚创建的crontab文件 <code>shell $ crontab crondatax #crondatax 你创建的crontab文件名</code>（3）重启crontab服务 <code>shell $ sudo /etc/init.d/crond restart Stopping crond: [ OK ] Starting crond: [ OK ]</code> （4）在13点5分过后，在日志目录会看到对应的日文件 <code>shell $ ls -al /home/hanfa.shf/ -rw-r--r-- 1 hanfa.shf users 12062 Mar 26 13:05 log.20160326130501</code></p>
+<blockquote>
+<p>进阶内容引自官方教程 ^_^</p>
+</blockquote>
+<div style="color:red">感谢我媳妇儿品品支持创作</div>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;高可用数据同步方案-SqlServer迁移Mysql实战&quot;&gt;&lt;a href=&quot;#高可用数据同步方案-SqlServer迁移Mysql实战&quot; class=&quot;headerlink&quot; title=&quot;高可用数据同步方案-SqlServer迁移Mysql实战&quot;&gt;&lt;/a&gt;高可
+    
+    </summary>
+    
+    
+      <category term="mysql" scheme="http://yoursite.com/tags/mysql/"/>
+    
+  </entry>
   
   <entry>
     <title>spring boot给接口返回添加输入输出日志</title>
@@ -1499,31 +1568,6 @@ git branch -d -r branchname 删除远程branchname分支
     
     
       <category term="git" scheme="http://yoursite.com/tags/git/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>sql相关</title>
-    <link href="http://yoursite.com/2017/05/26/day7/"/>
-    <id>http://yoursite.com/2017/05/26/day7/</id>
-    <published>2017-05-26T11:14:30.920Z</published>
-    <updated>2017-01-10T11:34:08.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>##学习总结</p>
-<p>###1、sql优化<br>（1）、EXISTS 方案代替IN<br>（2）、不用is null、is not null等操作符，可以用a&gt;0或者a&gt;’’代替<br>（3）、对查询的表加别名<br>（4）、用TRUNCATE替代DELETE<br>（5）、用where代替having<br>（6）、建立索引提高效率<br>（7）、用exists替换distinct<br>（8）、sql语句用大写代替小写<br>（9）、用&gt;=代替&gt;<br>（10）、用Union替换or<br><a id="more"></a></p>
-<p>###2、主从复制、读写分离</p>
-<p>###3、拉姆达表达式<br>   公司里面最常见的作用就是筛选列表<br>   list.stream().filter(x-&gt;isnull()).filter()……….</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;##学习总结&lt;/p&gt;
-&lt;p&gt;###1、sql优化&lt;br&gt;（1）、EXISTS 方案代替IN&lt;br&gt;（2）、不用is null、is not null等操作符，可以用a&amp;gt;0或者a&amp;gt;’’代替&lt;br&gt;（3）、对查询的表加别名&lt;br&gt;（4）、用TRUNCATE替代DELETE&lt;br&gt;（5）、用where代替having&lt;br&gt;（6）、建立索引提高效率&lt;br&gt;（7）、用exists替换distinct&lt;br&gt;（8）、sql语句用大写代替小写&lt;br&gt;（9）、用&amp;gt;=代替&amp;gt;&lt;br&gt;（10）、用Union替换or&lt;br&gt;
-    
-    </summary>
-    
-    
-      <category term="sql" scheme="http://yoursite.com/tags/sql/"/>
     
   </entry>
   

@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>高可用数据同步方案-SqlServer迁移Mysql实战 | I Love pinpin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="高可用数据同步方案-SqlServer迁移Mysql实战简介  随着业务量的上升，以前的架构已经不满足业务的发展，数据作为业务中最重要的一环，需要有更好的架构作为支撑。目前我司有sql server转mysql的需求，所以结合当前业务，我挑选了阿里云开源的一个很好用的同步工具DataX DataX介绍 DataX 是一个异构数据源离线同步工具，致力于实现包括关系型数据库(MySQL、Oracle等">
+<meta name="keywords" content="mysql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="高可用数据同步方案-SqlServer迁移Mysql实战">
+<meta property="og:url" content="http://yoursite.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/index.html">
+<meta property="og:site_name" content="I Love pinpin">
+<meta property="og:description" content="高可用数据同步方案-SqlServer迁移Mysql实战简介  随着业务量的上升，以前的架构已经不满足业务的发展，数据作为业务中最重要的一环，需要有更好的架构作为支撑。目前我司有sql server转mysql的需求，所以结合当前业务，我挑选了阿里云开源的一个很好用的同步工具DataX DataX介绍 DataX 是一个异构数据源离线同步工具，致力于实现包括关系型数据库(MySQL、Oracle等">
+<meta property="og:image" content="https://cloud.githubusercontent.com/assets/1067175/17879884/ec7e36f4-6927-11e6-8f5f-ffc43d6a468b.png">
+<meta property="og:updated_time" content="2017-07-04T11:02:09.556Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="高可用数据同步方案-SqlServer迁移Mysql实战">
+<meta name="twitter:description" content="高可用数据同步方案-SqlServer迁移Mysql实战简介  随着业务量的上升，以前的架构已经不满足业务的发展，数据作为业务中最重要的一环，需要有更好的架构作为支撑。目前我司有sql server转mysql的需求，所以结合当前业务，我挑选了阿里云开源的一个很好用的同步工具DataX DataX介绍 DataX 是一个异构数据源离线同步工具，致力于实现包括关系型数据库(MySQL、Oracle等">
+<meta name="twitter:image" content="https://cloud.githubusercontent.com/assets/1067175/17879884/ec7e36f4-6927-11e6-8f5f-ffc43d6a468b.png">
+  
+    <link rel="alternative" href="/atom.xml" title="I Love pinpin" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">I Love pinpin</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">跟我们家品品打个招呼哈</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="yoursite.com">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-高可用数据同步方案-SqlServer迁移Mysql实战" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/" class="article-date">
+  <time datetime="2017-07-04T07:22:01.000Z" itemprop="datePublished">2017-07-04</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      高可用数据同步方案-SqlServer迁移Mysql实战
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="高可用数据同步方案-SqlServer迁移Mysql实战"><a href="#高可用数据同步方案-SqlServer迁移Mysql实战" class="headerlink" title="高可用数据同步方案-SqlServer迁移Mysql实战"></a>高可用数据同步方案-SqlServer迁移Mysql实战</h3><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>  随着业务量的上升，以前的架构已经不满足业务的发展，数据作为业务中最重要的一环，需要有更好的架构作为支撑。目前我司有sql server转mysql的需求，所以结合当前业务，我挑选了阿里云开源的一个很好用的同步工具DataX</p>
+<h5 id="DataX介绍"><a href="#DataX介绍" class="headerlink" title="DataX介绍"></a>DataX介绍</h5><blockquote>
+<p>DataX 是一个异构数据源离线同步工具，致力于实现包括关系型数据库(MySQL、Oracle等)、HDFS、Hive、MaxCompute(原ODPS)、HBase、FTP等各种异构数据源之间稳定高效的数据同步功能。</p>
+</blockquote>
+<h5 id="框架设计"><a href="#框架设计" class="headerlink" title="框架设计"></a>框架设计</h5><p><img src="https://cloud.githubusercontent.com/assets/1067175/17879884/ec7e36f4-6927-11e6-8f5f-ffc43d6a468b.png" alt="datax_framework_new"></p>
+<p>DataX本身作为离线数据同步框架，采用Framework + plugin架构构建。将数据源读取和写入抽象成为Reader/Writer插件，纳入到整个同步框架中。</p>
+<ul>
+<li>Reader：Reader为数据采集模块，负责采集数据源的数据，将数据发送给Framework。</li>
+<li>Writer： Writer为数据写入模块，负责不断向Framework取数据，并将数据写入到目的端。</li>
+<li>Framework：Framework用于连接reader和writer，作为两者的数据传输通道，并处理缓冲，流控，并发，数据转换等核心技术问题。</li>
+</ul>
+<h4 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h4><h5 id="下载安装部署"><a href="#下载安装部署" class="headerlink" title="下载安装部署"></a>下载安装部署</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> wget http://datax-opensource.oss-cn-hangzhou.aliyuncs.com/datax.tar.gz</div><div class="line"><span class="meta">$</span> tar zxvf datax.tar.gz</div><div class="line"><span class="meta">$</span> sudo chmod -R 755 &#123;YOUR_DATAX_HOME&#125;</div></pre></td></tr></table></figure>
+<p>也可以自己下载源码安装，不过需要安装maven</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> git clone git@github.com:alibaba/DataX.git</div><div class="line"><span class="meta">$</span> cd  &#123;DataX_source_code_home&#125;</div><div class="line"><span class="meta">$</span> mvn -U clean package assembly:assembly -Dmaven.test.skip=true</div></pre></td></tr></table></figure>
+<p>打包成功后的DataX包位于 {DataX_source_code_home}/target/datax/datax/ ，结构如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> cd  &#123;DataX_source_code_home&#125;</div><div class="line"><span class="meta">$</span> ls ./target/datax/datax/</div><div class="line">   bin		conf		job		lib		log		log_perf	plugin</div></pre></td></tr></table></figure>
+<h5 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h5><p>你需要编写一个基本信息配置文件，文件包括原库到写入库的表字段对应关系。基本信息包括</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  "job": &#123;</div><div class="line">    "content": [</div><div class="line">      &#123;</div><div class="line">        "reader": &#123;        //读入库配置，比如说是sql server</div><div class="line">          "name": "",      //数据源名称，别瞎写</div><div class="line">          "parameter": &#123;&#125;  //数据库配置信息</div><div class="line">        &#125;,</div><div class="line">        "writer": &#123;        //写入库配置，比如说是mysql</div><div class="line">          "name": "",      //数据源名称，别瞎写</div><div class="line">          "parameter": &#123;&#125;  //数据库配置信息</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">    ],</div><div class="line">    "setting": &#123;            //基本设置</div><div class="line">      "speed": &#123;            //流量控制</div><div class="line">        "channel": 1,       //同步时候的并发数</div><div class="line">        "byte": 104857600   //同步时候的字节大小，影响速度</div><div class="line">      &#125;,</div><div class="line">      "errorLimit": &#123;       //脏数据控制</div><div class="line">        "record": 10,       //脏数据最大记录数阈值</div><div class="line">        "percentage": 0.05  //脏数据占比阈值</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>下面给一个配置demo，大家根据自己的需要修改demo，然后使用</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">     "job": &#123;</div><div class="line">          "setting": &#123;</div><div class="line">               "speed": &#123;</div><div class="line">                    "byte": 1073741824</div><div class="line">               &#125;</div><div class="line">          &#125;,</div><div class="line">          "content": [</div><div class="line">               &#123;</div><div class="line">                    "reader": &#123;</div><div class="line">                         "name": "sqlserverreader",</div><div class="line">                         "parameter": &#123;</div><div class="line">                              "username": "root",  //自己根据需要修改数据库用户名</div><div class="line">                              "password": "admin", //密码</div><div class="line">                              "where": "",</div><div class="line">                              "connection": [</div><div class="line">                                   &#123;</div><div class="line">                                        "querySql": [</div><div class="line">                                             "SELECT Id,MyReasonId,MyProductType,MyReason FROM dbo.MyReason  WITH ( NOLOCK )"</div><div class="line">                                        ],//全量sql,根据自己需要写增量sql也可以</div><div class="line">                                        "jdbcUrl": [</div><div class="line">                                             "jdbc:sqlserver://192.168.1.1:1433;DatabaseName=XXXX"</div><div class="line">                                        ]//自己根据需要修改数据库连接</div><div class="line">                                   &#125;</div><div class="line">                              ]</div><div class="line">                         &#125;</div><div class="line">                    &#125;,</div><div class="line">                    "writer": &#123;</div><div class="line">                         "name": "mysqlwriter",</div><div class="line">                         "parameter": &#123;</div><div class="line">                              "writeMode": "insert",  //写入模式，这里写插入</div><div class="line">                              "username": "root",//自己根据需要修改数据库用户名</div><div class="line">                              "password": "admin",//密码</div><div class="line">                              "column": [</div><div class="line">                                    "id",       //注意与上面的列一一对应</div><div class="line">                                    "my_reason_id",</div><div class="line">                                    "my_product_type",</div><div class="line">                                    "my_reason" </div><div class="line">                                    ],</div><div class="line">                              "connection": [</div><div class="line">                                   &#123;</div><div class="line">                                        "jdbcUrl": "jdbc:mysql://192.168.1.2:3306/XXX?useUnicode=true&amp;characterEncoding=utf-8",</div><div class="line">                                        "table": [</div><div class="line">                                             "my_reason"</div><div class="line">                                        ]</div><div class="line">                                   &#125;</div><div class="line">                              ]</div><div class="line">                         &#125;</div><div class="line">                    &#125;</div><div class="line">               &#125;</div><div class="line">          ]</div><div class="line">     &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>编辑好之后，放到新建work目录里面，然后存为mssql_to_mysql.json，下面就可以运行了</p>
+<h5 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> cd  &#123;YOUR_DATAX_HOME&#125;/bin</div><div class="line"><span class="meta">$</span> python datax.py ../work/mssql_to_mysql.json</div></pre></td></tr></table></figure>
+<p>同步结束，显示日志如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line">2015-12-17 11:20:25.263 [job-0] INFO  JobContainer - </div><div class="line">任务启动时刻                    : 2015-12-17 11:20:15</div><div class="line">任务结束时刻                    : 2015-12-17 11:20:25</div><div class="line">任务总计耗时                    :                 10s</div><div class="line">任务平均流量                    :              205B/s</div><div class="line">记录写入速度                    :              5rec/s</div><div class="line">读出记录总数                    :                  50</div><div class="line">读写失败总数                    :                   0</div></pre></td></tr></table></figure>
+<p>这样就说明成功啦</p>
+<h4 id="进阶"><a href="#进阶" class="headerlink" title="进阶"></a>进阶</h4><h5 id="job配置"><a href="#job配置" class="headerlink" title="job配置"></a>job配置</h5><p>将你需要同步的增量数据放入到安装目录job下面，存为myjob.json，名称随意</p>
+<p>linux下通过crontab命令实现</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>查看crond服务是否启动，出现以下日志表示已启动</div><div class="line"><span class="meta">$</span>/sbin/service crond status</div><div class="line"> crond (pid  30742) is running...</div></pre></td></tr></table></figure>
+<ul>
+<li><p>第一步：创建作业的配置文件（json格式） 参考上节内容。这里假设已配置好MySQL到ODPS的配置文件mysql2odps.json</p>
+</li>
+<li><p>第二步：列出列出crontab文件，命令： crontab -l<br>（1）若出现以下日志，表示当前用户没有定时任务，用户需要新建crontab文件，并提交crontab文件，参考第三步。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$crontab -l</div><div class="line"> no crontab for xxx</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>（2）若出现以下日志，表示当前用户已经有正在运行的定时任务，用户只需用命令crontab -e 来编辑crontab文件，参考第四步。 <code>shell $ crontab -l 0,10,20,35,44,50 * * * * python /home/admin/datax3/bin/datax.py /home/admin/mysql2odps.json &gt;&gt;/home/hanfa.shf/log.</code>date +\%Y\%m\%d\%H\%M\%S<code>2&gt;&amp;1</code></p>
+<ul>
+<li><p>第三步：若当前用户没有定时任务（之前从未创建过crontab任务)</p>
+<p>​</p>
+<p>（1）创建一个新的crontab文件，如取名crondatax</p>
+<p>​</p>
+<p>示例1：每天13点5分进行同步作业，并把运行日志输出到目录/home/hanfa.shf/下log.运行时间 文件中,如定时运行是在2016-3-26 13:10:13运行的，产生的日志文件名为：log.20160326131023</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$ vim crondatax</div><div class="line">#输入以下内容</div><div class="line">5  13 * * *  python /home/admin/datax3/bin/datax.py /home/admin/mysql2odps.json  &gt;&gt;/home/hanfa.shf/log.`date +\%Y\%m\%d\%H\%M\%S`  2&gt;&amp;1</div><div class="line">#/home/admin/datax3/bin/datax.py 表示你安装的DataX datax.py所在目录（请替换为您真实的绝对路径目录）；</div><div class="line">#/home/admin/mysql2odps.json  表示作业的配置文件目录（请替换为您真实的绝对路径目录）；</div><div class="line">#/home/hanfa.shf/log.`date +\%Y\%m\%d\%H\%M\%S` 表示日志输出位置，并以log.当前时间 命名（请替换为您真实的绝对路径目录）</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>（2）提交你刚刚创建的crontab文件 <code>shell $ crontab crondatax #crondatax 你创建的crontab文件名</code>（3）重启crontab服务 <code>shell $ sudo /etc/init.d/crond restart Stopping crond: [ OK ] Starting crond: [ OK ]</code> （4）在13点5分过后，在日志目录会看到对应的日文件 <code>shell $ ls -al /home/hanfa.shf/ -rw-r--r-- 1 hanfa.shf users 12062 Mar 26 13:05 log.20160326130501</code></p>
+<blockquote>
+<p>进阶内容引自官方教程 ^_^</p>
+</blockquote>
+<div style="color:red">感谢我媳妇儿品品支持创作</div>
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/" data-id="cj4pgtd9a001kqkj3goanwgf9" class="article-share-link" data-share="baidu" data-title="高可用数据同步方案-SqlServer迁移Mysql实战">分享到</a>
+      
+
+      
+        <a href="http://yoursite.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/06/09/Spring boot返回request、response log添加/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">spring boot给接口返回添加输入输出日志</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+  <section id="comments">
+    <div id="ds-thread" class="ds-thread" data-thread-key="2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/" data-title="高可用数据同步方案-SqlServer迁移Mysql实战" data-url="http://yoursite.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/"></div>
+  </section>
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/">高可用数据同步方案-SqlServer迁移Mysql实战</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/09/Spring boot返回request、response log添加/">spring boot给接口返回添加输入输出日志</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/高并发的核心技术-幂等的实现方案/">高并发的核心技术-幂等的实现方案</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/面试大全/">初级面试必备教程</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/26/自己收集的面试题/">自己收集的面试题</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://arvinxiang.com" target="_blank">主题作者</a>
+          </li>
+        
+          <li>
+            <a href="http://reqianduan.com" target="_blank">热前端</a>
+          </li>
+        
+          <li>
+            <a href="http://yuancheng.work" target="_blank">远程.work</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 itar<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/mustfun/landscape-plus-x" target="_blank">Landscape-plus-x by mustfun</a>
+    </div>
+  </div>
+  <script src="https://files.cnblogs.com/files/VergiLyn/canvas_nest.js"><script>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!-- 多说公共js代码 start -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"reqianduan"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共js代码 end -->
+
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+</div>
+</body>
+</html>

@@ -69,6 +69,119 @@
     <div class="outer">
       <section id="main">
   
+    <article id="post-Spring AOP系列之AOP原理介绍" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/30/Spring AOP系列之AOP原理介绍/" class="article-date">
+  <time datetime="2017-10-30T07:22:01.000Z" itemprop="datePublished">2017-10-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/10/30/Spring AOP系列之AOP原理介绍/">Spring Boot  AOP系列之AOP原理介绍</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Spring-Boot-AOP系列之AOP原理介绍"><a href="#Spring-Boot-AOP系列之AOP原理介绍" class="headerlink" title="Spring Boot  AOP系列之AOP原理介绍"></a>Spring Boot  AOP系列之AOP原理介绍</h3><hr>
+<blockquote>
+<p>序言：在本文中，jdk动态代理和cglib代理的核心原理，我都会一一讲到，看本文的时候可以结合着上文看，了解创建的过程，创建的生命周期，才能知晓原理</p>
+</blockquote>
+<h4 id="一、JDK动态代理原理"><a href="#一、JDK动态代理原理" class="headerlink" title="一、JDK动态代理原理"></a>一、JDK动态代理原理</h4><h5 id="1、前言"><a href="#1、前言" class="headerlink" title="1、前言"></a>1、前言</h5><p>  其实大家看了上文的demo肯定会有所疑惑，为什么实现了一个<code>InvocationHandler</code>接口就可以实现切面的植入了，就可以在写好的函数方法上面，植入我们的代码呢？是不是很神奇，惊不惊喜，意不意外。OK，废话不多说，下面跟着我的思路，走一遍源代码。</p>
+<h5 id="2、介绍"><a href="#2、介绍" class="headerlink" title="2、介绍"></a>2、介绍</h5><p>  上文中提到了，Spring jdk动态代理最核心的一句话莫过于下面这句话</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">HelloWorld helloWorld=(HelloWorld)Proxy.</div><div class="line">                 newProxyInstance(JDKProxyTest.class.getClassLoader(),</div><div class="line">                        <span class="keyword">new</span> Class&lt;?&gt;[]&#123;HelloWorld.class&#125;,</div><div class="line">                        <span class="keyword">new</span> MyInvocationHandler(<span class="keyword">new</span> HelloworldImpl()));</div></pre></td></tr></table></figure>
+<p>走进<code>newProxyInstance</code>这个方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">final</span> Class&lt;?&gt;[] intfs = interfaces.clone();</div><div class="line"><span class="keyword">final</span> SecurityManager sm = System.getSecurityManager();</div><div class="line"><span class="keyword">if</span> (sm != <span class="keyword">null</span>) &#123;</div><div class="line">  checkProxyAccess(Reflection.getCallerClass(), loader, intfs);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*</span></div><div class="line"> * 从缓存中取出或者生成代理</div><div class="line">*/</div><div class="line">Class&lt;?&gt; cl = getProxyClass0(loader, intfs);</div></pre></td></tr></table></figure>
+        
+          <p class="article-more-link">
+            <a href="/2017/10/30/Spring AOP系列之AOP原理介绍/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2017/10/30/Spring AOP系列之AOP原理介绍/" data-id="cj9e0xmmw0008j0j3v15wg6tk" class="article-share-link" data-share="baidu" data-title="Spring Boot  AOP系列之AOP原理介绍">分享到</a>
+      
+
+      
+        <a href="http://yoursite.com/2017/10/30/Spring AOP系列之AOP原理介绍/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Spring AOP系列之代理创建" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/30/Spring AOP系列之代理创建/" class="article-date">
+  <time datetime="2017-10-30T04:22:01.000Z" itemprop="datePublished">2017-10-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/10/30/Spring AOP系列之代理创建/">Spring Boot  AOP系列之动态代理创建</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Spring-Boot-AOP系列之动态代理创建"><a href="#Spring-Boot-AOP系列之动态代理创建" class="headerlink" title="Spring Boot  AOP系列之动态代理创建"></a>Spring Boot  AOP系列之动态代理创建</h3><hr>
+<blockquote>
+<p>序言：在本文中，我会讲到Spring中如何创建动态代理，如何利用jdk或者cglib来创建动态代理，但是同时，我也会提及如何手动创建代理，这将有助于我们了解动态代理的原理。我们先来讲讲如何手动创建吧。</p>
+</blockquote>
+<h4 id="一、-手动创建之jdk动态代理"><a href="#一、-手动创建之jdk动态代理" class="headerlink" title="一、 手动创建之jdk动态代理"></a>一、 手动创建之jdk动态代理</h4><h5 id="1、-jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现InvocationHandler类，"><a href="#1、-jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现InvocationHandler类，" class="headerlink" title="1、 jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现InvocationHandler类，"></a>1、 jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现InvocationHandler类，</h5><p>接口如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Helloworld</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>实现类如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloworldImpl</span> <span class="keyword">implements</span> <span class="title">HelloWorld</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.print(<span class="string">"hello world"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+        
+          <p class="article-more-link">
+            <a href="/2017/10/30/Spring AOP系列之代理创建/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2017/10/30/Spring AOP系列之代理创建/" data-id="cj9e0xmmz0009j0j3mkn6jbw4" class="article-share-link" data-share="baidu" data-title="Spring Boot  AOP系列之动态代理创建">分享到</a>
+      
+
+      
+        <a href="http://yoursite.com/2017/10/30/Spring AOP系列之代理创建/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/" class="article-date">
@@ -214,86 +327,11 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/" data-id="cj6rim52w000fccj317cxj56i" class="article-share-link" data-share="baidu" data-title="">Share</a>
+        <a data-url="http://yoursite.com/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/" data-id="cj9e0xmn5000fj0j3d7w0ohof" class="article-share-link" data-share="baidu" data-title="">分享到</a>
       
 
       
-        <a href="http://yoursite.com/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/#ds-thread" class="article-comment-link">Comments</a>
-      
-
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" class="article-date">
-  <time datetime="2017-08-25T06:47:27.653Z" itemprop="datePublished">2017-08-25</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="Spring-Boot-集成-resteasy篇-—-jax-rs常用注解介绍"><a href="#Spring-Boot-集成-resteasy篇-—-jax-rs常用注解介绍" class="headerlink" title="Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍"></a>Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍</h2><h3 id="GET"><a href="#GET" class="headerlink" title="@GET"></a>@GET</h3><p>http请求方式里面的get请求，标记这个请求方式为get</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * http://localhost:8080/v1/province/city/1</div><div class="line"> * <span class="doctag">@param</span> id</div><div class="line"> * <span class="doctag">@return</span></div><div class="line"> */</div><div class="line"><span class="meta">@Path</span>(<span class="string">"city/&#123;id&#125;"</span>)</div><div class="line"><span class="meta">@GET</span></div><div class="line"><span class="meta">@Produces</span>(MediaType.APPLICATION_JSON) <span class="comment">//表示输出json</span></div><div class="line"><span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON) <span class="comment">//表示输入为json</span></div><div class="line"><span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">getCity</span><span class="params">(@PathParam(<span class="string">"id"</span>)</span> Long id) </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="PUT"><a href="#PUT" class="headerlink" title="@PUT"></a>@PUT</h3><p>http请求方式里面的get请求，标记这个请求方式为put</p>
-<p>一般用来创建一个资源</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Path</span>(<span class="string">"city/&#123;id&#125;"</span>)</div><div class="line"><span class="meta">@PUT</span></div><div class="line"><span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line"><span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON)</div><div class="line"><span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">getCity</span><span class="params">(@PathParam(<span class="string">"id"</span>)</span> Long id) </span>&#123;</div><div class="line"></div><div class="line">  <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>###@POST</p>
-<p>http请求方式里面的get请求，标记这个请求方式为post</p>
-<p>一般用来创建和更新</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Path</span>(<span class="string">"city/&#123;id&#125;"</span>)</div><div class="line"><span class="meta">@POST</span></div><div class="line"><span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line"><span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON)</div><div class="line"><span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">postCity</span><span class="params">(@PathParam(<span class="string">"id"</span>)</span> Long id) </span>&#123;</div><div class="line"></div><div class="line">  <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="DELETE"><a href="#DELETE" class="headerlink" title="@DELETE"></a>@DELETE</h3><p>http请求方式里面的get请求，标记这个请求方式为delete</p>
-<p>一般用来删除一个资源</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Path</span>(<span class="string">"city/&#123;id&#125;"</span>)</div><div class="line"><span class="meta">@DELETE</span></div><div class="line"><span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line"><span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON)</div><div class="line"><span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">postCity</span><span class="params">(@PathParam(<span class="string">"id"</span>)</span> Long id) </span>&#123;</div><div class="line">  <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="PathParam"><a href="#PathParam" class="headerlink" title="@PathParam"></a>@PathParam</h3><p>一般url里面的参数用PathParam</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">  * http://localhost:8080/v1/province/city/1</div><div class="line">  * <span class="doctag">@param</span> id</div><div class="line">  * <span class="doctag">@return</span></div><div class="line">  */</div><div class="line"> <span class="meta">@Path</span>(<span class="string">"city/&#123;id&#125;"</span>)</div><div class="line"> <span class="meta">@GET</span></div><div class="line"> <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON) <span class="comment">//表示输出json</span></div><div class="line"> <span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON) <span class="comment">//表示输入为json</span></div><div class="line"> <span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">getCity</span><span class="params">(@PathParam(<span class="string">"id"</span>)</span> Long id) </span>&#123;</div><div class="line"></div><div class="line">     <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
-<h3 id="QueryParam"><a href="#QueryParam" class="headerlink" title="@QueryParam"></a>@QueryParam</h3><p>可以输出url后面的参数</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">   * http://localhost:8080/v1/province/queryCity/1?name=wh</div><div class="line">   * <span class="doctag">@param</span> id</div><div class="line">   * <span class="doctag">@return</span></div><div class="line">   */</div><div class="line">  <span class="meta">@Path</span>(<span class="string">"queryCity/&#123;id&#125;"</span>)</div><div class="line">  <span class="meta">@GET</span></div><div class="line">  <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">  <span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON)</div><div class="line">  <span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">queryCity</span><span class="params">(@PathParam(<span class="string">"id"</span>)</span> Long id,@<span class="title">QueryParam</span><span class="params">(<span class="string">"name"</span>)</span>String name) </span>&#123;</div><div class="line">      System.out.println(name);</div><div class="line">      <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
-<h3 id="HeaderParam"><a href="#HeaderParam" class="headerlink" title="@HeaderParam"></a>@HeaderParam</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">     * http://localhost:8080/v1/province/queryCity/1?name=wh</div><div class="line">     * <span class="doctag">@param</span> id</div><div class="line">     * <span class="doctag">@return</span></div><div class="line">     */</div><div class="line">    <span class="meta">@Path</span>(<span class="string">"queryCity/&#123;id&#125;"</span>)</div><div class="line">    <span class="meta">@GET</span></div><div class="line">    <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">    <span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON)</div><div class="line">    <span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">queryCity</span><span class="params">(@HeaderParam(<span class="string">"auth"</span>)</span>String authKey,@<span class="title">PathParam</span><span class="params">(<span class="string">"id"</span>)</span> Long id,@<span class="title">QueryParam</span><span class="params">(<span class="string">"name"</span>)</span>String name) </span>&#123;</div><div class="line">        System.out.println(name);</div><div class="line">        System.out.println(authKey);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<p>效果如下图</p>
-<p><img src="http://ojkdckcc1.bkt.clouddn.com/微信截图_20170823120918.png" alt=""></p>
-<h3 id="CookieParam"><a href="#CookieParam" class="headerlink" title="@CookieParam"></a>@CookieParam</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">     * http://localhost:8080/v1/province/queryCity/1?name=wh</div><div class="line">     * <span class="doctag">@param</span> id</div><div class="line">     * <span class="doctag">@return</span></div><div class="line">     */</div><div class="line">    <span class="meta">@Path</span>(<span class="string">"queryCity/&#123;id&#125;"</span>)</div><div class="line">    <span class="meta">@GET</span></div><div class="line">    <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">    <span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON)</div><div class="line">    <span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">queryCity</span><span class="params">(@CookieParam(<span class="string">"__utma"</span>)</span>String sessionId,@<span class="title">HeaderParam</span><span class="params">(<span class="string">"auth"</span>)</span>String authKey,@<span class="title">PathParam</span><span class="params">(<span class="string">"id"</span>)</span> Long id,@<span class="title">QueryParam</span><span class="params">(<span class="string">"name"</span>)</span>String name) </span>&#123;</div><div class="line">        System.out.println(name);</div><div class="line">        System.out.println(sessionId);</div><div class="line">        System.out.println(authKey);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<p><strong>注：</strong> _utma是postman里面自带的一个cookie，所以直接调用就可以拿到值，不用额外设置</p>
-<h3 id="MatrixParam"><a href="#MatrixParam" class="headerlink" title="@MatrixParam"></a>@MatrixParam</h3><p>matrixParam一般是用来分离参数的，一般和分号一起使用，下例中，分号后面的from被成功识别打印</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">     * http://localhost:8080/v1/province/queryCity/1;from=wh?name=sh</div><div class="line">     * <span class="doctag">@param</span> id</div><div class="line">     * <span class="doctag">@return</span></div><div class="line">     */</div><div class="line">    <span class="meta">@Path</span>(<span class="string">"queryCity/&#123;id&#125;"</span>)</div><div class="line">    <span class="meta">@GET</span></div><div class="line">    <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">    <span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON)</div><div class="line">    <span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">queryCity</span><span class="params">(@MatrixParam(<span class="string">"from"</span>)</span>String from,@<span class="title">CookieParam</span><span class="params">(<span class="string">"__utma"</span>)</span>String sessionId,@<span class="title">HeaderParam</span><span class="params">(<span class="string">"auth"</span>)</span>String authKey,@<span class="title">PathParam</span><span class="params">(<span class="string">"id"</span>)</span> Long id,@<span class="title">QueryParam</span><span class="params">(<span class="string">"name"</span>)</span>String name) </span>&#123;</div><div class="line">        System.out.println(id);</div><div class="line">        System.out.println(name);</div><div class="line">        System.out.println(sessionId);</div><div class="line">        System.out.println(authKey);</div><div class="line">        System.out.println(from);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span></div><div class="line">sh</div><div class="line"><span class="number">111872281.1804816201</span>.1493794349.1495509065.1496976869.12</div><div class="line">xsdfarewrsdfjnainrfa;ewe==</div><div class="line">wh</div></pre></td></tr></table></figure>
-<h3 id="FormParam"><a href="#FormParam" class="headerlink" title="@FormParam"></a>@FormParam</h3><p>postman里面改为post请求，表单中添加age参数，得到输出</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">     *  http://localhost:8080/v1/province/city/1?name=%22%E5%B0%8F%E6%98%8E%22</div><div class="line">     * <span class="doctag">@param</span> id</div><div class="line">     * <span class="doctag">@param</span> name</div><div class="line">     * <span class="doctag">@return</span></div><div class="line">     */</div><div class="line">    <span class="meta">@POST</span></div><div class="line">    <span class="meta">@Path</span>(<span class="string">"city/&#123;id&#125;"</span>)</div><div class="line">    <span class="meta">@Consumes</span>(MediaType.APPLICATION_FORM_URLENCODED)</div><div class="line">    <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">    <span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">addBook</span><span class="params">(@FormParam(<span class="string">"age"</span>)</span>Integer age,@<span class="title">PathParam</span><span class="params">(<span class="string">"id"</span>)</span> String id, @<span class="title">QueryParam</span><span class="params">(<span class="string">"name"</span>)</span> String name) </span>&#123;</div><div class="line">        System.out.println(id);</div><div class="line">        System.out.println(name);</div><div class="line">        System.out.println(age);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span></div><div class="line">sh</div><div class="line"><span class="number">23</span></div></pre></td></tr></table></figure>
-<p>###@Form</p>
-<p>这个注解，允许你将你的form注入到一个实体里面，看例子吧</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyForm</span> </span>&#123;</div><div class="line">    <span class="meta">@FormParam</span>(<span class="string">"age"</span>)</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> age;</div><div class="line">    <span class="meta">@HeaderParam</span>(<span class="string">"auth"</span>)</div><div class="line">    <span class="keyword">private</span> String authKey;</div><div class="line">    <span class="meta">@PathParam</span>(<span class="string">"id"</span>)</div><div class="line">    <span class="keyword">private</span> String id;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getAge</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> age;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAge</span><span class="params">(<span class="keyword">int</span> age)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.age = age;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAuthKey</span><span class="params">(String authKey)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.authKey = authKey;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getAuthKey</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> authKey;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getId</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> id;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">(String id)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.id = id;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@PUT</span></div><div class="line"><span class="meta">@Path</span>(<span class="string">"city/&#123;id&#125;"</span>)</div><div class="line"><span class="meta">@Consumes</span>(MediaType.APPLICATION_FORM_URLENCODED)</div><div class="line"><span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line"><span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">addForm</span><span class="params">(@Form MyForm form)</span> </span>&#123;</div><div class="line">    System.out.println(JSON.toJSONString(form));</div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>输出</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;<span class="string">"age"</span>:<span class="number">23</span>,<span class="string">"authKey"</span>:<span class="string">"xsdfarewrsdfjnainrfa;ewe=="</span>,<span class="string">"id"</span>:<span class="string">"1"</span>&#125;</div></pre></td></tr></table></figure>
-<p>同样也可以把@Form注入到一个实体里面去</p>
-<h3 id="DefaultValue"><a href="#DefaultValue" class="headerlink" title="@DefaultValue"></a>@DefaultValue</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">    * http://localhost:8080/v1/province/queryCity/1?name=wh</div><div class="line">    * <span class="doctag">@param</span> id</div><div class="line">    * <span class="doctag">@return</span></div><div class="line">    */</div><div class="line">   <span class="meta">@Path</span>(<span class="string">"queryCity/&#123;id&#125;"</span>)</div><div class="line">   <span class="meta">@GET</span></div><div class="line">   <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">   <span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON)</div><div class="line">   <span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">queryCity</span><span class="params">(@PathParam(<span class="string">"id"</span>)</span> Long id,@<span class="title">DefaultValue</span><span class="params">(<span class="string">"sh"</span>)</span>@<span class="title">QueryParam</span><span class="params">(<span class="string">"name"</span>)</span>String name) </span>&#123;</div><div class="line">       System.out.println(name);</div><div class="line">       <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
-<p>可以在queryParam前面加一个默认值</p>
-<h3 id="Context"><a href="#Context" class="headerlink" title="@Context"></a>@Context</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">The <span class="meta">@Context</span> 注解允许你注入下面这些类</div><div class="line">• javax.ws.rs.core.HttpHeaders</div><div class="line">• javax.ws.rs.core.UriInfo</div><div class="line">• javax.ws.rs.core.Request</div><div class="line">• javax.servlet.http.HttpServletRequest</div><div class="line">• javax.servlet.http.HttpServletResponse</div><div class="line">• javax.servlet.ServletConfig</div><div class="line">• javax.servlet.ServletContext</div><div class="line">• javax.ws.rs.core.SecurityContext</div><div class="line">在filter中使用较多</div></pre></td></tr></table></figure>
-<h3 id="Encoded-and-encoding"><a href="#Encoded-and-encoding" class="headerlink" title="@Encoded and encoding"></a>@Encoded and encoding</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">     * http://localhost:8080/v1/province/en_city/小明</div><div class="line">     * <span class="doctag">@param</span> name</div><div class="line">     * <span class="doctag">@return</span></div><div class="line">     */</div><div class="line">    <span class="meta">@Path</span>(value = <span class="string">"en_city/&#123;name&#125;"</span>)</div><div class="line">    <span class="meta">@GET</span></div><div class="line">    <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">    <span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON)</div><div class="line">    <span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">getCity</span><span class="params">(@PathParam(<span class="string">"name"</span>)</span>@Encoded String name) </span>&#123;</div><div class="line">        System.out.println(name);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<p>输出</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">%E5%B0%<span class="number">8F</span>%E6%<span class="number">98</span>%<span class="number">8</span>E</div></pre></td></tr></table></figure>
-<blockquote>
-<p>end</p>
-</blockquote>
-
-      
-    </div>
-    <footer class="article-footer">
-      
-        <a data-url="http://yoursite.com/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" data-id="cj6rim52u000dccj3u4gtsj5a" class="article-share-link" data-share="baidu" data-title="">Share</a>
-      
-
-      
-        <a href="http://yoursite.com/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/#ds-thread" class="article-comment-link">Comments</a>
+        <a href="http://yoursite.com/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/#ds-thread" class="article-comment-link">评论</a>
       
 
       
@@ -342,14 +380,64 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/08/25/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" data-id="cj6rim5220001ccj31mqj4hj8" class="article-share-link" data-share="baidu" data-title="">Share</a>
+        <a data-url="http://yoursite.com/2017/08/25/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" data-id="cj9e0xmo1000zj0j3ryz0uydj" class="article-share-link" data-share="baidu" data-title="">分享到</a>
       
 
       
-        <a href="http://yoursite.com/2017/08/25/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/#ds-thread" class="article-comment-link">Comments</a>
+        <a href="http://yoursite.com/2017/08/25/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/#ds-thread" class="article-comment-link">评论</a>
       
 
       
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" class="article-date">
+  <time datetime="2017-07-19T07:22:01.000Z" itemprop="datePublished">2017-07-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/">Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Spring-Boot-集成-resteasy篇-—-jax-rs常用注解介绍"><a href="#Spring-Boot-集成-resteasy篇-—-jax-rs常用注解介绍" class="headerlink" title="Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍"></a>Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍</h2><h3 id="GET"><a href="#GET" class="headerlink" title="@GET"></a>@GET</h3><p>http请求方式里面的get请求，标记这个请求方式为get</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * http://localhost:8080/v1/province/city/1</div><div class="line"> * <span class="doctag">@param</span> id</div><div class="line"> * <span class="doctag">@return</span></div><div class="line"> */</div><div class="line"><span class="meta">@Path</span>(<span class="string">"city/&#123;id&#125;"</span>)</div><div class="line"><span class="meta">@GET</span></div><div class="line"><span class="meta">@Produces</span>(MediaType.APPLICATION_JSON) <span class="comment">//表示输出json</span></div><div class="line"><span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON) <span class="comment">//表示输入为json</span></div><div class="line"><span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">getCity</span><span class="params">(@PathParam(<span class="string">"id"</span>)</span> Long id) </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+        
+          <p class="article-more-link">
+            <a href="/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" data-id="cj9e0xmn3000dj0j3e1ws6cys" class="article-share-link" data-share="baidu" data-title="Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍">分享到</a>
+      
+
+      
+        <a href="http://yoursite.com/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a></li></ul>
+
     </footer>
   </div>
   
@@ -433,11 +521,11 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/" data-id="cj6rim54e0023ccj3f20gc7ft" class="article-share-link" data-share="baidu" data-title="高可用数据同步方案-SqlServer迁移Mysql实战">Share</a>
+        <a data-url="http://yoursite.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/" data-id="cj9e0xmpo002nj0j39s1y0k5j" class="article-share-link" data-share="baidu" data-title="高可用数据同步方案-SqlServer迁移Mysql实战">分享到</a>
       
 
       
-        <a href="http://yoursite.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/#ds-thread" class="article-comment-link">Comments</a>
+        <a href="http://yoursite.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/#ds-thread" class="article-comment-link">评论</a>
       
 
       
@@ -494,11 +582,11 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/06/09/Spring boot返回request、response log添加/" data-id="cj6rim52z000jccj39ii5hu70" class="article-share-link" data-share="baidu" data-title="spring boot给接口返回添加输入输出日志">Share</a>
+        <a data-url="http://yoursite.com/2017/06/09/Spring boot返回request、response log添加/" data-id="cj9e0xmo30012j0j3i12xc3a2" class="article-share-link" data-share="baidu" data-title="spring boot给接口返回添加输入输出日志">分享到</a>
       
 
       
-        <a href="http://yoursite.com/2017/06/09/Spring boot返回request、response log添加/#ds-thread" class="article-comment-link">Comments</a>
+        <a href="http://yoursite.com/2017/06/09/Spring boot返回request、response log添加/#ds-thread" class="article-comment-link">评论</a>
       
 
       
@@ -550,11 +638,11 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/高并发的核心技术-幂等的实现方案/" data-id="cj6rim54g0026ccj3hlvlav53" class="article-share-link" data-share="baidu" data-title="高并发的核心技术-幂等的实现方案">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/高并发的核心技术-幂等的实现方案/" data-id="cj9e0xmpd002ij0j3t4ma1855" class="article-share-link" data-share="baidu" data-title="高并发的核心技术-幂等的实现方案">分享到</a>
       
 
       
-        <a href="http://yoursite.com/2017/05/26/高并发的核心技术-幂等的实现方案/#ds-thread" class="article-comment-link">Comments</a>
+        <a href="http://yoursite.com/2017/05/26/高并发的核心技术-幂等的实现方案/#ds-thread" class="article-comment-link">评论</a>
       
 
       
@@ -605,11 +693,11 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/面试大全/" data-id="cj6rim54d0021ccj3jbhx7c5f" class="article-share-link" data-share="baidu" data-title="初级面试必备教程">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/面试大全/" data-id="cj9e0xmpc002gj0j3750pfd94" class="article-share-link" data-share="baidu" data-title="初级面试必备教程">分享到</a>
       
 
       
-        <a href="http://yoursite.com/2017/05/26/面试大全/#ds-thread" class="article-comment-link">Comments</a>
+        <a href="http://yoursite.com/2017/05/26/面试大全/#ds-thread" class="article-comment-link">评论</a>
       
 
       
@@ -662,11 +750,11 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/自己收集的面试题/" data-id="cj6rim54a001wccj36w8ld0wa" class="article-share-link" data-share="baidu" data-title="自己收集的面试题">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/自己收集的面试题/" data-id="cj9e0xmpn002lj0j33gcvgul2" class="article-share-link" data-share="baidu" data-title="自己收集的面试题">分享到</a>
       
 
       
-        <a href="http://yoursite.com/2017/05/26/自己收集的面试题/#ds-thread" class="article-comment-link">Comments</a>
+        <a href="http://yoursite.com/2017/05/26/自己收集的面试题/#ds-thread" class="article-comment-link">评论</a>
       
 
       
@@ -679,111 +767,10 @@
 
 
   
-    <article id="post-自定义注解" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/05/26/自定义注解/" class="article-date">
-  <time datetime="2017-05-26T11:14:31.060Z" itemprop="datePublished">2017-05-26</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/05/26/自定义注解/">自定义注解</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>1、先上代码（定义注解）</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Constraint</span>(validatedBy = DecimalValidator.class) <span class="comment">//具体的实现</span></div><div class="line"><span class="meta">@Target</span>( &#123; java.lang.annotation.ElementType.METHOD,</div><div class="line">    java.lang.annotation.ElementType.FIELD &#125;)</div><div class="line"><span class="meta">@Retention</span>(java.lang.annotation.RetentionPolicy.RUNTIME)</div><div class="line"><span class="meta">@Documented</span></div><div class="line"><span class="keyword">public</span> <span class="meta">@interface</span> IsDecimal &#123;</div><div class="line">	java.lang.<span class="function">String <span class="title">message</span><span class="params">()</span> <span class="keyword">default</span> ""</span>;</div><div class="line">	Class&lt;?&gt;[] groups() <span class="keyword">default</span> &#123;&#125;;</div><div class="line">	Class&lt;? extends Payload&gt;[] payload() <span class="keyword">default</span> &#123;&#125;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-        
-          <p class="article-more-link">
-            <a href="/2017/05/26/自定义注解/#more">Read More</a>
-          </p>
-        
-      
-    </div>
-    <footer class="article-footer">
-      
-        <a data-url="http://yoursite.com/2017/05/26/自定义注解/" data-id="cj6rim548001uccj331t4jzaf" class="article-share-link" data-share="baidu" data-title="自定义注解">Share</a>
-      
-
-      
-        <a href="http://yoursite.com/2017/05/26/自定义注解/#ds-thread" class="article-comment-link">Comments</a>
-      
-
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-耳鸣疗法" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/05/26/耳鸣疗法/" class="article-date">
-  <time datetime="2017-05-26T11:14:31.056Z" itemprop="datePublished">2017-05-26</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/05/26/耳鸣疗法/">耳鸣疗法</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>（1）梳头抹耳法：双手十指由前发际向后梳头，梳到头后部时，两掌心贴住耳廓后部，两手分别向左右两侧抹耳廓至面颊部为1次，连续108次。</p>
-<p>（2）鸣天鼓法：两掌搓热，用两掌心分别贴住左右两耳，手指托住后脑部，食指压在中指上，使食指从中指上重重地滑落，经此弹击后颈发际处，可听到“咚咚”之声，如击天鼓，共击108次。</p>
-<p>（3）掌心震耳（自行鼓膜按摩法）：两手掌搓热，用搓热的两手掌心捂住两耳．手掌与耳朵完全封闭，然后两掌突然松开，听到“叭”的一声，起到震耳的作用。共108次。</p>
-        
-          <p class="article-more-link">
-            <a href="/2017/05/26/耳鸣疗法/#more">Read More</a>
-          </p>
-        
-      
-    </div>
-    <footer class="article-footer">
-      
-        <a data-url="http://yoursite.com/2017/05/26/耳鸣疗法/" data-id="cj6rim54b001yccj301qbac9w" class="article-share-link" data-share="baidu" data-title="耳鸣疗法">Share</a>
-      
-
-      
-        <a href="http://yoursite.com/2017/05/26/耳鸣疗法/#ds-thread" class="article-comment-link">Comments</a>
-      
-
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/生活/">生活</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
 
 
   <nav id="page-nav">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
   </nav>
 </section>
       
@@ -793,43 +780,47 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
+    <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
+    <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+      <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Spring-Boot/" style="font-size: 15px;">Spring Boot</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 12.5px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 12.5px;">smarty</a> <a href="/tags/spring/" style="font-size: 12.5px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 17.5px;">多线程</a> <a href="/tags/大数据/" style="font-size: 12.5px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 12.5px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
+    <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">近期文章</h3>
     <div class="widget">
       <ul>
         
           <li>
-            <a href="/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/">(no title)</a>
+            <a href="/2017/10/30/Spring AOP系列之AOP原理介绍/">Spring Boot  AOP系列之AOP原理介绍</a>
           </li>
         
           <li>
-            <a href="/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/">(no title)</a>
+            <a href="/2017/10/30/Spring AOP系列之代理创建/">Spring Boot  AOP系列之动态代理创建</a>
+          </li>
+        
+          <li>
+            <a href="/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/">(no title)</a>
           </li>
         
           <li>
@@ -837,11 +828,7 @@
           </li>
         
           <li>
-            <a href="/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/">高可用数据同步方案-SqlServer迁移Mysql实战</a>
-          </li>
-        
-          <li>
-            <a href="/2017/06/09/Spring boot返回request、response log添加/">spring boot给接口返回添加输入输出日志</a>
+            <a href="/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/">Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍</a>
           </li>
         
       </ul>
@@ -851,7 +838,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Links</h3>
+    <h3 class="widget-title">友情链接</h3>
     <div class="widget">
       <ul>
         
@@ -897,7 +884,7 @@
 </nav>
   <!-- totop start -->
 <div id="totop">
-<a title="totop"><img src="/img/scrollup.png"/></a>
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
 </div>
 
 <!-- totop end -->

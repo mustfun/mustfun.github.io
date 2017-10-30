@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-08-23T03:25:48.740Z</updated>
+  <updated>2017-10-30T10:10:09.602Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,148 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Spring Boot  AOP系列之AOP原理介绍</title>
+    <link href="http://yoursite.com/2017/10/30/Spring%20AOP%E7%B3%BB%E5%88%97%E4%B9%8BAOP%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/"/>
+    <id>http://yoursite.com/2017/10/30/Spring AOP系列之AOP原理介绍/</id>
+    <published>2017-10-30T07:22:01.000Z</published>
+    <updated>2017-10-30T10:10:09.602Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="Spring-Boot-AOP系列之AOP原理介绍"><a href="#Spring-Boot-AOP系列之AOP原理介绍" class="headerlink" title="Spring Boot  AOP系列之AOP原理介绍"></a>Spring Boot  AOP系列之AOP原理介绍</h3><hr>
+<blockquote>
+<p>序言：在本文中，jdk动态代理和cglib代理的核心原理，我都会一一讲到，看本文的时候可以结合着上文看，了解创建的过程，创建的生命周期，才能知晓原理</p>
+</blockquote>
+<h4 id="一、JDK动态代理原理"><a href="#一、JDK动态代理原理" class="headerlink" title="一、JDK动态代理原理"></a>一、JDK动态代理原理</h4><h5 id="1、前言"><a href="#1、前言" class="headerlink" title="1、前言"></a>1、前言</h5><p>  其实大家看了上文的demo肯定会有所疑惑，为什么实现了一个<code>InvocationHandler</code>接口就可以实现切面的植入了，就可以在写好的函数方法上面，植入我们的代码呢？是不是很神奇，惊不惊喜，意不意外。OK，废话不多说，下面跟着我的思路，走一遍源代码。</p>
+<h5 id="2、介绍"><a href="#2、介绍" class="headerlink" title="2、介绍"></a>2、介绍</h5><p>  上文中提到了，Spring jdk动态代理最核心的一句话莫过于下面这句话</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">HelloWorld helloWorld=(HelloWorld)Proxy.</div><div class="line">                 newProxyInstance(JDKProxyTest.class.getClassLoader(),</div><div class="line">                        <span class="keyword">new</span> Class&lt;?&gt;[]&#123;HelloWorld.class&#125;,</div><div class="line">                        <span class="keyword">new</span> MyInvocationHandler(<span class="keyword">new</span> HelloworldImpl()));</div></pre></td></tr></table></figure>
+<p>走进<code>newProxyInstance</code>这个方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">final</span> Class&lt;?&gt;[] intfs = interfaces.clone();</div><div class="line"><span class="keyword">final</span> SecurityManager sm = System.getSecurityManager();</div><div class="line"><span class="keyword">if</span> (sm != <span class="keyword">null</span>) &#123;</div><div class="line">  checkProxyAccess(Reflection.getCallerClass(), loader, intfs);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*</span></div><div class="line"> * 从缓存中取出或者生成代理</div><div class="line">*/</div><div class="line">Class&lt;?&gt; cl = getProxyClass0(loader, intfs);</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<p><code>getProxyClass0</code>核心方法片段如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> Class&lt;?&gt; getProxyClass0(ClassLoader loader,</div><div class="line">                                       Class&lt;?&gt;... interfaces) &#123;</div><div class="line">  <span class="keyword">if</span> (interfaces.length &gt; <span class="number">65535</span>) &#123;</div><div class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"interface limit exceeded"</span>);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="comment">// 如果已经创建了就从缓存里面拿，如果没有创建就通过ProxyClassFactory创建一个</span></div><div class="line">  <span class="keyword">return</span> proxyClassCache.get(loader, interfaces);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>proxyClassCache</code>是这样的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> WeakCache&lt;ClassLoader, Class&lt;?&gt;[], Class&lt;?&gt;&gt;</div><div class="line">        proxyClassCache = <span class="keyword">new</span> WeakCache&lt;&gt;(<span class="keyword">new</span> KeyFactory(), <span class="keyword">new</span> ProxyClassFactory());</div></pre></td></tr></table></figure>
+<p><code>ProxyClassFactory</code>是<code>Proxy</code>的一个静态内部类，实现了<code>WeakCache</code>的内部接口<code>BiFunction</code>的<code>apply</code>方法，代码如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">private static final class ProxyClassFactory  </div><div class="line">    implements BiFunction&lt;ClassLoader, Class&lt;?&gt;[], Class&lt;?&gt;&gt; &#123;  </div><div class="line">    // 所有代理类名字的前缀  </div><div class="line">    private static final String proxyClassNamePrefix = "$Proxy";  </div><div class="line">  </div><div class="line">    // 用于生成代理类名字的计数器  </div><div class="line">    private static final AtomicLong nextUniqueNumber = new AtomicLong();  </div><div class="line">  </div><div class="line">    @Override  </div><div class="line">    public Class&lt;?&gt; apply(ClassLoader loader, Class&lt;?&gt;[] interfaces) &#123;  </div><div class="line">        // 省略验证代理接口的代码……  </div><div class="line">  </div><div class="line">        String proxyPkg = null;     // 生成的代理类的包名  </div><div class="line">        // 对于非公共接口，代理类的包名与接口的相同  </div><div class="line">        for (Class&lt;?&gt; intf : interfaces) &#123;  </div><div class="line">            int flags = intf.getModifiers();  </div><div class="line">            if (!Modifier.isPublic(flags)) &#123;  </div><div class="line">                String name = intf.getName();  </div><div class="line">                int n = name.lastIndexOf('.');  </div><div class="line">                String pkg = ((n == -1) ? "" : name.substring(0, n + 1));  </div><div class="line">                if (proxyPkg == null) &#123;  </div><div class="line">                    proxyPkg = pkg;  </div><div class="line">                &#125; else if (!pkg.equals(proxyPkg)) &#123;  </div><div class="line">                    throw new IllegalArgumentException(  </div><div class="line">                        "non-public interfaces from different packages");  </div><div class="line">                &#125;  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">  </div><div class="line">        // 对于公共接口的包名，默认为com.sun.proxy  </div><div class="line">        if (proxyPkg == null) &#123;  </div><div class="line">            proxyPkg = ReflectUtil.PROXY_PACKAGE + ".";  </div><div class="line">        &#125;  </div><div class="line">  </div><div class="line">        // 获取计数  </div><div class="line">        long num = nextUniqueNumber.getAndIncrement();  </div><div class="line">        // 默认情况下，代理类的完全限定名为：com.sun.proxy.$Proxy0，com.sun.proxy.$Proxy1……依次递增  </div><div class="line">        String proxyName = proxyPkg + proxyClassNamePrefix + num;  </div><div class="line">  </div><div class="line">        // 这里才是真正的生成代理类的字节码的地方  </div><div class="line">        byte[] proxyClassFile = ProxyGenerator.generateProxyClass(  </div><div class="line">            proxyName, interfaces);  </div><div class="line">        try &#123;  </div><div class="line">            // 根据二进制字节码返回相应的Class实例  </div><div class="line">            return defineClass0(loader, proxyName,  </div><div class="line">                                proxyClassFile, 0, proxyClassFile.length);  </div><div class="line">        &#125; catch (ClassFormatError e) &#123;  </div><div class="line">            throw new IllegalArgumentException(e.toString());  </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们注意一下这行代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">byte</span>[] proxyClassFile = ProxyGenerator.generateProxyClass(</div><div class="line">               proxyName, interfaces, accessFlags);</div></pre></td></tr></table></figure>
+<p>进去：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">byte</span>[] generateProxyClass(<span class="keyword">final</span> String var0, Class&lt;?&gt;[] var1, <span class="keyword">int</span> var2) &#123;</div><div class="line">        ProxyGenerator var3 = <span class="keyword">new</span> ProxyGenerator(var0, var1, var2);</div><div class="line">        <span class="keyword">final</span> <span class="keyword">byte</span>[] var4 = var3.generateClassFile();</div><div class="line">   <span class="comment">//saveGeneratedFiles 这个参数是经我们配置的，默认是false，目的是是否保存在磁盘里面</span></div><div class="line">        <span class="keyword">if</span> (saveGeneratedFiles) &#123;</div><div class="line">            AccessController.doPrivileged(<span class="keyword">new</span> PrivilegedAction&lt;Void&gt;() &#123;</div><div class="line">                <span class="function"><span class="keyword">public</span> Void <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                    <span class="keyword">try</span> &#123;</div><div class="line">                        <span class="keyword">int</span> var1 = var0.lastIndexOf(<span class="number">46</span>);</div><div class="line">                        Path var2;</div><div class="line">                        <span class="keyword">if</span> (var1 &gt; <span class="number">0</span>) &#123;</div><div class="line">                            Path var3 = Paths.get(var0.substring(<span class="number">0</span>, var1).replace(<span class="string">'.'</span>, File.separatorChar));</div><div class="line">                            Files.createDirectories(var3);</div><div class="line">                            var2 = var3.resolve(var0.substring(var1 + <span class="number">1</span>, var0.length()) + <span class="string">".class"</span>);</div><div class="line">                        &#125; <span class="keyword">else</span> &#123;</div><div class="line">                            var2 = Paths.get(var0 + <span class="string">".class"</span>);</div><div class="line">                        &#125;</div><div class="line"></div><div class="line">                        Files.write(var2, var4, <span class="keyword">new</span> OpenOption[<span class="number">0</span>]);</div><div class="line">                        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">                    &#125; <span class="keyword">catch</span> (IOException var4x) &#123;</div><div class="line">                        <span class="keyword">throw</span> <span class="keyword">new</span> InternalError(<span class="string">"I/O exception saving generated file: "</span> + var4x);</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> var4;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">boolean</span> saveGeneratedFiles = ((Boolean)AccessController.doPrivileged(<span class="keyword">new</span> GetBooleanAction(<span class="string">"sun.misc.ProxyGenerator.saveGeneratedFiles"</span>))).booleanValue();</div></pre></td></tr></table></figure>
+<p>在启动项目的时候，虚拟机设置一下这个参数<code>sun.misc.ProxyGenerator.saveGeneratedFiles</code>为true，就可以打印出代理对象的字节码文件。</p>
+<p>PS:其实我们还有很多方法获取字节码文件，后文中介绍</p>
+<p>OK，我们看下我们生成的字节码文件长什么样子：</p>
+<p><img src="http://ojkdckcc1.bkt.clouddn.com//blog/weixin_43242342342342.jpg" alt="jdk代理class文件"></p>
+<p>我们可以清楚的看到生成的代理文件，实现了我们的自己需要的代理的接口<code>QueryUserInfoBiz</code> ，实现了<code>SpringProxy</code>接口 ，继承了<code>Proxy</code>类等。再来看看我们普通的一个方法，是如何被代理的。</p>
+<p><code>insertUserInfoV5</code>这个方法被代理之后，被植入了一段代码，<code>super.h.invoke</code>方法 , super表示Proxy这个夫类，h表示Proxy里面的一个属性，是<code>InvocationHandler</code>类型的，回忆一下，我们在手动创建jdk动态代理的时候，是不是需要指定一个<code>InvocationHandler</code>，这里就是起这个作用的，比如说在上个例子中，是我们自己写的<code>MyInvocationHandler</code>类，但是在Spring中，我们没有指定这个<code>handler</code>，那到底调用的是谁呢？</p>
+<p>接上回：</p>
+<p>在我们最开始用缓存创建那一段的时候，后面还有这样一段代码。这段代码的作用是让handler作为参数调用构造方法来获得代理类的实例</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">if</span> (sm != <span class="keyword">null</span>) &#123;</div><div class="line">                checkNewProxyPermission(Reflection.getCallerClass(), cl);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">final</span> Constructor&lt;?&gt; cons = cl.getConstructor(constructorParams);</div><div class="line">            <span class="keyword">final</span> InvocationHandler ih = h;</div><div class="line">            <span class="keyword">if</span> (!Modifier.isPublic(cl.getModifiers())) &#123;</div><div class="line">                AccessController.doPrivileged(<span class="keyword">new</span> PrivilegedAction&lt;Void&gt;() &#123;</div><div class="line">                    <span class="function"><span class="keyword">public</span> Void <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                        cons.setAccessible(<span class="keyword">true</span>);</div><div class="line">                        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">                    &#125;</div><div class="line">                &#125;);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> cons.newInstance(<span class="keyword">new</span> Object[]&#123;h&#125;);</div></pre></td></tr></table></figure>
+<p>实际上，调用者是，一般而言，谁去准备创建proxy，谁一般就是这个handler，比如我们这里讲的aop里面，创建者就是<code>JdkDynamicAopProxy</code>这个类，这个类他实现了<code>InvocationHandler</code>接口，所以他被作为参数传进去了，自然而言，当代理类里面的方法被调用的时候，他的invoke方法就会被唤醒。</p>
+<h4 id="二、CGLib原理介绍"><a href="#二、CGLib原理介绍" class="headerlink" title="二、CGLib原理介绍"></a>二、CGLib原理介绍</h4><p>我们再来看看Cglib代理  </p>
+<p>先来看看Cglib手动创建的一个简单代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Enhancer enhancer = <span class="keyword">new</span> Enhancer();</div><div class="line">enhancer.setSuperclass(RealSubject.class);<span class="comment">//继承被代理的那个类</span></div><div class="line">enhancer.setCallback(<span class="keyword">new</span> DynamicSubjectHandler())<span class="comment">//设置回调类</span></div><div class="line">RealSubject realSubject = (RealSubject)enhancer.create();<span class="comment">//创建代理对象</span></div></pre></td></tr></table></figure>
+<p>核心方法自然是<code>create</code>方法，走进去看一下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">create</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.classOnly = <span class="keyword">false</span>;</div><div class="line">        <span class="keyword">this</span>.argumentTypes = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.createHelper();</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p><code>createHelper</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> Object <span class="title">createHelper</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.validate();</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.superclass != <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">this</span>.setNamePrefix(<span class="keyword">this</span>.superclass.getName());</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">this</span>.interfaces != <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">this</span>.setNamePrefix(<span class="keyword">this</span>.interfaces[ReflectUtils.findPackageProtected(<span class="keyword">this</span>.interfaces)].getName());</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.create(KEY_FACTORY.newInstance(<span class="keyword">this</span>.superclass != <span class="keyword">null</span> ? <span class="keyword">this</span>.superclass.getName() : <span class="keyword">null</span>, ReflectUtils.getNames(<span class="keyword">this</span>.interfaces), <span class="keyword">this</span>.filter, <span class="keyword">this</span>.callbackTypes, <span class="keyword">this</span>.useFactory, <span class="keyword">this</span>.interceptDuringConstruction, <span class="keyword">this</span>.serialVersionUID));</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>调用了<code>super.create</code>方法，核心代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//如果还没有生成，就走生成逻辑</span></div><div class="line"><span class="keyword">if</span> (gen == <span class="keyword">null</span>) &#123;</div><div class="line">  <span class="keyword">byte</span>[] b = <span class="keyword">this</span>.strategy.generate(<span class="keyword">this</span>);</div><div class="line">  String className = ClassNameReader.getClassName(<span class="keyword">new</span> ClassReader(b));</div><div class="line">  <span class="keyword">this</span>.getClassNameCache(loader).add(className);</div><div class="line">  gen = ReflectUtils.defineClass(className, b, loader);</div><div class="line">&#125;</div><div class="line"><span class="comment">//生成的代理类放在缓存里面</span></div><div class="line"><span class="keyword">if</span> (<span class="keyword">this</span>.useCache) &#123;</div><div class="line">  ((Map)cache2).put(key, <span class="keyword">new</span> WeakReference(gen));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后看<code>generate方法</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">byte</span>[] generate(ClassGenerator cg) <span class="keyword">throws</span> Exception &#123;</div><div class="line">  DebuggingClassWriter cw = <span class="keyword">this</span>.getClassVisitor();</div><div class="line">  <span class="keyword">this</span>.transform(cg).generateClass(cw);</div><div class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.transform(cw.toByteArray());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>再看<code>generateClass</code>方法，这个就是生成代理文件的最核心逻辑了，先看<code>Enhancer</code>里面的<code>generateClass</code> 方法，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">ClassEmitter e = <span class="keyword">new</span> ClassEmitter(v);</div><div class="line">            e.begin_class(<span class="number">46</span>, <span class="number">1</span>, <span class="keyword">this</span>.getClassName(), Type.getType(sc), <span class="keyword">this</span>.useFactory ? TypeUtils.add(TypeUtils.getTypes(<span class="keyword">this</span>.interfaces), FACTORY) : TypeUtils.getTypes(<span class="keyword">this</span>.interfaces), <span class="string">"&lt;generated&gt;"</span>);</div><div class="line">            List constructorInfo = CollectionUtils.transform(constructors, MethodInfoTransformer.getInstance());</div><div class="line">            e.declare_field(<span class="number">2</span>, <span class="string">"CGLIB$BOUND"</span>, Type.BOOLEAN_TYPE, (Object)<span class="keyword">null</span>);</div><div class="line">            <span class="keyword">if</span> (!<span class="keyword">this</span>.interceptDuringConstruction) &#123;</div><div class="line">                e.declare_field(<span class="number">2</span>, <span class="string">"CGLIB$CONSTRUCTED"</span>, Type.BOOLEAN_TYPE, (Object)<span class="keyword">null</span>);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            e.declare_field(<span class="number">26</span>, <span class="string">"CGLIB$THREAD_CALLBACKS"</span>, THREAD_LOCAL, (Object)<span class="keyword">null</span>);</div><div class="line">            e.declare_field(<span class="number">26</span>, <span class="string">"CGLIB$STATIC_CALLBACKS"</span>, CALLBACK_ARRAY, (Object)<span class="keyword">null</span>);</div><div class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.serialVersionUID != <span class="keyword">null</span>) &#123;</div><div class="line">                e.declare_field(<span class="number">26</span>, <span class="string">"serialVersionUID"</span>, Type.LONG_TYPE, <span class="keyword">this</span>.serialVersionUID);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.callbackTypes.length; ++i) &#123;</div><div class="line">                e.declare_field(<span class="number">2</span>, getCallbackField(i), <span class="keyword">this</span>.callbackTypes[i], (Object)<span class="keyword">null</span>);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">this</span>.emitMethods(e, methods, actualMethods);</div><div class="line">            <span class="keyword">this</span>.emitConstructors(e, constructorInfo);</div><div class="line">            <span class="keyword">this</span>.emitSetThreadCallbacks(e);</div><div class="line">            <span class="keyword">this</span>.emitSetStaticCallbacks(e);</div><div class="line">            <span class="keyword">this</span>.emitBindCallbacks(e);</div><div class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.useFactory) &#123;</div><div class="line">                <span class="keyword">int</span>[] keys = <span class="keyword">this</span>.getCallbackKeys();</div><div class="line">                <span class="keyword">this</span>.emitNewInstanceCallbacks(e);</div><div class="line">                <span class="keyword">this</span>.emitNewInstanceCallback(e);</div><div class="line">                <span class="keyword">this</span>.emitNewInstanceMultiarg(e, constructorInfo);</div><div class="line">                <span class="keyword">this</span>.emitGetCallback(e, keys);</div><div class="line">                <span class="keyword">this</span>.emitSetCallback(e, keys);</div><div class="line">                <span class="keyword">this</span>.emitGetCallbacks(e);</div><div class="line">                <span class="keyword">this</span>.emitSetCallbacks(e);</div><div class="line">            &#125;</div></pre></td></tr></table></figure>
+<p>这段就是生成字节码的核心逻辑，这段里面有很复杂的调用逻辑，我们这里不作详细介绍。</p>
+<p>我们也有办法拿到CGLIB生成的代理文件，我这里不赘述，后面开一篇博客讲，这里面也挺麻烦的，当初我也找了很久。</p>
+<p>OK，我们来看一下某一份生成好的代理字节码文件</p>
+<p><img src="http://ojkdckcc1.bkt.clouddn.com//blog/微信图片_20171030165300.png" alt="CGlib生成的字节码文件"></p>
+<p>这个代理类继承了我们被代理的类或者接口，然后实现了<code>SpringProxy</code>、<code>Advised</code>接口等, 首先当我们调用<code>addOneCityV8</code>方法的时候，代理类会先去看<code>CGLIB$CALLBACK_0</code> 这个属性为不为空，这个是一个<code>MethodIntercepter</code>类型的 ，如果为空就调用一个绑定方法，<code>CGLIB$BIND_CALLBACKS</code> ，它负责从一个叫做<code>CGLIB$THREAD_CALLBACKS</code> 的ThreadLocal对象中拿或者叫做<code>CGLIB$STATIC_CALLBACKS</code>的<code>Callback</code>数组中拿。拿到了之后就执行<code>intercept</code>方法。</p>
+<p>那么这里有个问题，回调类到底是如何选择的呢？</p>
+<p>这里的处理逻辑和JDK动态代理类似，回调类基于一种，谁创建，谁负责的逻辑，已AOP创建动态代理为例，<code>CglibAopProxy</code>这个类在创建代理的时候，会调用一个 <code>getCallbacks</code>方法，在<code>CglibAopProxy</code> 中可以搜索到，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">boolean</span> exposeProxy = <span class="keyword">this</span>.advised.isExposeProxy();</div><div class="line">		<span class="keyword">boolean</span> isFrozen = <span class="keyword">this</span>.advised.isFrozen();</div><div class="line">		<span class="keyword">boolean</span> isStatic = <span class="keyword">this</span>.advised.getTargetSource().isStatic();</div><div class="line"></div><div class="line">		<span class="comment">// Choose an "aop" interceptor (used for AOP calls).</span></div><div class="line">		Callback aopInterceptor = <span class="keyword">new</span> DynamicAdvisedInterceptor(<span class="keyword">this</span>.advised);</div><div class="line"></div><div class="line">		<span class="comment">// Choose a "straight to target" interceptor. (used for calls that are</span></div><div class="line">		<span class="comment">// unadvised but can return this). May be required to expose the proxy.</span></div><div class="line">		Callback targetInterceptor;</div><div class="line">		<span class="keyword">if</span> (exposeProxy) &#123;</div><div class="line">			targetInterceptor = isStatic ?</div><div class="line">					<span class="keyword">new</span> StaticUnadvisedExposedInterceptor(<span class="keyword">this</span>.advised.getTargetSource().getTarget()) :</div><div class="line">					<span class="keyword">new</span> DynamicUnadvisedExposedInterceptor(<span class="keyword">this</span>.advised.getTargetSource());</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">else</span> &#123;</div><div class="line">			targetInterceptor = isStatic ?</div><div class="line">					<span class="keyword">new</span> StaticUnadvisedInterceptor(<span class="keyword">this</span>.advised.getTargetSource().getTarget()) :</div><div class="line">					<span class="keyword">new</span> DynamicUnadvisedInterceptor(<span class="keyword">this</span>.advised.getTargetSource());</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="comment">// Choose a "direct to target" dispatcher (used for</span></div><div class="line">		<span class="comment">// unadvised calls to static targets that cannot return this).</span></div><div class="line">		Callback targetDispatcher = isStatic ?</div><div class="line">				<span class="keyword">new</span> StaticDispatcher(<span class="keyword">this</span>.advised.getTargetSource().getTarget()) : <span class="keyword">new</span> SerializableNoOp();</div><div class="line"></div><div class="line">		Callback[] mainCallbacks = <span class="keyword">new</span> Callback[] &#123;</div><div class="line">				aopInterceptor,  <span class="comment">// for normal advice</span></div><div class="line">				targetInterceptor,  <span class="comment">// invoke target without considering advice, if optimized</span></div><div class="line">				<span class="keyword">new</span> SerializableNoOp(),  <span class="comment">// no override for methods mapped to this</span></div><div class="line">				targetDispatcher, <span class="keyword">this</span>.advisedDispatcher,</div><div class="line">				<span class="keyword">new</span> EqualsInterceptor(<span class="keyword">this</span>.advised),</div><div class="line">				<span class="keyword">new</span> HashCodeInterceptor(<span class="keyword">this</span>.advised)</div><div class="line">		&#125;;</div></pre></td></tr></table></figure>
+<p>根据摘取的部分片段可以得知，他是跟配置相关的，如果你没有作任何配置，那么系统一般首选<code>DynamicAdvisedInterceptor</code> 这个拦截器。也就是回调类就是<code>DynamicAdvisedInterceptor</code> ，会调用他里面的<code>intercept</code>方法。</p>
+<p>完毕。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;Spring-Boot-AOP系列之AOP原理介绍&quot;&gt;&lt;a href=&quot;#Spring-Boot-AOP系列之AOP原理介绍&quot; class=&quot;headerlink&quot; title=&quot;Spring Boot  AOP系列之AOP原理介绍&quot;&gt;&lt;/a&gt;Spring Boot  AOP系列之AOP原理介绍&lt;/h3&gt;&lt;hr&gt;
+&lt;blockquote&gt;
+&lt;p&gt;序言：在本文中，jdk动态代理和cglib代理的核心原理，我都会一一讲到，看本文的时候可以结合着上文看，了解创建的过程，创建的生命周期，才能知晓原理&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4 id=&quot;一、JDK动态代理原理&quot;&gt;&lt;a href=&quot;#一、JDK动态代理原理&quot; class=&quot;headerlink&quot; title=&quot;一、JDK动态代理原理&quot;&gt;&lt;/a&gt;一、JDK动态代理原理&lt;/h4&gt;&lt;h5 id=&quot;1、前言&quot;&gt;&lt;a href=&quot;#1、前言&quot; class=&quot;headerlink&quot; title=&quot;1、前言&quot;&gt;&lt;/a&gt;1、前言&lt;/h5&gt;&lt;p&gt;  其实大家看了上文的demo肯定会有所疑惑，为什么实现了一个&lt;code&gt;InvocationHandler&lt;/code&gt;接口就可以实现切面的植入了，就可以在写好的函数方法上面，植入我们的代码呢？是不是很神奇，惊不惊喜，意不意外。OK，废话不多说，下面跟着我的思路，走一遍源代码。&lt;/p&gt;
+&lt;h5 id=&quot;2、介绍&quot;&gt;&lt;a href=&quot;#2、介绍&quot; class=&quot;headerlink&quot; title=&quot;2、介绍&quot;&gt;&lt;/a&gt;2、介绍&lt;/h5&gt;&lt;p&gt;  上文中提到了，Spring jdk动态代理最核心的一句话莫过于下面这句话&lt;/p&gt;
+&lt;figure class=&quot;highlight java&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;HelloWorld helloWorld=(HelloWorld)Proxy.&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;                 newProxyInstance(JDKProxyTest.class.getClassLoader(),&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;                        &lt;span class=&quot;keyword&quot;&gt;new&lt;/span&gt; Class&amp;lt;?&amp;gt;[]&amp;#123;HelloWorld.class&amp;#125;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;                        &lt;span class=&quot;keyword&quot;&gt;new&lt;/span&gt; MyInvocationHandler(&lt;span class=&quot;keyword&quot;&gt;new&lt;/span&gt; HelloworldImpl()));&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;走进&lt;code&gt;newProxyInstance&lt;/code&gt;这个方法&lt;/p&gt;
+&lt;figure class=&quot;highlight java&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;final&lt;/span&gt; Class&amp;lt;?&amp;gt;[] intfs = interfaces.clone();&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;final&lt;/span&gt; SecurityManager sm = System.getSecurityManager();&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; (sm != &lt;span class=&quot;keyword&quot;&gt;null&lt;/span&gt;) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;  checkProxyAccess(Reflection.getCallerClass(), loader, intfs);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;/*&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt; * 从缓存中取出或者生成代理&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;*/&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;Class&amp;lt;?&amp;gt; cl = getProxyClass0(loader, intfs);&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+    
+      <category term="Spring Boot" scheme="http://yoursite.com/tags/Spring-Boot/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring Boot  AOP系列之动态代理创建</title>
+    <link href="http://yoursite.com/2017/10/30/Spring%20AOP%E7%B3%BB%E5%88%97%E4%B9%8B%E4%BB%A3%E7%90%86%E5%88%9B%E5%BB%BA/"/>
+    <id>http://yoursite.com/2017/10/30/Spring AOP系列之代理创建/</id>
+    <published>2017-10-30T04:22:01.000Z</published>
+    <updated>2017-10-30T10:10:39.438Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="Spring-Boot-AOP系列之动态代理创建"><a href="#Spring-Boot-AOP系列之动态代理创建" class="headerlink" title="Spring Boot  AOP系列之动态代理创建"></a>Spring Boot  AOP系列之动态代理创建</h3><hr>
+<blockquote>
+<p>序言：在本文中，我会讲到Spring中如何创建动态代理，如何利用jdk或者cglib来创建动态代理，但是同时，我也会提及如何手动创建代理，这将有助于我们了解动态代理的原理。我们先来讲讲如何手动创建吧。</p>
+</blockquote>
+<h4 id="一、-手动创建之jdk动态代理"><a href="#一、-手动创建之jdk动态代理" class="headerlink" title="一、 手动创建之jdk动态代理"></a>一、 手动创建之jdk动态代理</h4><h5 id="1、-jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现InvocationHandler类，"><a href="#1、-jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现InvocationHandler类，" class="headerlink" title="1、 jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现InvocationHandler类，"></a>1、 jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现InvocationHandler类，</h5><p>接口如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Helloworld</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>实现类如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloworldImpl</span> <span class="keyword">implements</span> <span class="title">HelloWorld</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.print(<span class="string">"hello world"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>拦截类如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyInvocationHandler</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span></span>&#123;</div><div class="line">    <span class="keyword">private</span> Object target;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyInvocationHandler</span><span class="params">(Object target)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.target=target;</div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</div><div class="line">        System.out.println(<span class="string">"method :"</span>+ method.getName()+<span class="string">" is invoked!"</span>);</div><div class="line">        <span class="keyword">return</span> method.invoke(target,args);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>测试如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JDKProxyTest</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[]args)</span> <span class="keyword">throws</span> NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException </span>&#123;</div><div class="line">       <span class="comment">//重要的是这里的newProxyInstance方法，后面博文讲原理的时候会讲到为什么会植入切面的</span></div><div class="line">        HelloWorld helloWorld=(HelloWorld)Proxy.</div><div class="line">                 newProxyInstance(JDKProxyTest.class.getClassLoader(),</div><div class="line">                        <span class="keyword">new</span> Class&lt;?&gt;[]&#123;HelloWorld.class&#125;,</div><div class="line">                        <span class="keyword">new</span> MyInvocationHandler(<span class="keyword">new</span> HelloworldImpl()));</div><div class="line">        helloWorld.sayHello();</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="2、这里先教大家怎么做，以后教大家原理，现在依葫芦画瓢就行"><a href="#2、这里先教大家怎么做，以后教大家原理，现在依葫芦画瓢就行" class="headerlink" title="2、这里先教大家怎么做，以后教大家原理，现在依葫芦画瓢就行"></a>2、这里先教大家怎么做，以后教大家原理，现在依葫芦画瓢就行</h5><h4 id="二、手动创建之CGLIB代理"><a href="#二、手动创建之CGLIB代理" class="headerlink" title="二、手动创建之CGLIB代理"></a>二、手动创建之CGLIB代理</h4><h5 id="1、cglib代理和jdk代理目的差不多，但是cglib代理不仅可以代理接口，还可以代理类，比jdk代理作用-范围更加广泛一些，cglib代理借助了ASM这个非常强大的Java字节码生成框架"><a href="#1、cglib代理和jdk代理目的差不多，但是cglib代理不仅可以代理接口，还可以代理类，比jdk代理作用-范围更加广泛一些，cglib代理借助了ASM这个非常强大的Java字节码生成框架" class="headerlink" title="1、cglib代理和jdk代理目的差不多，但是cglib代理不仅可以代理接口，还可以代理类，比jdk代理作用 范围更加广泛一些，cglib代理借助了ASM这个非常强大的Java字节码生成框架"></a>1、cglib代理和jdk代理目的差不多，但是cglib代理不仅可以代理接口，还可以代理类，比jdk代理作用 范围更加广泛一些，cglib代理借助了ASM这个非常强大的Java字节码生成框架</h5><h5 id="2、demo如下"><a href="#2、demo如下" class="headerlink" title="2、demo如下"></a>2、demo如下</h5><p>  接口： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Subject</span> </span>&#123;    </div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">request</span><span class="params">()</span></span>;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>  实现：  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RealSubject</span> <span class="keyword">implements</span> <span class="title">Subject</span></span>&#123;    </div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">request</span><span class="params">()</span></span>&#123;    </div><div class="line">       System.out.println(<span class="string">"From real subject."</span>);    </div><div class="line">   &#125;    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>处理类，也叫回调方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//实现了InvocationHandler,很重要</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DynamicSubjectHandler</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span>    </span></div><div class="line">&#123;    </div><div class="line">    <span class="keyword">private</span> Object obj;<span class="comment">//这是动态代理的好处，被封装的对象是Object类型，接受任意类型的对象    </span></div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DynamicSubject</span><span class="params">()</span>    </span></div><div class="line">    &#123;    </div><div class="line">    &#125;    </div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DynamicSubject</span><span class="params">(Object obj)</span>    </span></div><div class="line">    &#123;    </div><div class="line">        <span class="keyword">this</span>.obj = obj;    </div><div class="line">    &#125;    </div><div class="line">    </div><div class="line">    <span class="comment">//这个方法不是我们显示的去调用    </span></div><div class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable    </span></div><div class="line">    &#123;    </div><div class="line">        System.out.println(<span class="string">"before calling "</span> + method);    </div><div class="line">    </div><div class="line">        method.invoke(obj, args);    </div><div class="line">    </div><div class="line">        System.out.println(<span class="string">"after calling "</span> + method);    </div><div class="line">    </div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;    </div><div class="line">    &#125;    </div><div class="line">    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Test方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Client</span></span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</div><div class="line">        Enhancer enhancer = <span class="keyword">new</span> Enhancer();</div><div class="line">        enhancer.setSuperclass(RealSubject.class);<span class="comment">//继承被代理的那个类</span></div><div class="line">        enhancer.setCallback(<span class="keyword">new</span> DynamicSubjectHandler())<span class="comment">//设置回调类</span></div><div class="line">        RealSubject realSubject = (RealSubject)enhancer.create();<span class="comment">//创建代理对象</span></div><div class="line">        realSubject.request();</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="comment">//PS: 这段代码是我手敲的,大家粘贴的时候注意一下哈</span></div></pre></td></tr></table></figure>
+<p>#####2、执行main方法之后，DynamicSubjectHandler 中的invoke方法会被显式调用，打印出信息，原理后面我会介绍，详情关注下篇博文。</p>
+<h4 id="三、Spring-boot创建之JDK动态代理"><a href="#三、Spring-boot创建之JDK动态代理" class="headerlink" title="三、Spring boot创建之JDK动态代理"></a>三、Spring boot创建之JDK动态代理</h4><p>  事实上，spring对于代理的类的创建选用何种方法是有规律可寻的，详细可看一下源代码，如下：</p>
+<p><img src="http://ojkdckcc1.bkt.clouddn.com/微信图片_20171030144249.png" alt="spring如何选择代理类型"></p>
+<p>spring在创建代理的时候，会调用DefaultAopProxyFactory里面的createAopProxy方法，这个方法会取判断是使用jdk动态代理还是cglib代理。第一个参数，config.isOptimize()，这个方法是一个配置的，用于判断创建代理是否乐观（是否会经常改动），默认配置为false，第二个参数是不是目标代理类。第三个参数，<code>hasNoUserSuppliedProxyInterfaces()</code>这个方法，判断代理类的AdviseSupport处理类是不是只会指定SpringProxy这个接口，一般会返回true。当这些条件都不满足的时候，spring 默认走jdk动态代理。当满足这些条件中某一个的时候，去判断是不是接口或者已经是代理类，如果是接口或者已经是代理类的时候，就去走jdk动态代理，否者走cglib代理  </p>
+<p>OK，讲清楚了spring选择动态代理的原因之后，我们来看看怎么指定jdk动态代理。</p>
+<p>Spring boot配置jdk动态代理很简单，只需要在Spring boot配置文件中配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">spring.aop.proxy-target-class=false</div></pre></td></tr></table></figure>
+<p>然后自己写代理类的时候注意是接口就完毕啦。</p>
+<h4 id="四、Spring-boot创建之Cglib代理"><a href="#四、Spring-boot创建之Cglib代理" class="headerlink" title="四、Spring boot创建之Cglib代理"></a>四、Spring boot创建之Cglib代理</h4><p>同理，spring boot创建Cglib代理也很简单，直接配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">spring.aop.proxy-target-class=true</div></pre></td></tr></table></figure>
+<p>就可以强制使用cglib代理</p>
+<p>下篇博文介绍原理哈</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;Spring-Boot-AOP系列之动态代理创建&quot;&gt;&lt;a href=&quot;#Spring-Boot-AOP系列之动态代理创建&quot; class=&quot;headerlink&quot; title=&quot;Spring Boot  AOP系列之动态代理创建&quot;&gt;&lt;/a&gt;Spring Boot  AOP系列之动态代理创建&lt;/h3&gt;&lt;hr&gt;
+&lt;blockquote&gt;
+&lt;p&gt;序言：在本文中，我会讲到Spring中如何创建动态代理，如何利用jdk或者cglib来创建动态代理，但是同时，我也会提及如何手动创建代理，这将有助于我们了解动态代理的原理。我们先来讲讲如何手动创建吧。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4 id=&quot;一、-手动创建之jdk动态代理&quot;&gt;&lt;a href=&quot;#一、-手动创建之jdk动态代理&quot; class=&quot;headerlink&quot; title=&quot;一、 手动创建之jdk动态代理&quot;&gt;&lt;/a&gt;一、 手动创建之jdk动态代理&lt;/h4&gt;&lt;h5 id=&quot;1、-jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现InvocationHandler类，&quot;&gt;&lt;a href=&quot;#1、-jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现InvocationHandler类，&quot; class=&quot;headerlink&quot; title=&quot;1、 jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现InvocationHandler类，&quot;&gt;&lt;/a&gt;1、 jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现InvocationHandler类，&lt;/h5&gt;&lt;p&gt;接口如下&lt;/p&gt;
+&lt;figure class=&quot;highlight java&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;interface&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;Helloworld&lt;/span&gt; &lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;sayHello&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;()&lt;/span&gt;&lt;/span&gt;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;实现类如下：&lt;/p&gt;
+&lt;figure class=&quot;highlight java&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;HelloworldImpl&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;HelloWorld&lt;/span&gt; &lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;sayHello&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;()&lt;/span&gt; &lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        System.out.print(&lt;span class=&quot;string&quot;&gt;&quot;hello world&quot;&lt;/span&gt;);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+    
+      <category term="Spring Boot" scheme="http://yoursite.com/tags/Spring-Boot/"/>
+    
+  </entry>
   
   <entry>
     <title></title>
@@ -163,13 +305,53 @@
   
   <entry>
     <title></title>
-    <link href="http://yoursite.com/2017/08/25/Spring%20Boot%20%E9%9B%86%E6%88%90%20resteasy%E7%AF%87%20%E2%80%94%20jax-rs%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3%E4%BB%8B%E7%BB%8D/"/>
-    <id>http://yoursite.com/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/</id>
-    <published>2017-08-25T06:47:27.653Z</published>
-    <updated>2017-08-23T06:00:34.404Z</updated>
+    <link href="http://yoursite.com/2017/08/25/Fastjson%E8%A7%A3%E6%9E%90%E5%A4%9A%E7%BA%A7%E6%B3%9B%E5%9E%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F%E2%80%94%E6%96%B0%E5%A2%9E%E4%BD%BF%E7%94%A8class%E6%96%87%E4%BB%B6%E6%9D%A5%E8%A7%A3%E6%9E%90%E5%A4%9A%E7%BA%A7%E6%B3%9B%E5%9E%8B/"/>
+    <id>http://yoursite.com/2017/08/25/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/</id>
+    <published>2017-08-25T06:47:27.651Z</published>
+    <updated>2017-08-25T06:42:49.984Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="Fastjson解析多级泛型"><a href="#Fastjson解析多级泛型" class="headerlink" title="Fastjson解析多级泛型"></a>Fastjson解析多级泛型</h3><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>现在网上大多数是使用<code>TypeReference</code> 方式来解析JSON数据，这里我提供另外一种方式来解析，使用类文件进行解析，两种方式我都会给出实际代码</p>
+<h4 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h4><h5 id="TypeReference方式"><a href="#TypeReference方式" class="headerlink" title="TypeReference方式"></a>TypeReference方式</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span></div><div class="line">   <span class="meta">@Path</span>(<span class="string">"getUserCourse"</span>)</div><div class="line">   <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">   <span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourse()&#123;</div><div class="line">       <span class="keyword">return</span> externalBiz.getUserCourse();</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourse()&#123;</div><div class="line">        String result = restTemplate.getForObject(MOCK_JSON_URL, String.class);</div><div class="line">        <span class="keyword">return</span> JSONObject.parseObject(result, <span class="keyword">new</span> TypeReference&lt;Result&lt;List&lt;UserCourseDto&gt;&gt;&gt;() &#123;&#125;);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p><strong>浏览器访问：</strong><code>http://localhost:8080/v1/province/getUserCourse</code></p>
+<p>可以得到json返回的结果</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  status: 0,</div><div class="line">  message: "1",</div><div class="line">  data: [</div><div class="line">    &#123;</div><div class="line">      openType: "兑换 ",</div><div class="line">      userID: 30014,</div><div class="line">      classID: 10376,</div><div class="line">      className: "趣味职场俚语课程【11月班】",</div><div class="line">      chargeFee: 106,</div><div class="line">      classStudyTime: null,</div><div class="line">      openRMB: 0,</div><div class="line">      rechargeFee: 0,</div><div class="line">      awardFee: 0,</div><div class="line">      openFee: 0,</div><div class="line">      dateAdded: 1312175789393,</div><div class="line">      expiredDate: 1323964800000</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>介绍：</strong></p>
+<p>这里使用了提供的TypeReference进行包装，能够清晰明了进行解析多级泛型，但是有时候，我们做一些通用的解析框架的时候，可能会用T类型，T类型拿到的是字节码文件，或者class对象，又该怎么处理呢？请看下面介绍。</p>
+<h4 id="class类方式"><a href="#class类方式" class="headerlink" title="class类方式"></a>class类方式</h4><p><strong>接口：</strong></p>
+<p>接口之类用了一个注解来处理的，没有直接传class对象过去，因为在实际项目中，基本都是注解，没有谁会直接传class对象。所以我传的Annotation数组过去啦</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span></div><div class="line">   <span class="meta">@Reader</span>(extParamClass = &#123;Result.class,List.class,UserCourseDto.class&#125;)</div><div class="line">   <span class="meta">@Path</span>(<span class="string">"getUserCourseV2"</span>)</div><div class="line">   <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">   <span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourseV2()&#123;</div><div class="line">       Annotation[] annotations = <span class="keyword">new</span> Annotation[<span class="number">0</span>];</div><div class="line">       <span class="keyword">for</span> (Method method : <span class="keyword">this</span>.getClass().getMethods()) &#123;</div><div class="line">           <span class="keyword">if</span> (method.getName().equals(<span class="string">"getUserCourseV2"</span>))&#123;</div><div class="line">               annotations = method.getAnnotations();</div><div class="line">           &#125;</div><div class="line">       &#125;</div><div class="line">       <span class="keyword">return</span> externalBiz.getUserCourseV2(annotations);</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p><strong>处理：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourseV2(Annotation[] annotations) &#123;</div><div class="line">        <span class="keyword">final</span> Reader[] readers = &#123;<span class="keyword">null</span>&#125;;</div><div class="line">        <span class="keyword">if</span>(annotations != <span class="keyword">null</span>) &#123;</div><div class="line">            Arrays</div><div class="line">                    .stream(annotations)</div><div class="line">                    .filter(annotation -&gt; annotation.annotationType().equals(Reader.class))</div><div class="line">                    .findFirst().ifPresent(x -&gt; readers[<span class="number">0</span>] = (Reader) x);</div><div class="line">        &#125;</div><div class="line">        Class[] classes = readers[<span class="number">0</span>].extParamClass();</div><div class="line">        String result = restTemplate.getForObject(MOCK_JSON_URL, String.class);</div><div class="line">        <span class="comment">//这里不用TypeReference方式，直接用class对象来处理</span></div><div class="line"></div><div class="line">        ParameterizedTypeImpl beforeType = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">if</span> (classes.length!=<span class="number">0</span>)&#123;</div><div class="line">            <span class="comment">//支持多级泛型的解析</span></div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = classes.length-<span class="number">1</span>; i &gt;<span class="number">0</span> ; i--) &#123;</div><div class="line">                beforeType = <span class="keyword">new</span> ParameterizedTypeImpl(<span class="keyword">new</span> Type[]&#123;beforeType == <span class="keyword">null</span>? classes[i]:beforeType&#125;, <span class="keyword">null</span>, classes[i - <span class="number">1</span>]);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span>  JSON.parseObject(result,beforeType);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>代码评析：</strong></p>
+<p>主要起作用的还是这两行代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = classes.length-<span class="number">1</span>; i &gt;<span class="number">0</span> ; i--) &#123;</div><div class="line">                beforeType = <span class="keyword">new</span> ParameterizedTypeImpl(<span class="keyword">new</span> Type[]&#123;beforeType == <span class="keyword">null</span>? classes[i]:beforeType&#125;, <span class="keyword">null</span>, classes[i - <span class="number">1</span>]);</div><div class="line">            &#125;</div></pre></td></tr></table></figure>
+<p>主要意思是将你的class对象包装成一个ParameterizedTypeImpl，使用ParameterizedTypeImpl来解析多级泛型，但是要注意的是，每层泛型，都需要用一个ParameterizedTypeImpl对象进行包装起来才会起作用，因为他会有一个<code>actualTypeArguments</code> 和一个 <code>rawType</code> ，在多级泛型中，用我这里的例子说明，第一层的时候<code>rawType</code>  会是一个<code>Result</code>对象，而<code>actualTypeArguments</code> 会是一个包装过后的<code>ParameterizedTypeImpl</code>对象，第二层的时候，<code>rawType</code>  会是一个List对象，而<code>actualTypeArguments</code> 会是包装上一层的对象。后同。PS : 如果这里不知道我说的是什么，请调试的时候结合来看哈</p>
+<p>最后也可以正确解析哈~</p>
+<blockquote>
+<p>END</p>
+</blockquote>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;Fastjson解析多级泛型&quot;&gt;&lt;a href=&quot;#Fastjson解析多级泛型&quot; class=&quot;headerlink&quot; title=&quot;Fastjson解析多级泛型&quot;&gt;&lt;/a&gt;Fastjson解析多级泛型&lt;/h3&gt;&lt;h4 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot;
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍</title>
+    <link href="http://yoursite.com/2017/07/19/Spring%20Boot%20%E9%9B%86%E6%88%90%20resteasy%E7%AF%87%20%E2%80%94%20jax-rs%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3%E4%BB%8B%E7%BB%8D/"/>
+    <id>http://yoursite.com/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/</id>
+    <published>2017-07-19T07:22:01.000Z</published>
+    <updated>2017-10-30T10:09:23.720Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Spring-Boot-集成-resteasy篇-—-jax-rs常用注解介绍"><a href="#Spring-Boot-集成-resteasy篇-—-jax-rs常用注解介绍" class="headerlink" title="Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍"></a>Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍</h2><h3 id="GET"><a href="#GET" class="headerlink" title="@GET"></a>@GET</h3><p>http请求方式里面的get请求，标记这个请求方式为get</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * http://localhost:8080/v1/province/city/1</div><div class="line"> * <span class="doctag">@param</span> id</div><div class="line"> * <span class="doctag">@return</span></div><div class="line"> */</div><div class="line"><span class="meta">@Path</span>(<span class="string">"city/&#123;id&#125;"</span>)</div><div class="line"><span class="meta">@GET</span></div><div class="line"><span class="meta">@Produces</span>(MediaType.APPLICATION_JSON) <span class="comment">//表示输出json</span></div><div class="line"><span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON) <span class="comment">//表示输入为json</span></div><div class="line"><span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">getCity</span><span class="params">(@PathParam(<span class="string">"id"</span>)</span> Long id) </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<a id="more"></a>
 <h3 id="PUT"><a href="#PUT" class="headerlink" title="@PUT"></a>@PUT</h3><p>http请求方式里面的get请求，标记这个请求方式为put</p>
 <p>一般用来创建一个资源</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Path</span>(<span class="string">"city/&#123;id&#125;"</span>)</div><div class="line"><span class="meta">@PUT</span></div><div class="line"><span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line"><span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON)</div><div class="line"><span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">getCity</span><span class="params">(@PathParam(<span class="string">"id"</span>)</span> Long id) </span>&#123;</div><div class="line"></div><div class="line">  <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -215,49 +397,13 @@
     
     <summary type="html">
     
-      &lt;h2 id=&quot;Spring-Boot-集成-resteasy篇-—-jax-rs常用注解介绍&quot;&gt;&lt;a href=&quot;#Spring-Boot-集成-resteasy篇-—-jax-rs常用注解介绍&quot; class=&quot;headerlink&quot; title=&quot;Spring Boot 集成
+      &lt;h2 id=&quot;Spring-Boot-集成-resteasy篇-—-jax-rs常用注解介绍&quot;&gt;&lt;a href=&quot;#Spring-Boot-集成-resteasy篇-—-jax-rs常用注解介绍&quot; class=&quot;headerlink&quot; title=&quot;Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍&quot;&gt;&lt;/a&gt;Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍&lt;/h2&gt;&lt;h3 id=&quot;GET&quot;&gt;&lt;a href=&quot;#GET&quot; class=&quot;headerlink&quot; title=&quot;@GET&quot;&gt;&lt;/a&gt;@GET&lt;/h3&gt;&lt;p&gt;http请求方式里面的get请求，标记这个请求方式为get&lt;/p&gt;
+&lt;figure class=&quot;highlight java&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;/**&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt; * http://localhost:8080/v1/province/city/1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt; * &lt;span class=&quot;doctag&quot;&gt;@param&lt;/span&gt; id&lt;/div&gt;&lt;div class=&quot;line&quot;&gt; * &lt;span class=&quot;doctag&quot;&gt;@return&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt; */&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;@Path&lt;/span&gt;(&lt;span class=&quot;string&quot;&gt;&quot;city/&amp;#123;id&amp;#125;&quot;&lt;/span&gt;)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;@GET&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;@Produces&lt;/span&gt;(MediaType.APPLICATION_JSON) &lt;span class=&quot;comment&quot;&gt;//表示输出json&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;@Consumes&lt;/span&gt;(MediaType.APPLICATION_JSON) &lt;span class=&quot;comment&quot;&gt;//表示输入为json&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;public&lt;/span&gt; Result&amp;lt;Boolean&amp;gt; &lt;span class=&quot;title&quot;&gt;getCity&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(@PathParam(&lt;span class=&quot;string&quot;&gt;&quot;id&quot;&lt;/span&gt;)&lt;/span&gt; Long id) &lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;new&lt;/span&gt; Result&amp;lt;&amp;gt;();&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
     
     </summary>
     
     
-  </entry>
-  
-  <entry>
-    <title></title>
-    <link href="http://yoursite.com/2017/08/25/Fastjson%E8%A7%A3%E6%9E%90%E5%A4%9A%E7%BA%A7%E6%B3%9B%E5%9E%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F%E2%80%94%E6%96%B0%E5%A2%9E%E4%BD%BF%E7%94%A8class%E6%96%87%E4%BB%B6%E6%9D%A5%E8%A7%A3%E6%9E%90%E5%A4%9A%E7%BA%A7%E6%B3%9B%E5%9E%8B/"/>
-    <id>http://yoursite.com/2017/08/25/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/</id>
-    <published>2017-08-25T06:47:27.651Z</published>
-    <updated>2017-08-25T06:42:49.984Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="Fastjson解析多级泛型"><a href="#Fastjson解析多级泛型" class="headerlink" title="Fastjson解析多级泛型"></a>Fastjson解析多级泛型</h3><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>现在网上大多数是使用<code>TypeReference</code> 方式来解析JSON数据，这里我提供另外一种方式来解析，使用类文件进行解析，两种方式我都会给出实际代码</p>
-<h4 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h4><h5 id="TypeReference方式"><a href="#TypeReference方式" class="headerlink" title="TypeReference方式"></a>TypeReference方式</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span></div><div class="line">   <span class="meta">@Path</span>(<span class="string">"getUserCourse"</span>)</div><div class="line">   <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">   <span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourse()&#123;</div><div class="line">       <span class="keyword">return</span> externalBiz.getUserCourse();</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourse()&#123;</div><div class="line">        String result = restTemplate.getForObject(MOCK_JSON_URL, String.class);</div><div class="line">        <span class="keyword">return</span> JSONObject.parseObject(result, <span class="keyword">new</span> TypeReference&lt;Result&lt;List&lt;UserCourseDto&gt;&gt;&gt;() &#123;&#125;);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<p><strong>浏览器访问：</strong><code>http://localhost:8080/v1/province/getUserCourse</code></p>
-<p>可以得到json返回的结果</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  status: 0,</div><div class="line">  message: "1",</div><div class="line">  data: [</div><div class="line">    &#123;</div><div class="line">      openType: "兑换 ",</div><div class="line">      userID: 30014,</div><div class="line">      classID: 10376,</div><div class="line">      className: "趣味职场俚语课程【11月班】",</div><div class="line">      chargeFee: 106,</div><div class="line">      classStudyTime: null,</div><div class="line">      openRMB: 0,</div><div class="line">      rechargeFee: 0,</div><div class="line">      awardFee: 0,</div><div class="line">      openFee: 0,</div><div class="line">      dateAdded: 1312175789393,</div><div class="line">      expiredDate: 1323964800000</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>介绍：</strong></p>
-<p>这里使用了提供的TypeReference进行包装，能够清晰明了进行解析多级泛型，但是有时候，我们做一些通用的解析框架的时候，可能会用T类型，T类型拿到的是字节码文件，或者class对象，又该怎么处理呢？请看下面介绍。</p>
-<h4 id="class类方式"><a href="#class类方式" class="headerlink" title="class类方式"></a>class类方式</h4><p><strong>接口：</strong></p>
-<p>接口之类用了一个注解来处理的，没有直接传class对象过去，因为在实际项目中，基本都是注解，没有谁会直接传class对象。所以我传的Annotation数组过去啦</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span></div><div class="line">   <span class="meta">@Reader</span>(extParamClass = &#123;Result.class,List.class,UserCourseDto.class&#125;)</div><div class="line">   <span class="meta">@Path</span>(<span class="string">"getUserCourseV2"</span>)</div><div class="line">   <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">   <span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourseV2()&#123;</div><div class="line">       Annotation[] annotations = <span class="keyword">new</span> Annotation[<span class="number">0</span>];</div><div class="line">       <span class="keyword">for</span> (Method method : <span class="keyword">this</span>.getClass().getMethods()) &#123;</div><div class="line">           <span class="keyword">if</span> (method.getName().equals(<span class="string">"getUserCourseV2"</span>))&#123;</div><div class="line">               annotations = method.getAnnotations();</div><div class="line">           &#125;</div><div class="line">       &#125;</div><div class="line">       <span class="keyword">return</span> externalBiz.getUserCourseV2(annotations);</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
-<p><strong>处理：</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourseV2(Annotation[] annotations) &#123;</div><div class="line">        <span class="keyword">final</span> Reader[] readers = &#123;<span class="keyword">null</span>&#125;;</div><div class="line">        <span class="keyword">if</span>(annotations != <span class="keyword">null</span>) &#123;</div><div class="line">            Arrays</div><div class="line">                    .stream(annotations)</div><div class="line">                    .filter(annotation -&gt; annotation.annotationType().equals(Reader.class))</div><div class="line">                    .findFirst().ifPresent(x -&gt; readers[<span class="number">0</span>] = (Reader) x);</div><div class="line">        &#125;</div><div class="line">        Class[] classes = readers[<span class="number">0</span>].extParamClass();</div><div class="line">        String result = restTemplate.getForObject(MOCK_JSON_URL, String.class);</div><div class="line">        <span class="comment">//这里不用TypeReference方式，直接用class对象来处理</span></div><div class="line"></div><div class="line">        ParameterizedTypeImpl beforeType = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">if</span> (classes.length!=<span class="number">0</span>)&#123;</div><div class="line">            <span class="comment">//支持多级泛型的解析</span></div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = classes.length-<span class="number">1</span>; i &gt;<span class="number">0</span> ; i--) &#123;</div><div class="line">                beforeType = <span class="keyword">new</span> ParameterizedTypeImpl(<span class="keyword">new</span> Type[]&#123;beforeType == <span class="keyword">null</span>? classes[i]:beforeType&#125;, <span class="keyword">null</span>, classes[i - <span class="number">1</span>]);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span>  JSON.parseObject(result,beforeType);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>代码评析：</strong></p>
-<p>主要起作用的还是这两行代码</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = classes.length-<span class="number">1</span>; i &gt;<span class="number">0</span> ; i--) &#123;</div><div class="line">                beforeType = <span class="keyword">new</span> ParameterizedTypeImpl(<span class="keyword">new</span> Type[]&#123;beforeType == <span class="keyword">null</span>? classes[i]:beforeType&#125;, <span class="keyword">null</span>, classes[i - <span class="number">1</span>]);</div><div class="line">            &#125;</div></pre></td></tr></table></figure>
-<p>主要意思是将你的class对象包装成一个ParameterizedTypeImpl，使用ParameterizedTypeImpl来解析多级泛型，但是要注意的是，每层泛型，都需要用一个ParameterizedTypeImpl对象进行包装起来才会起作用，因为他会有一个<code>actualTypeArguments</code> 和一个 <code>rawType</code> ，在多级泛型中，用我这里的例子说明，第一层的时候<code>rawType</code>  会是一个<code>Result</code>对象，而<code>actualTypeArguments</code> 会是一个包装过后的<code>ParameterizedTypeImpl</code>对象，第二层的时候，<code>rawType</code>  会是一个List对象，而<code>actualTypeArguments</code> 会是包装上一层的对象。后同。PS : 如果这里不知道我说的是什么，请调试的时候结合来看哈</p>
-<p>最后也可以正确解析哈~</p>
-<blockquote>
-<p>END</p>
-</blockquote>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h3 id=&quot;Fastjson解析多级泛型&quot;&gt;&lt;a href=&quot;#Fastjson解析多级泛型&quot; class=&quot;headerlink&quot; title=&quot;Fastjson解析多级泛型&quot;&gt;&lt;/a&gt;Fastjson解析多级泛型&lt;/h3&gt;&lt;h4 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot;
-    
-    </summary>
-    
+      <category term="Spring Boot" scheme="http://yoursite.com/tags/Spring-Boot/"/>
     
   </entry>
   
@@ -1201,469 +1347,6 @@ static public $PROD_URL=&quot;www.stb.xxxxxx.com&quot;;
     
     
       <category term="linux" scheme="http://yoursite.com/tags/linux/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>kafka系列教程</title>
-    <link href="http://yoursite.com/2017/05/26/kafka/"/>
-    <id>http://yoursite.com/2017/05/26/kafka/</id>
-    <published>2017-05-26T11:14:30.964Z</published>
-    <updated>2017-01-10T11:37:30.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>#kafka系列教程  </p>
-<p>##安装配置  </p>
-<p>###1、安装配置<br>（1）、wget <a href="http://mirrors.cnnic.cn/apache/kafka/0.10.0.1/kafka_2.10-0.10.0.1.tgz" target="_blank" rel="external">http://mirrors.cnnic.cn/apache/kafka/0.10.0.1/kafka_2.10-0.10.0.1.tgz</a>    地址随时有可能改变  <a href="http://kafka.apache.org/downloads.html" target="_blank" rel="external">http://kafka.apache.org/downloads.html</a><br> (2)、tar -xzf kafka_2.10-0.10.0.1.tgz<br> (3)、export KAFKA_HOME=/usr/local/kafka……   视自己情况而定<br> (4)、export PATH=$PATH:$KAFKA_HOME/bin    </p>
-<a id="more"></a>
-<p>###2、启动<br>(1)、先启动zookeeper<br> bin/zookeeper-server-start.sh config/zookeeper.properties<br>(2)、启动zookeeper后，稍微等一会（30秒）再启动kafka，否则出错<br> $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server.properties &amp;<br>(3)、创建一个kafka topic    (名称是kafkatopic)<br>bin/kafka-topics.sh –create –zookeeper localhost:2181 –replication-factor 1 -partitions 1 –topic kafkatopic<br>(4)、列出topic<br> ./bin/kafka-topics.sh –list –zookeeper localhost:2181   </p>
-<p>###开始发送消息<br>（1）、开启控制台发送消息<br>./bin/kafka-console-producer.sh –broker-list localhost:9092 –top<br>ic kafkatopic  </p>
-<p>###开启消费消息<br>（2）、开启控制台消费消息<br>./bin/kafka-console-consumer.sh –zookeeper localhost:2181 –topic<br> kafkatopic –from-beginning  </p>
-<p>##配置单机多代理模式（一台机器多个broker）  </p>
-<p>###配置<br>1、kafka的每一个server-1.properties文件需要区别3个配置项目，分别是 broker.id  port   log.dir<br>比如说默认配置是这样的：</p>
-<ul>
-<li>brokder.id  1                       </li>
-<li>port        9093                    </li>
-<li>log.dir     /tmp/kafka-logs-1<br>加一个broker既可以单独配置一个server-2.properties </li>
-<li>broker.id 2</li>
-<li>prot 9094   </li>
-<li>log.dir /tmp/kafka-logs-2   </li>
-</ul>
-<p>2、OK,配置完成之后就可以用命令启动2个broker了<br>/bin/kafka-server-start.sh /config/server-1.properties<br>/bin/kafka-server-start.sh /config/server-1.properties     </p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;#kafka系列教程  &lt;/p&gt;
-&lt;p&gt;##安装配置  &lt;/p&gt;
-&lt;p&gt;###1、安装配置&lt;br&gt;（1）、wget &lt;a href=&quot;http://mirrors.cnnic.cn/apache/kafka/0.10.0.1/kafka_2.10-0.10.0.1.tgz&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://mirrors.cnnic.cn/apache/kafka/0.10.0.1/kafka_2.10-0.10.0.1.tgz&lt;/a&gt;    地址随时有可能改变  &lt;a href=&quot;http://kafka.apache.org/downloads.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://kafka.apache.org/downloads.html&lt;/a&gt;&lt;br&gt; (2)、tar -xzf kafka_2.10-0.10.0.1.tgz&lt;br&gt; (3)、export KAFKA_HOME=/usr/local/kafka……   视自己情况而定&lt;br&gt; (4)、export PATH=$PATH:$KAFKA_HOME/bin    &lt;/p&gt;
-    
-    </summary>
-    
-    
-      <category term="消息队列" scheme="http://yoursite.com/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JVM参数详解</title>
-    <link href="http://yoursite.com/2017/05/26/JVM%E5%8F%82%E6%95%B0/"/>
-    <id>http://yoursite.com/2017/05/26/JVM参数/</id>
-    <published>2017-05-26T11:14:30.960Z</published>
-    <updated>2017-01-10T11:29:12.000Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="JVM参数详解"><a href="#JVM参数详解" class="headerlink" title="JVM参数详解"></a>JVM参数详解</h3><p>不管是YGC还是Full GC,GC过程中都会对导致程序运行中中断,正确的选择<a href="http://www.cnblogs.com/redcreen/archive/2011/05/04/2037029.html" target="_blank" rel="external">不同的GC策略</a>,调整JVM、GC的参数，可以极大的减少由于GC工作，而导致的程序运行中断方面的问题，进而适当的提高Java程序的工作效率。但是调整GC是以个极为复杂的过程，由于各个程序具备不同的特点，如：web和GUI程序就有很大区别（Web可以适当的停顿，但GUI停顿是客户无法接受的），而且由于跑在各个机器上的配置不同（主要cup个数，内存不同），所以使用的GC种类也会不同(如何选择见<a href="http://www.cnblogs.com/redcreen/archive/2011/05/04/2037029.html" target="_blank" rel="external">GC种类及如何选择</a>)。本文将注重介绍JVM、GC的一些重要参数的设置来提高系统的性能。</p>
-<pre><code>JVM内存组成及GC相关内容请见之前的文章:[JVM内存组成](http://www.cnblogs.com/redcreen/archive/2011/05/04/2036387.html) [GC策略&amp;内存申请](http://www.cnblogs.com/redcreen/archive/2011/05/04/2037056.html)。
-</code></pre><a id="more"></a>
-<p><strong>JVM参数的含义 </strong>实例见<a href="http://www.cnblogs.com/redcreen/archive/2011/05/05/2038331.html" target="_blank" rel="external">实例分析</a></p>
-<table>
-<thead>
-<tr>
-<th><strong>参数名称</strong></th>
-<th><strong>含义</strong></th>
-<th><strong>默认值</strong></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>-Xms</td>
-<td>初始堆大小</td>
-<td>物理内存的1/64(&lt;1GB)</td>
-<td>默认(MinHeapFreeRatio参数可以调整)空余堆内存小于40%时，JVM就会增大堆直到-Xmx的最大限制.</td>
-</tr>
-<tr>
-<td>-Xmx</td>
-<td>最大堆大小</td>
-<td>物理内存的1/4(&lt;1GB)</td>
-<td>默认(MaxHeapFreeRatio参数可以调整)空余堆内存大于70%时，JVM会减少堆直到 -Xms的最小限制</td>
-</tr>
-<tr>
-<td>-Xmn</td>
-<td>年轻代大小(1.4or lator)</td>
-<td></td>
-<td><strong>注意</strong>：此处的大小是（eden+ 2 survivor space).与jmap -heap中显示的New gen是不同的。整个堆大小=年轻代大小 + 年老代大小 + 持久代大小.增大年轻代后,将会减小年老代大小.此值对系统性能影响较大,Sun官方推荐配置为整个堆的3/8</td>
-</tr>
-<tr>
-<td>-XX:NewSize</td>
-<td>设置年轻代大小(for 1.3/1.4)</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>-XX:MaxNewSize</td>
-<td>年轻代最大值(for 1.3/1.4)</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>-XX:PermSize</td>
-<td>设置持久代(perm gen)初始值</td>
-<td>物理内存的1/64</td>
-<td></td>
-</tr>
-<tr>
-<td>-XX:MaxPermSize</td>
-<td>设置持久代最大值</td>
-<td>物理内存的1/4</td>
-<td></td>
-</tr>
-<tr>
-<td>-Xss</td>
-<td>每个线程的堆栈大小</td>
-<td></td>
-<td>JDK5.0以后每个线程堆栈大小为1M,以前每个线程堆栈大小为256K.更具应用的线程所需内存大小进行 调整.在相同物理内存下,减小这个值能生成更多的线程.但是操作系统对一个进程内的线程数还是有限制的,不能无限生成,经验值在3000~5000左右一般小的应用， 如果栈不是很深， 应该是128k够用的 大的应用建议使用256k。这个选项对性能影响比较大，需要严格的测试。（校长）和threadstacksize选项解释很类似,官方文档似乎没有解释,在论坛中有这样一句话:””-Xss is translated in a VM flag named ThreadStackSize”一般设置这个值就可以了。</td>
-</tr>
-<tr>
-<td>-<em>XX:ThreadStackSize</em></td>
-<td>Thread Stack Size</td>
-<td></td>
-<td>(0 means use default stack size) [Sparc: 512; Solaris x86: 320 (was 256 prior in 5.0 and earlier); Sparc 64 bit: 1024; Linux amd64: 1024 (was 0 in 5.0 and earlier); all others 0.]</td>
-</tr>
-<tr>
-<td>-XX:NewRatio</td>
-<td>年轻代(包括Eden和两个Survivor区)与年老代的比值(除去持久代)</td>
-<td></td>
-<td>-XX:NewRatio=4表示年轻代与年老代所占比值为1:4,年轻代占整个堆栈的1/5Xms=Xmx并且设置了Xmn的情况下，该参数不需要进行设置。</td>
-</tr>
-<tr>
-<td>-XX:SurvivorRatio</td>
-<td>Eden区与Survivor区的大小比值</td>
-<td></td>
-<td>设置为8,则两个Survivor区与一个Eden区的比值为2:8,一个Survivor区占整个年轻代的1/10</td>
-</tr>
-<tr>
-<td>-XX:LargePageSizeInBytes</td>
-<td>内存页的大小不可设置过大， 会影响Perm的大小</td>
-<td></td>
-<td>=128m</td>
-</tr>
-<tr>
-<td>-XX:+UseFastAccessorMethods</td>
-<td>原始类型的快速优化</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>-XX:+DisableExplicitGC</td>
-<td>关闭System.gc()</td>
-<td></td>
-<td>这个参数需要严格的测试</td>
-</tr>
-<tr>
-<td>-XX:MaxTenuringThreshold</td>
-<td>垃圾最大年龄</td>
-<td></td>
-<td>如果设置为0的话,则年轻代对象不经过Survivor区,直接进入年老代. 对于年老代比较多的应用,可以提高效率.如果将此值设置为一个较大值,则年轻代对象会在Survivor区进行多次复制,这样可以增加对象再年轻代的存活 时间,增加在年轻代即被回收的概率该参数只有在串行GC时才有效.</td>
-</tr>
-<tr>
-<td>-XX:+AggressiveOpts</td>
-<td>加快编译</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>-XX:+UseBiasedLocking</td>
-<td>锁机制的性能改善</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>-Xnoclassgc</td>
-<td>禁用垃圾回收</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>-XX:SoftRefLRUPolicyMSPerMB</td>
-<td>每兆堆空闲空间中SoftReference的存活时间</td>
-<td>1s</td>
-<td>softly reachable objects will remain alive for some amount of time after the last time they were referenced. The default value is one second of lifetime per free megabyte in the heap</td>
-</tr>
-<tr>
-<td>-XX:PretenureSizeThreshold</td>
-<td>对象超过多大是直接在旧生代分配</td>
-<td>0</td>
-<td>单位字节 新生代采用Parallel Scavenge GC时无效另一种直接在旧生代分配的情况是大的数组对象,且数组中无外部引用对象.</td>
-</tr>
-<tr>
-<td>-XX:TLABWasteTargetPercent</td>
-<td>TLAB占eden区的百分比</td>
-<td>1%</td>
-<td></td>
-</tr>
-<tr>
-<td>-XX:+<em>CollectGen0First</em></td>
-<td>FullGC时是否先YGC</td>
-<td>false</td>
-</tr>
-</tbody>
-</table>
-<p><strong>并行收集器相关参数</strong></p>
-<table>
-<thead>
-<tr>
-<th>-XX:+UseParallelGC</th>
-<th>Full GC采用parallel MSC(此项待验证)</th>
-<th></th>
-<th>选择垃圾收集器为并行收集器.此配置仅对年轻代有效.即上述配置下,年轻代使用并发收集,而年老代仍旧使用串行收集.(此项待验证)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>-XX:+UseParNewGC</td>
-<td>设置年轻代为并行收集</td>
-<td></td>
-<td>可与CMS收集同时使用JDK5.0以上,JVM会根据系统配置自行设置,所以无需再设置此值</td>
-</tr>
-<tr>
-<td>-XX:ParallelGCThreads</td>
-<td>并行收集器的线程数</td>
-<td></td>
-<td>此值最好配置与处理器数目相等 同样适用于CMS</td>
-</tr>
-<tr>
-<td>-XX:+UseParallelOldGC</td>
-<td>年老代垃圾收集方式为并行收集(Parallel Compacting)</td>
-<td></td>
-<td>这个是JAVA 6出现的参数选项</td>
-</tr>
-<tr>
-<td>-XX:MaxGCPauseMillis</td>
-<td>每次年轻代垃圾回收的最长时间(最大暂停时间)</td>
-<td></td>
-<td>如果无法满足此时间,JVM会自动调整年轻代大小,以满足此值.</td>
-</tr>
-<tr>
-<td>-XX:+UseAdaptiveSizePolicy</td>
-<td>自动选择年轻代区大小和相应的Survivor区比例</td>
-<td></td>
-<td>设置此选项后,并行收集器会自动选择年轻代区大小和相应的Survivor区比例,以达到目标系统规定的最低相应时间或者收集频率等,此值建议使用并行收集器时,一直打开.</td>
-</tr>
-<tr>
-<td>-XX:GCTimeRatio</td>
-<td>设置垃圾回收时间占程序运行时间的百分比</td>
-<td></td>
-<td>公式为1/(1+n)</td>
-</tr>
-<tr>
-<td>-XX:+<em>ScavengeBeforeFullGC</em></td>
-<td>Full GC前调用YGC</td>
-<td>true</td>
-<td>Do young generation GC prior to a full GC. (Introduced in 1.4.1.)</td>
-</tr>
-</tbody>
-</table>
-<p><strong>CMS相关参数</strong></p>
-<table>
-<thead>
-<tr>
-<th>-XX:+UseConcMarkSweepGC</th>
-<th>使用CMS内存收集</th>
-<th></th>
-<th>测试中配置这个以后,-XX:NewRatio=4的配置失效了,原因不明.所以,此时年轻代大小最好用-Xmn设置.???</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>-XX:+AggressiveHeap</td>
-<td></td>
-<td></td>
-<td>试图是使用大量的物理内存长时间大内存使用的优化，能检查计算资源（内存， 处理器数量）至少需要256MB内存大量的CPU／内存， （在1.4.1在4CPU的机器上已经显示有提升）</td>
-</tr>
-<tr>
-<td>-XX:CMSFullGCsBeforeCompaction</td>
-<td>多少次后进行内存压缩</td>
-<td></td>
-<td>由于并发收集器不对内存空间进行压缩,整理,所以运行一段时间以后会产生”碎片”,使得运行效率降低.此值设置运行多少次GC以后对内存空间进行压缩,整理.</td>
-</tr>
-<tr>
-<td>-XX:+CMSParallelRemarkEnabled</td>
-<td>降低标记停顿</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>-XX+UseCMSCompactAtFullCollection</td>
-<td>在FULL GC的时候， 对年老代的压缩</td>
-<td></td>
-<td>CMS是不会移动内存的， 因此， 这个非常容易产生碎片， 导致内存不够用， 因此， 内存的压缩这个时候就会被启用。 增加这个参数是个好习惯。可能会影响性能,但是可以消除碎片</td>
-</tr>
-<tr>
-<td>-XX:+UseCMSInitiatingOccupancyOnly</td>
-<td>使用手动定义初始化定义开始CMS收集</td>
-<td></td>
-<td>禁止hostspot自行触发CMS GC</td>
-</tr>
-<tr>
-<td>-XX:CMSInitiatingOccupancyFraction=70</td>
-<td>使用cms作为垃圾回收使用70％后开始CMS收集</td>
-<td>92</td>
-<td>为了保证不出现promotion failed(见下面介绍)错误,该值的设置需要满足以下公式<strong>CMSInitiatingOccupancyFraction计算公式</strong></td>
-</tr>
-<tr>
-<td>-XX:CMSInitiatingPermOccupancyFraction</td>
-<td>设置Perm Gen使用到达多少比率时触发</td>
-<td>92</td>
-<td></td>
-</tr>
-<tr>
-<td>-XX:+CMSIncrementalMode</td>
-<td>设置为增量模式</td>
-<td></td>
-<td>用于单CPU情况</td>
-</tr>
-<tr>
-<td>-XX:+CMSClassUnloadingEnabled</td>
-<td></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<p><strong>辅助信息</strong></p>
-<table>
-<thead>
-<tr>
-<th>-XX:+PrintGC</th>
-<th></th>
-<th></th>
-<th>输出形式:[GC 118250K-&gt;113543K(130112K), 0.0094143 secs][Full GC 121376K-&gt;10414K(130112K), 0.0650971 secs]</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>-XX:+PrintGCDetails</td>
-<td></td>
-<td></td>
-<td>输出形式:[GC [DefNew: 8614K-&gt;781K(9088K), 0.0123035 secs] 118250K-&gt;113543K(130112K), 0.0124633 secs][GC [DefNew: 8614K-&gt;8614K(9088K), 0.0000665 secs][Tenured: 112761K-&gt;10414K(121024K), 0.0433488 secs] 121376K-&gt;10414K(130112K), 0.0436268 secs]</td>
-</tr>
-<tr>
-<td>-XX:+PrintGCTimeStamps</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>-XX:+PrintGC:PrintGCTimeStamps</td>
-<td></td>
-<td></td>
-<td>可与-XX:+PrintGC -XX:+PrintGCDetails混合使用输出形式:11.851: [GC 98328K-&gt;93620K(130112K), 0.0082960 secs]</td>
-</tr>
-<tr>
-<td>-XX:+PrintGCApplicationStoppedTime</td>
-<td>打印垃圾回收期间程序暂停的时间.可与上面混合使用</td>
-<td></td>
-<td>输出形式:Total time for which application threads were stopped: 0.0468229 seconds</td>
-</tr>
-<tr>
-<td>-XX:+PrintGCApplicationConcurrentTime</td>
-<td>打印每次垃圾回收前,程序未中断的执行时间.可与上面混合使用</td>
-<td></td>
-<td>输出形式:Application time: 0.5291524 seconds</td>
-</tr>
-<tr>
-<td>-XX:+PrintHeapAtGC</td>
-<td>打印GC前后的详细堆栈信息</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>-Xloggc:filename</td>
-<td>把相关日志信息记录到文件以便分析.与上面几个配合使用</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>-XX:+PrintClassHistogram</td>
-<td>garbage collects before printing the histogram.</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>-XX:+PrintTLAB</td>
-<td>查看TLAB空间的使用情况</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>XX:+PrintTenuringDistribution</td>
-<td>查看每次minor GC后新的存活周期的阈值</td>
-<td></td>
-<td>Desired survivor size 1048576 bytes, new threshold 7 (max 15)new threshold 7即标识新的存活周期的阈值为7。</td>
-</tr>
-</tbody>
-</table>
-<p><strong>GC性能方面的考虑</strong></p>
-<pre><code>对于GC的性能主要有2个方面的指标：吞吐量throughput（工作时间不算gc的时间占总的时间比）和暂停pause（gc发生时app对外显示的无法响应）。
-</code></pre><p>\1. Total Heap</p>
-<pre><code>默认情况下，vm会增加/减少heap大小以维持free space在整个vm中占的比例，这个比例由MinHeapFreeRatio和MaxHeapFreeRatio指定。
-</code></pre><p>一般而言，server端的app会有以下规则：</p>
-<ul>
-<li>对vm分配尽可能多的memory；</li>
-<li>将Xms和Xmx设为一样的值。如果虚拟机启动时设置使用的内存比较小，这个时候又需要初始化很多对象，虚拟机就必须重复地增加内存。</li>
-<li>处理器核数增加，内存也跟着增大。</li>
-</ul>
-<p>\2. The Young Generation</p>
-<pre><code>另外一个对于app流畅性运行影响的因素是young generation的大小。young generation越大，minor collection越少；但是在固定heap size情况下，更大的young generation就意味着小的tenured generation，就意味着更多的major collection(major collection会引发minor collection)。
-
-NewRatio反映的是young和tenured generation的大小比例。NewSize和MaxNewSize反映的是young generation大小的下限和上限，将这两个值设为一样就固定了young generation的大小（同Xms和Xmx设为一样）。
-
-如果希望，SurvivorRatio也可以优化survivor的大小，不过这对于性能的影响不是很大。SurvivorRatio是eden和survior大小比例。
-</code></pre><p>一般而言，server端的app会有以下规则：</p>
-<ul>
-<li>首先决定能分配给vm的最大的heap size，然后设定最佳的young generation的大小；</li>
-<li>如果heap size固定后，增加young generation的大小意味着减小tenured generation大小。让tenured generation在任何时候够大，能够容纳所有live的data（留10%-20%的空余）。</li>
-</ul>
-<p><strong>经验&amp;&amp;规则</strong></p>
-<ol>
-<li>年轻代大小选择<ul>
-<li>响应时间优先的应用:尽可能设大,直到接近系统的最低响应时间限制(根据实际情况选择).在此种情况下,年轻代收集发生的频率也是最小的.同时,减少到达年老代的对象.</li>
-<li>吞吐量优先的应用:尽可能的设置大,可能到达Gbit的程度.因为对响应时间没有要求,垃圾收集可以并行进行,一般适合8CPU以上的应用.</li>
-<li>避免设置过小.当新生代设置过小时会导致:1.YGC次数更加频繁 2.可能导致YGC对象直接进入旧生代,如果此时旧生代满了,会触发FGC.</li>
-</ul>
-</li>
-<li>年老代大小选择<ol>
-<li>响应时间优先的应用:年老代使用并发收集器,所以其大小需要小心设置,一般要考虑并发会话率和会话持续时间等一些参数.如果堆设置小了,可以会造成内存碎 片,高回收频率以及应用暂停而使用传统的标记清除方式;如果堆大了,则需要较长的收集时间.最优化的方案,一般需要参考以下数据获得:<br>并发垃圾收集信息、持久代并发收集次数、传统GC信息、花在年轻代和年老代回收上的时间比例。</li>
-<li>吞吐量优先的应用:一般吞吐量优先的应用都有一个很大的年轻代和一个较小的年老代.原因是,这样可以尽可能回收掉大部分短期对象,减少中期的对象,而年老代尽存放长期存活对象.</li>
-</ol>
-</li>
-<li>较小堆引起的碎片问题<br>因为年老代的并发收集器使用标记,清除算法,所以不会对堆进行压缩.当收集器回收时,他会把相邻的空间进行合并,这样可以分配给较大的对象.但是,当堆空间较小时,运行一段时间以后,就会出现”碎片”,如果并发收集器找不到足够的空间,那么并发收集器将会停止,然后使用传统的标记,清除方式进行回收.如果出现”碎片”,可能需要进行如下配置:<br>-XX:+UseCMSCompactAtFullCollection:使用并发收集器时,开启对年老代的压缩.<br>-XX:CMSFullGCsBeforeCompaction=0:上面配置开启的情况下,这里设置多少次Full GC后,对年老代进行压缩</li>
-<li>用64位操作系统，Linux下64位的jdk比32位jdk要慢一些，但是吃得内存更多，吞吐量更大</li>
-<li>XMX和XMS设置一样大，MaxPermSize和MinPermSize设置一样大，这样可以减轻伸缩堆大小带来的压力</li>
-<li><em>**</em>使用CMS的好处是用尽量少的新生代，经验值是128M－256M， 然后老生代利用CMS并行收集， 这样能保证系统低延迟的吞吐效率。 实际上cms的收集停顿时间非常的短，2G的内存， 大约20－80ms的应用程序停顿时间</li>
-<li>系统停顿的时候可能是GC的问题也可能是程序的问题，多用jmap和jstack查看，或者killall -3 java，然后查看java控制台日志，能看出很多问题。(相关工具的使用方法将在后面的blog中介绍)</li>
-<li>仔细了解自己的应用，如果用了缓存，那么年老代应该大一些，缓存的HashMap不应该无限制长，建议采用LRU算法的Map做缓存，LRUMap的最大长度也要根据实际情况设定。</li>
-<li>采用并发回收时，年轻代小一点，年老代要大，因为年老大用的是并发回收，即使时间长点也不会影响其他程序继续运行，网站不会停顿</li>
-<li>JVM参数的设置(特别是 –Xmx –Xms –Xmn -XX:SurvivorRatio  -XX:MaxTenuringThreshold等参数的设置没有一个固定的公式，需要根据PV old区实际数据 YGC次数等多方面来衡量。为了避免promotion faild可能会导致xmn设置偏小，也意味着YGC的次数会增多，处理并发访问的能力下降等问题。每个参数的调整都需要经过详细的性能测试，才能找到特定应用的最佳配置。</li>
-</ol>
-<p><strong>promotion failed:</strong></p>
-<p>垃圾回收时promotion failed是个很头痛的问题，一般可能是两种原因产生，第一个原因是救助空间不够，救助空间里的对象还不应该被移动到年老代，但年轻代又有很多对象需要放入救助空间；第二个原因是年老代没有足够的空间接纳来自年轻代的对象；这两种情况都会转向Full GC，网站停顿时间较长。</p>
-<p>解决方方案一：</p>
-<p><em>第一个原因我的最终解决办法是去掉救助空间，设置-XX:SurvivorRatio=65536 -XX:MaxTenuringThreshold=0即可，第二个原因我的解决办法是设置CMSInitiatingOccupancyFraction为某个值（假设70），这样年老代空间到70%时就开始执行CMS，年老代有足够的空间接纳来自年轻代的对象。</em></p>
-<p>解决方案一的改进方案：</p>
-<p><em>又有改进了，上面方法不太好，因为没有用到救助空间，所以年老代容易满，CMS执行会比较频繁。我改善了一下，还是用救助空间，但是把救助空间加大，这样也不会有promotion failed。具体操作上，32位Linux和64位Linux好像不一样，64位系统似乎只要配置MaxTenuringThreshold参数，CMS还是有暂停。为了解决暂停问题和promotion failed问题，最后我设置-XX:SurvivorRatio=1 ，并把MaxTenuringThreshold去掉，这样即没有暂停又不会有promotoin failed，而且更重要的是，年老代和永久代上升非常慢（因为好多对象到不了年老代就被回收了），所以CMS执行频率非常低，好几个小时才执行一次，这样，服务器都不用重启了。</em></p>
-<p>-Xmx4000M -Xms4000M -Xmn600M -XX:PermSize=500M -XX:MaxPermSize=500M -Xss256K -XX:+DisableExplicitGC -XX:SurvivorRatio=1 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:CMSFullGCsBeforeCompaction=0 -XX:+CMSClassUnloadingEnabled -XX:LargePageSizeInBytes=128M -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=80 -XX:SoftRefLRUPolicyMSPerMB=0 -XX:+PrintClassHistogram -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintHeapAtGC -Xloggc:log/gc.log</p>
-<p><strong>CMSInitiatingOccupancyFraction值与Xmn的关系公式</strong></p>
-<p>上面介绍了promontion faild产生的原因是EDEN空间不足的情况下将EDEN与From survivor中的存活对象存入To survivor区时,To survivor区的空间不足，再次晋升到old gen区，而old gen区内存也不够的情况下产生了promontion faild从而导致full gc.那可以推断出：eden+from survivor &lt; old gen区剩余内存时，不会出现promontion faild的情况，即：<br>(Xmx-Xmn)*(1-CMSInitiatingOccupancyFraction/100)&gt;=(Xmn-Xmn/(SurvivorRatior+2))  进而推断出：</p>
-<p>CMSInitiatingOccupancyFraction &lt;=((Xmx-Xmn)-(Xmn-Xmn/(SurvivorRatior+2)))/(Xmx-Xmn)*100</p>
-<p>例如：</p>
-<p>当xmx=128 xmn=36 SurvivorRatior=1时 CMSInitiatingOccupancyFraction&lt;=((128.0-36)-(36-36/(1+2)))/(128-36)*100 =73.913</p>
-<p>当xmx=128 xmn=24 SurvivorRatior=1时 CMSInitiatingOccupancyFraction&lt;=((128.0-24)-(24-24/(1+2)))/(128-24)*100=84.615…</p>
-<p>当xmx=3000 xmn=600 SurvivorRatior=1时  CMSInitiatingOccupancyFraction&lt;=((3000.0-600)-(600-600/(1+2)))/(3000-600)*100=83.33</p>
-<p>CMSInitiatingOccupancyFraction低于70% 需要调整xmn或SurvivorRatior值。</p>
-<p>令：</p>
-<p><a href="http://bbs.weblogicfans.net/archiver/tid-2835.html" target="_blank" rel="external">网上一童鞋</a>推断出的公式是：:(Xmx-Xmn)*(100-CMSInitiatingOccupancyFraction)/100&gt;=Xmn 这个公式个人认为不是很严谨，在内存小的时候会影响xmn的计算。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h3 id=&quot;JVM参数详解&quot;&gt;&lt;a href=&quot;#JVM参数详解&quot; class=&quot;headerlink&quot; title=&quot;JVM参数详解&quot;&gt;&lt;/a&gt;JVM参数详解&lt;/h3&gt;&lt;p&gt;不管是YGC还是Full GC,GC过程中都会对导致程序运行中中断,正确的选择&lt;a href=&quot;http://www.cnblogs.com/redcreen/archive/2011/05/04/2037029.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;不同的GC策略&lt;/a&gt;,调整JVM、GC的参数，可以极大的减少由于GC工作，而导致的程序运行中断方面的问题，进而适当的提高Java程序的工作效率。但是调整GC是以个极为复杂的过程，由于各个程序具备不同的特点，如：web和GUI程序就有很大区别（Web可以适当的停顿，但GUI停顿是客户无法接受的），而且由于跑在各个机器上的配置不同（主要cup个数，内存不同），所以使用的GC种类也会不同(如何选择见&lt;a href=&quot;http://www.cnblogs.com/redcreen/archive/2011/05/04/2037029.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;GC种类及如何选择&lt;/a&gt;)。本文将注重介绍JVM、GC的一些重要参数的设置来提高系统的性能。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;JVM内存组成及GC相关内容请见之前的文章:[JVM内存组成](http://www.cnblogs.com/redcreen/archive/2011/05/04/2036387.html) [GC策略&amp;amp;内存申请](http://www.cnblogs.com/redcreen/archive/2011/05/04/2037056.html)。
-&lt;/code&gt;&lt;/pre&gt;
-    
-    </summary>
-    
-    
-      <category term="JVM" scheme="http://yoursite.com/tags/JVM/"/>
     
   </entry>
   

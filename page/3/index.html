@@ -69,6 +69,108 @@
     <div class="outer">
       <section id="main">
   
+    <article id="post-kafka" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/05/26/kafka/" class="article-date">
+  <time datetime="2017-05-26T11:14:30.964Z" itemprop="datePublished">2017-05-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/05/26/kafka/">kafka系列教程</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>#kafka系列教程  </p>
+<p>##安装配置  </p>
+<p>###1、安装配置<br>（1）、wget <a href="http://mirrors.cnnic.cn/apache/kafka/0.10.0.1/kafka_2.10-0.10.0.1.tgz" target="_blank" rel="external">http://mirrors.cnnic.cn/apache/kafka/0.10.0.1/kafka_2.10-0.10.0.1.tgz</a>    地址随时有可能改变  <a href="http://kafka.apache.org/downloads.html" target="_blank" rel="external">http://kafka.apache.org/downloads.html</a><br> (2)、tar -xzf kafka_2.10-0.10.0.1.tgz<br> (3)、export KAFKA_HOME=/usr/local/kafka……   视自己情况而定<br> (4)、export PATH=$PATH:$KAFKA_HOME/bin    </p>
+        
+          <p class="article-more-link">
+            <a href="/2017/05/26/kafka/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2017/05/26/kafka/" data-id="cj9e0xmoj001gj0j3mmmenop8" class="article-share-link" data-share="baidu" data-title="kafka系列教程">分享到</a>
+      
+
+      
+        <a href="http://yoursite.com/2017/05/26/kafka/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/消息队列/">消息队列</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-JVM参数" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/05/26/JVM参数/" class="article-date">
+  <time datetime="2017-05-26T11:14:30.960Z" itemprop="datePublished">2017-05-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/05/26/JVM参数/">JVM参数详解</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="JVM参数详解"><a href="#JVM参数详解" class="headerlink" title="JVM参数详解"></a>JVM参数详解</h3><p>不管是YGC还是Full GC,GC过程中都会对导致程序运行中中断,正确的选择<a href="http://www.cnblogs.com/redcreen/archive/2011/05/04/2037029.html" target="_blank" rel="external">不同的GC策略</a>,调整JVM、GC的参数，可以极大的减少由于GC工作，而导致的程序运行中断方面的问题，进而适当的提高Java程序的工作效率。但是调整GC是以个极为复杂的过程，由于各个程序具备不同的特点，如：web和GUI程序就有很大区别（Web可以适当的停顿，但GUI停顿是客户无法接受的），而且由于跑在各个机器上的配置不同（主要cup个数，内存不同），所以使用的GC种类也会不同(如何选择见<a href="http://www.cnblogs.com/redcreen/archive/2011/05/04/2037029.html" target="_blank" rel="external">GC种类及如何选择</a>)。本文将注重介绍JVM、GC的一些重要参数的设置来提高系统的性能。</p>
+<pre><code>JVM内存组成及GC相关内容请见之前的文章:[JVM内存组成](http://www.cnblogs.com/redcreen/archive/2011/05/04/2036387.html) [GC策略&amp;内存申请](http://www.cnblogs.com/redcreen/archive/2011/05/04/2037056.html)。
+</code></pre>
+        
+          <p class="article-more-link">
+            <a href="/2017/05/26/JVM参数/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2017/05/26/JVM参数/" data-id="cj9e0xmmm0003j0j3wd9czx1a" class="article-share-link" data-share="baidu" data-title="JVM参数详解">分享到</a>
+      
+
+      
+        <a href="http://yoursite.com/2017/05/26/JVM参数/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JVM/">JVM</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-java排查问题" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/05/26/java排查问题/" class="article-date">
@@ -101,11 +203,11 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/java排查问题/" data-id="cj6rim53j0016ccj3tddvnyjq" class="article-share-link" data-share="baidu" data-title="JAVA排查问题">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/java排查问题/" data-id="cj9e0xmol001ij0j3ckikgqel" class="article-share-link" data-share="baidu" data-title="JAVA排查问题">分享到</a>
       
 
       
-        <a href="http://yoursite.com/2017/05/26/java排查问题/#ds-thread" class="article-comment-link">Comments</a>
+        <a href="http://yoursite.com/2017/05/26/java排查问题/#ds-thread" class="article-comment-link">评论</a>
       
 
       
@@ -151,11 +253,11 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/java基础/" data-id="cj6rim53i0014ccj3yjf5xva4" class="article-share-link" data-share="baidu" data-title="JAVA基础">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/java基础/" data-id="cj9e0xmog001ej0j3ltu6iqjs" class="article-share-link" data-share="baidu" data-title="JAVA基础">分享到</a>
       
 
       
-        <a href="http://yoursite.com/2017/05/26/java基础/#ds-thread" class="article-comment-link">Comments</a>
+        <a href="http://yoursite.com/2017/05/26/java基础/#ds-thread" class="article-comment-link">评论</a>
       
 
       
@@ -205,11 +307,11 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/GIT指南/" data-id="cj6rim51o0000ccj33ivnfq9j" class="article-share-link" data-share="baidu" data-title="GIT常用指令集合">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/GIT指南/" data-id="cj9e0xmmd0001j0j35d7io8id" class="article-share-link" data-share="baidu" data-title="GIT常用指令集合">分享到</a>
       
 
       
-        <a href="http://yoursite.com/2017/05/26/GIT指南/#ds-thread" class="article-comment-link">Comments</a>
+        <a href="http://yoursite.com/2017/05/26/GIT指南/#ds-thread" class="article-comment-link">评论</a>
       
 
       
@@ -255,11 +357,11 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/day7/" data-id="cj6rim53f0010ccj3sb1oeky4" class="article-share-link" data-share="baidu" data-title="sql相关">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/day7/" data-id="cj9e0xmoq001oj0j3lmem6p73" class="article-share-link" data-share="baidu" data-title="sql相关">分享到</a>
       
 
       
-        <a href="http://yoursite.com/2017/05/26/day7/#ds-thread" class="article-comment-link">Comments</a>
+        <a href="http://yoursite.com/2017/05/26/day7/#ds-thread" class="article-comment-link">评论</a>
       
 
       
@@ -305,11 +407,11 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/day6/" data-id="cj6rim53h0012ccj3hvutstxz" class="article-share-link" data-share="baidu" data-title="linux相关">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/day6/" data-id="cj9e0xmoe001bj0j3bg2cpkku" class="article-share-link" data-share="baidu" data-title="linux相关">分享到</a>
       
 
       
-        <a href="http://yoursite.com/2017/05/26/day6/#ds-thread" class="article-comment-link">Comments</a>
+        <a href="http://yoursite.com/2017/05/26/day6/#ds-thread" class="article-comment-link">评论</a>
       
 
       
@@ -355,11 +457,11 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/day5/" data-id="cj6rim53d000yccj31f8seri5" class="article-share-link" data-share="baidu" data-title="smarty相关">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/day5/" data-id="cj9e0xmo70015j0j3rhlk261o" class="article-share-link" data-share="baidu" data-title="smarty相关">分享到</a>
       
 
       
-        <a href="http://yoursite.com/2017/05/26/day5/#ds-thread" class="article-comment-link">Comments</a>
+        <a href="http://yoursite.com/2017/05/26/day5/#ds-thread" class="article-comment-link">评论</a>
       
 
       
@@ -402,11 +504,11 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/day4/" data-id="cj6rim53c000wccj3t3t3zq46" class="article-share-link" data-share="baidu" data-title="smarty语法详解">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/day4/" data-id="cj9e0xmo50013j0j3zc4rti1v" class="article-share-link" data-share="baidu" data-title="smarty语法详解">分享到</a>
       
 
       
-        <a href="http://yoursite.com/2017/05/26/day4/#ds-thread" class="article-comment-link">Comments</a>
+        <a href="http://yoursite.com/2017/05/26/day4/#ds-thread" class="article-comment-link">评论</a>
       
 
       
@@ -453,11 +555,11 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/26/day3/" data-id="cj6rim53a000uccj34m5x3if9" class="article-share-link" data-share="baidu" data-title="JAVA常用验证方法">Share</a>
+        <a data-url="http://yoursite.com/2017/05/26/day3/" data-id="cj9e0xmox001vj0j3l4oicxk2" class="article-share-link" data-share="baidu" data-title="JAVA常用验证方法">分享到</a>
       
 
       
-        <a href="http://yoursite.com/2017/05/26/day3/#ds-thread" class="article-comment-link">Comments</a>
+        <a href="http://yoursite.com/2017/05/26/day3/#ds-thread" class="article-comment-link">评论</a>
       
 
       
@@ -470,111 +572,10 @@
 
 
   
-    <article id="post-day2" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/05/26/day2/" class="article-date">
-  <time datetime="2017-05-26T11:14:30.850Z" itemprop="datePublished">2017-05-26</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/05/26/day2/">spring知识整合</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>#spring知识整合</p>
-<p>##JdbcTemplate<br>1、作用：jdbctemplate替我们完成了资源的创建以及释放工作，从而简化了我们对JDBC的操作，打开数据库连接、遍历查询结果、处理异常、处理事务、关闭数据库连接这些用户都无需再关注<br>2、用法：在bean中配置一下，给一个maindataSource即可<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;bean id="mainJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate"&gt;</div><div class="line">    &lt;constructor-arg ref="mainDataSource"/&gt;</div><div class="line">&lt;/bean&gt;</div></pre></td></tr></table></figure></p>
-        
-          <p class="article-more-link">
-            <a href="/2017/05/26/day2/#more">Read More</a>
-          </p>
-        
-      
-    </div>
-    <footer class="article-footer">
-      
-        <a data-url="http://yoursite.com/2017/05/26/day2/" data-id="cj6rim537000qccj3uv0osks3" class="article-share-link" data-share="baidu" data-title="spring知识整合">Share</a>
-      
-
-      
-        <a href="http://yoursite.com/2017/05/26/day2/#ds-thread" class="article-comment-link">Comments</a>
-      
-
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-day14" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/05/26/day14/" class="article-date">
-  <time datetime="2017-05-26T11:14:30.847Z" itemprop="datePublished">2017-05-26</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/05/26/day14/">ThreadLocal使用</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>#ThreadLocal使用</p>
-<p>##Thread介绍</p>
-<p>###1、set方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(T value)</span> </span>&#123;</div><div class="line">     Thread t = Thread.currentThread();</div><div class="line">     ThreadLocalMap map = getMap(t);</div><div class="line">     <span class="keyword">if</span> (map != <span class="keyword">null</span>)</div><div class="line">         map.set(<span class="keyword">this</span>, value);</div><div class="line">     <span class="keyword">else</span></div><div class="line">         createMap(t, value);</div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
-        
-          <p class="article-more-link">
-            <a href="/2017/05/26/day14/#more">Read More</a>
-          </p>
-        
-      
-    </div>
-    <footer class="article-footer">
-      
-        <a data-url="http://yoursite.com/2017/05/26/day14/" data-id="cj6rim539000tccj3znw72hp8" class="article-share-link" data-share="baidu" data-title="ThreadLocal使用">Share</a>
-      
-
-      
-        <a href="http://yoursite.com/2017/05/26/day14/#ds-thread" class="article-comment-link">Comments</a>
-      
-
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/多线程/">多线程</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
 
 
   <nav id="page-nav">
-    <a class="extend prev" rel="prev" href="/page/2/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/">Next &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/2/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/">下一页 &raquo;</a>
   </nav>
 </section>
       
@@ -584,43 +585,47 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
+    <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
+    <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+      <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Spring-Boot/" style="font-size: 15px;">Spring Boot</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 12.5px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 12.5px;">smarty</a> <a href="/tags/spring/" style="font-size: 12.5px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 17.5px;">多线程</a> <a href="/tags/大数据/" style="font-size: 12.5px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 12.5px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
+    <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">近期文章</h3>
     <div class="widget">
       <ul>
         
           <li>
-            <a href="/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/">(no title)</a>
+            <a href="/2017/10/30/Spring AOP系列之AOP原理介绍/">Spring Boot  AOP系列之AOP原理介绍</a>
           </li>
         
           <li>
-            <a href="/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/">(no title)</a>
+            <a href="/2017/10/30/Spring AOP系列之代理创建/">Spring Boot  AOP系列之动态代理创建</a>
+          </li>
+        
+          <li>
+            <a href="/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/">(no title)</a>
           </li>
         
           <li>
@@ -628,11 +633,7 @@
           </li>
         
           <li>
-            <a href="/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/">高可用数据同步方案-SqlServer迁移Mysql实战</a>
-          </li>
-        
-          <li>
-            <a href="/2017/06/09/Spring boot返回request、response log添加/">spring boot给接口返回添加输入输出日志</a>
+            <a href="/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/">Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍</a>
           </li>
         
       </ul>
@@ -642,7 +643,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Links</h3>
+    <h3 class="widget-title">友情链接</h3>
     <div class="widget">
       <ul>
         
@@ -688,7 +689,7 @@
 </nav>
   <!-- totop start -->
 <div id="totop">
-<a title="totop"><img src="/img/scrollup.png"/></a>
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
 </div>
 
 <!-- totop end -->

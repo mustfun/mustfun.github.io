@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Spring Boot  AOP系列之动态代理创建 | I Love pinpin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Spring Boot  AOP系列之动态代理创建  序言：在本文中，我会讲到Spring中如何创建动态代理，如何利用jdk或者cglib来创建动态代理，但是同时，我也会提及如何手动创建代理，这将有助于我们了解动态代理的原理。我们先来讲讲如何手动创建吧。  一、 手动创建之jdk动态代理1、 jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现Invocation">
+<meta name="keywords" content="Spring Boot">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Boot  AOP系列之动态代理创建">
+<meta property="og:url" content="http://yoursite.com/2017/10/30/Spring AOP系列之代理创建/index.html">
+<meta property="og:site_name" content="I Love pinpin">
+<meta property="og:description" content="Spring Boot  AOP系列之动态代理创建  序言：在本文中，我会讲到Spring中如何创建动态代理，如何利用jdk或者cglib来创建动态代理，但是同时，我也会提及如何手动创建代理，这将有助于我们了解动态代理的原理。我们先来讲讲如何手动创建吧。  一、 手动创建之jdk动态代理1、 jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现Invocation">
+<meta property="og:image" content="http://ojkdckcc1.bkt.clouddn.com/微信图片_20171030144249.png">
+<meta property="og:updated_time" content="2017-10-30T10:10:39.438Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring Boot  AOP系列之动态代理创建">
+<meta name="twitter:description" content="Spring Boot  AOP系列之动态代理创建  序言：在本文中，我会讲到Spring中如何创建动态代理，如何利用jdk或者cglib来创建动态代理，但是同时，我也会提及如何手动创建代理，这将有助于我们了解动态代理的原理。我们先来讲讲如何手动创建吧。  一、 手动创建之jdk动态代理1、 jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现Invocation">
+<meta name="twitter:image" content="http://ojkdckcc1.bkt.clouddn.com/微信图片_20171030144249.png">
+  
+    <link rel="alternative" href="/atom.xml" title="I Love pinpin" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">I Love pinpin</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">跟我们家品品打个招呼哈</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="yoursite.com">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-Spring AOP系列之代理创建" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/30/Spring AOP系列之代理创建/" class="article-date">
+  <time datetime="2017-10-30T04:22:01.000Z" itemprop="datePublished">2017-10-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Spring Boot  AOP系列之动态代理创建
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Spring-Boot-AOP系列之动态代理创建"><a href="#Spring-Boot-AOP系列之动态代理创建" class="headerlink" title="Spring Boot  AOP系列之动态代理创建"></a>Spring Boot  AOP系列之动态代理创建</h3><hr>
+<blockquote>
+<p>序言：在本文中，我会讲到Spring中如何创建动态代理，如何利用jdk或者cglib来创建动态代理，但是同时，我也会提及如何手动创建代理，这将有助于我们了解动态代理的原理。我们先来讲讲如何手动创建吧。</p>
+</blockquote>
+<h4 id="一、-手动创建之jdk动态代理"><a href="#一、-手动创建之jdk动态代理" class="headerlink" title="一、 手动创建之jdk动态代理"></a>一、 手动创建之jdk动态代理</h4><h5 id="1、-jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现InvocationHandler类，"><a href="#1、-jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现InvocationHandler类，" class="headerlink" title="1、 jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现InvocationHandler类，"></a>1、 jdk动态代理是基于接口的，所以必须要写一个接口，以及实现类，然后还需要写一个类来实现InvocationHandler类，</h5><p>接口如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Helloworld</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>实现类如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloworldImpl</span> <span class="keyword">implements</span> <span class="title">HelloWorld</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.print(<span class="string">"hello world"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>拦截类如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyInvocationHandler</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span></span>&#123;</div><div class="line">    <span class="keyword">private</span> Object target;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyInvocationHandler</span><span class="params">(Object target)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.target=target;</div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</div><div class="line">        System.out.println(<span class="string">"method :"</span>+ method.getName()+<span class="string">" is invoked!"</span>);</div><div class="line">        <span class="keyword">return</span> method.invoke(target,args);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>测试如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JDKProxyTest</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[]args)</span> <span class="keyword">throws</span> NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException </span>&#123;</div><div class="line">       <span class="comment">//重要的是这里的newProxyInstance方法，后面博文讲原理的时候会讲到为什么会植入切面的</span></div><div class="line">        HelloWorld helloWorld=(HelloWorld)Proxy.</div><div class="line">                 newProxyInstance(JDKProxyTest.class.getClassLoader(),</div><div class="line">                        <span class="keyword">new</span> Class&lt;?&gt;[]&#123;HelloWorld.class&#125;,</div><div class="line">                        <span class="keyword">new</span> MyInvocationHandler(<span class="keyword">new</span> HelloworldImpl()));</div><div class="line">        helloWorld.sayHello();</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="2、这里先教大家怎么做，以后教大家原理，现在依葫芦画瓢就行"><a href="#2、这里先教大家怎么做，以后教大家原理，现在依葫芦画瓢就行" class="headerlink" title="2、这里先教大家怎么做，以后教大家原理，现在依葫芦画瓢就行"></a>2、这里先教大家怎么做，以后教大家原理，现在依葫芦画瓢就行</h5><h4 id="二、手动创建之CGLIB代理"><a href="#二、手动创建之CGLIB代理" class="headerlink" title="二、手动创建之CGLIB代理"></a>二、手动创建之CGLIB代理</h4><h5 id="1、cglib代理和jdk代理目的差不多，但是cglib代理不仅可以代理接口，还可以代理类，比jdk代理作用-范围更加广泛一些，cglib代理借助了ASM这个非常强大的Java字节码生成框架"><a href="#1、cglib代理和jdk代理目的差不多，但是cglib代理不仅可以代理接口，还可以代理类，比jdk代理作用-范围更加广泛一些，cglib代理借助了ASM这个非常强大的Java字节码生成框架" class="headerlink" title="1、cglib代理和jdk代理目的差不多，但是cglib代理不仅可以代理接口，还可以代理类，比jdk代理作用 范围更加广泛一些，cglib代理借助了ASM这个非常强大的Java字节码生成框架"></a>1、cglib代理和jdk代理目的差不多，但是cglib代理不仅可以代理接口，还可以代理类，比jdk代理作用 范围更加广泛一些，cglib代理借助了ASM这个非常强大的Java字节码生成框架</h5><h5 id="2、demo如下"><a href="#2、demo如下" class="headerlink" title="2、demo如下"></a>2、demo如下</h5><p>  接口： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Subject</span> </span>&#123;    </div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">request</span><span class="params">()</span></span>;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>  实现：  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RealSubject</span> <span class="keyword">implements</span> <span class="title">Subject</span></span>&#123;    </div><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">request</span><span class="params">()</span></span>&#123;    </div><div class="line">       System.out.println(<span class="string">"From real subject."</span>);    </div><div class="line">   &#125;    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>处理类，也叫回调方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//实现了InvocationHandler,很重要</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DynamicSubjectHandler</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span>    </span></div><div class="line">&#123;    </div><div class="line">    <span class="keyword">private</span> Object obj;<span class="comment">//这是动态代理的好处，被封装的对象是Object类型，接受任意类型的对象    </span></div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DynamicSubject</span><span class="params">()</span>    </span></div><div class="line">    &#123;    </div><div class="line">    &#125;    </div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DynamicSubject</span><span class="params">(Object obj)</span>    </span></div><div class="line">    &#123;    </div><div class="line">        <span class="keyword">this</span>.obj = obj;    </div><div class="line">    &#125;    </div><div class="line">    </div><div class="line">    <span class="comment">//这个方法不是我们显示的去调用    </span></div><div class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable    </span></div><div class="line">    &#123;    </div><div class="line">        System.out.println(<span class="string">"before calling "</span> + method);    </div><div class="line">    </div><div class="line">        method.invoke(obj, args);    </div><div class="line">    </div><div class="line">        System.out.println(<span class="string">"after calling "</span> + method);    </div><div class="line">    </div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;    </div><div class="line">    &#125;    </div><div class="line">    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Test方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Client</span></span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</div><div class="line">        Enhancer enhancer = <span class="keyword">new</span> Enhancer();</div><div class="line">        enhancer.setSuperclass(RealSubject.class);<span class="comment">//继承被代理的那个类</span></div><div class="line">        enhancer.setCallback(<span class="keyword">new</span> DynamicSubjectHandler())<span class="comment">//设置回调类</span></div><div class="line">        RealSubject realSubject = (RealSubject)enhancer.create();<span class="comment">//创建代理对象</span></div><div class="line">        realSubject.request();</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="comment">//PS: 这段代码是我手敲的,大家粘贴的时候注意一下哈</span></div></pre></td></tr></table></figure>
+<p>#####2、执行main方法之后，DynamicSubjectHandler 中的invoke方法会被显式调用，打印出信息，原理后面我会介绍，详情关注下篇博文。</p>
+<h4 id="三、Spring-boot创建之JDK动态代理"><a href="#三、Spring-boot创建之JDK动态代理" class="headerlink" title="三、Spring boot创建之JDK动态代理"></a>三、Spring boot创建之JDK动态代理</h4><p>  事实上，spring对于代理的类的创建选用何种方法是有规律可寻的，详细可看一下源代码，如下：</p>
+<p><img src="http://ojkdckcc1.bkt.clouddn.com/微信图片_20171030144249.png" alt="spring如何选择代理类型"></p>
+<p>spring在创建代理的时候，会调用DefaultAopProxyFactory里面的createAopProxy方法，这个方法会取判断是使用jdk动态代理还是cglib代理。第一个参数，config.isOptimize()，这个方法是一个配置的，用于判断创建代理是否乐观（是否会经常改动），默认配置为false，第二个参数是不是目标代理类。第三个参数，<code>hasNoUserSuppliedProxyInterfaces()</code>这个方法，判断代理类的AdviseSupport处理类是不是只会指定SpringProxy这个接口，一般会返回true。当这些条件都不满足的时候，spring 默认走jdk动态代理。当满足这些条件中某一个的时候，去判断是不是接口或者已经是代理类，如果是接口或者已经是代理类的时候，就去走jdk动态代理，否者走cglib代理  </p>
+<p>OK，讲清楚了spring选择动态代理的原因之后，我们来看看怎么指定jdk动态代理。</p>
+<p>Spring boot配置jdk动态代理很简单，只需要在Spring boot配置文件中配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">spring.aop.proxy-target-class=false</div></pre></td></tr></table></figure>
+<p>然后自己写代理类的时候注意是接口就完毕啦。</p>
+<h4 id="四、Spring-boot创建之Cglib代理"><a href="#四、Spring-boot创建之Cglib代理" class="headerlink" title="四、Spring boot创建之Cglib代理"></a>四、Spring boot创建之Cglib代理</h4><p>同理，spring boot创建Cglib代理也很简单，直接配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">spring.aop.proxy-target-class=true</div></pre></td></tr></table></figure>
+<p>就可以强制使用cglib代理</p>
+<p>下篇博文介绍原理哈</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2017/10/30/Spring AOP系列之代理创建/" data-id="cj9e0xmmz0009j0j3mkn6jbw4" class="article-share-link" data-share="baidu" data-title="Spring Boot  AOP系列之动态代理创建">分享到</a>
+      
+
+      
+        <a href="http://yoursite.com/2017/10/30/Spring AOP系列之代理创建/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/10/30/Spring AOP系列之AOP原理介绍/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          Spring Boot  AOP系列之AOP原理介绍
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+  <section id="comments">
+    <div id="ds-thread" class="ds-thread" data-thread-key="2017/10/30/Spring AOP系列之代理创建/" data-title="Spring Boot  AOP系列之动态代理创建" data-url="http://yoursite.com/2017/10/30/Spring AOP系列之代理创建/"></div>
+  </section>
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Spring-Boot/" style="font-size: 15px;">Spring Boot</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 12.5px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 12.5px;">smarty</a> <a href="/tags/spring/" style="font-size: 12.5px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 17.5px;">多线程</a> <a href="/tags/大数据/" style="font-size: 12.5px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 12.5px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/10/30/Spring AOP系列之AOP原理介绍/">Spring Boot  AOP系列之AOP原理介绍</a>
+          </li>
+        
+          <li>
+            <a href="/2017/10/30/Spring AOP系列之代理创建/">Spring Boot  AOP系列之动态代理创建</a>
+          </li>
+        
+          <li>
+            <a href="/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/08/25/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/">Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://arvinxiang.com" target="_blank">主题作者</a>
+          </li>
+        
+          <li>
+            <a href="http://reqianduan.com" target="_blank">热前端</a>
+          </li>
+        
+          <li>
+            <a href="http://yuancheng.work" target="_blank">远程.work</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 itar<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/mustfun/landscape-plus-x" target="_blank">Landscape-plus-x by mustfun</a>
+    </div>
+  </div>
+  <script src="https://files.cnblogs.com/files/VergiLyn/canvas_nest.js"><script>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!-- 多说公共js代码 start -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"reqianduan"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共js代码 end -->
+
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+</div>
+</body>
+</html>

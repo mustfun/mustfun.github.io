@@ -1,0 +1,359 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Spring Boot  AOP系列之AOP原理介绍 | I Love pinpin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Spring Boot  AOP系列之AOP原理介绍  序言：在本文中，jdk动态代理和cglib代理的核心原理，我都会一一讲到，看本文的时候可以结合着上文看，了解创建的过程，创建的生命周期，才能知晓原理  一、JDK动态代理原理1、前言  其实大家看了上文的demo肯定会有所疑惑，为什么实现了一个InvocationHandler接口就可以实现切面的植入了，就可以在写好的函数方法上面，植入我们的">
+<meta name="keywords" content="Spring Boot">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Boot  AOP系列之AOP原理介绍">
+<meta property="og:url" content="http://yoursite.com/2017/10/30/Spring AOP系列之AOP原理介绍/index.html">
+<meta property="og:site_name" content="I Love pinpin">
+<meta property="og:description" content="Spring Boot  AOP系列之AOP原理介绍  序言：在本文中，jdk动态代理和cglib代理的核心原理，我都会一一讲到，看本文的时候可以结合着上文看，了解创建的过程，创建的生命周期，才能知晓原理  一、JDK动态代理原理1、前言  其实大家看了上文的demo肯定会有所疑惑，为什么实现了一个InvocationHandler接口就可以实现切面的植入了，就可以在写好的函数方法上面，植入我们的">
+<meta property="og:image" content="http://ojkdckcc1.bkt.clouddn.com//blog/weixin_43242342342342.jpg">
+<meta property="og:image" content="http://ojkdckcc1.bkt.clouddn.com//blog/微信图片_20171030165300.png">
+<meta property="og:updated_time" content="2017-10-30T10:10:09.602Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring Boot  AOP系列之AOP原理介绍">
+<meta name="twitter:description" content="Spring Boot  AOP系列之AOP原理介绍  序言：在本文中，jdk动态代理和cglib代理的核心原理，我都会一一讲到，看本文的时候可以结合着上文看，了解创建的过程，创建的生命周期，才能知晓原理  一、JDK动态代理原理1、前言  其实大家看了上文的demo肯定会有所疑惑，为什么实现了一个InvocationHandler接口就可以实现切面的植入了，就可以在写好的函数方法上面，植入我们的">
+<meta name="twitter:image" content="http://ojkdckcc1.bkt.clouddn.com//blog/weixin_43242342342342.jpg">
+  
+    <link rel="alternative" href="/atom.xml" title="I Love pinpin" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">I Love pinpin</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">跟我们家品品打个招呼哈</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="yoursite.com">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-Spring AOP系列之AOP原理介绍" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/30/Spring AOP系列之AOP原理介绍/" class="article-date">
+  <time datetime="2017-10-30T07:22:01.000Z" itemprop="datePublished">2017-10-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Spring Boot  AOP系列之AOP原理介绍
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Spring-Boot-AOP系列之AOP原理介绍"><a href="#Spring-Boot-AOP系列之AOP原理介绍" class="headerlink" title="Spring Boot  AOP系列之AOP原理介绍"></a>Spring Boot  AOP系列之AOP原理介绍</h3><hr>
+<blockquote>
+<p>序言：在本文中，jdk动态代理和cglib代理的核心原理，我都会一一讲到，看本文的时候可以结合着上文看，了解创建的过程，创建的生命周期，才能知晓原理</p>
+</blockquote>
+<h4 id="一、JDK动态代理原理"><a href="#一、JDK动态代理原理" class="headerlink" title="一、JDK动态代理原理"></a>一、JDK动态代理原理</h4><h5 id="1、前言"><a href="#1、前言" class="headerlink" title="1、前言"></a>1、前言</h5><p>  其实大家看了上文的demo肯定会有所疑惑，为什么实现了一个<code>InvocationHandler</code>接口就可以实现切面的植入了，就可以在写好的函数方法上面，植入我们的代码呢？是不是很神奇，惊不惊喜，意不意外。OK，废话不多说，下面跟着我的思路，走一遍源代码。</p>
+<h5 id="2、介绍"><a href="#2、介绍" class="headerlink" title="2、介绍"></a>2、介绍</h5><p>  上文中提到了，Spring jdk动态代理最核心的一句话莫过于下面这句话</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">HelloWorld helloWorld=(HelloWorld)Proxy.</div><div class="line">                 newProxyInstance(JDKProxyTest.class.getClassLoader(),</div><div class="line">                        <span class="keyword">new</span> Class&lt;?&gt;[]&#123;HelloWorld.class&#125;,</div><div class="line">                        <span class="keyword">new</span> MyInvocationHandler(<span class="keyword">new</span> HelloworldImpl()));</div></pre></td></tr></table></figure>
+<p>走进<code>newProxyInstance</code>这个方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">final</span> Class&lt;?&gt;[] intfs = interfaces.clone();</div><div class="line"><span class="keyword">final</span> SecurityManager sm = System.getSecurityManager();</div><div class="line"><span class="keyword">if</span> (sm != <span class="keyword">null</span>) &#123;</div><div class="line">  checkProxyAccess(Reflection.getCallerClass(), loader, intfs);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*</span></div><div class="line"> * 从缓存中取出或者生成代理</div><div class="line">*/</div><div class="line">Class&lt;?&gt; cl = getProxyClass0(loader, intfs);</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<p><code>getProxyClass0</code>核心方法片段如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> Class&lt;?&gt; getProxyClass0(ClassLoader loader,</div><div class="line">                                       Class&lt;?&gt;... interfaces) &#123;</div><div class="line">  <span class="keyword">if</span> (interfaces.length &gt; <span class="number">65535</span>) &#123;</div><div class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"interface limit exceeded"</span>);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="comment">// 如果已经创建了就从缓存里面拿，如果没有创建就通过ProxyClassFactory创建一个</span></div><div class="line">  <span class="keyword">return</span> proxyClassCache.get(loader, interfaces);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>proxyClassCache</code>是这样的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> WeakCache&lt;ClassLoader, Class&lt;?&gt;[], Class&lt;?&gt;&gt;</div><div class="line">        proxyClassCache = <span class="keyword">new</span> WeakCache&lt;&gt;(<span class="keyword">new</span> KeyFactory(), <span class="keyword">new</span> ProxyClassFactory());</div></pre></td></tr></table></figure>
+<p><code>ProxyClassFactory</code>是<code>Proxy</code>的一个静态内部类，实现了<code>WeakCache</code>的内部接口<code>BiFunction</code>的<code>apply</code>方法，代码如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">private static final class ProxyClassFactory  </div><div class="line">    implements BiFunction&lt;ClassLoader, Class&lt;?&gt;[], Class&lt;?&gt;&gt; &#123;  </div><div class="line">    // 所有代理类名字的前缀  </div><div class="line">    private static final String proxyClassNamePrefix = "$Proxy";  </div><div class="line">  </div><div class="line">    // 用于生成代理类名字的计数器  </div><div class="line">    private static final AtomicLong nextUniqueNumber = new AtomicLong();  </div><div class="line">  </div><div class="line">    @Override  </div><div class="line">    public Class&lt;?&gt; apply(ClassLoader loader, Class&lt;?&gt;[] interfaces) &#123;  </div><div class="line">        // 省略验证代理接口的代码……  </div><div class="line">  </div><div class="line">        String proxyPkg = null;     // 生成的代理类的包名  </div><div class="line">        // 对于非公共接口，代理类的包名与接口的相同  </div><div class="line">        for (Class&lt;?&gt; intf : interfaces) &#123;  </div><div class="line">            int flags = intf.getModifiers();  </div><div class="line">            if (!Modifier.isPublic(flags)) &#123;  </div><div class="line">                String name = intf.getName();  </div><div class="line">                int n = name.lastIndexOf('.');  </div><div class="line">                String pkg = ((n == -1) ? "" : name.substring(0, n + 1));  </div><div class="line">                if (proxyPkg == null) &#123;  </div><div class="line">                    proxyPkg = pkg;  </div><div class="line">                &#125; else if (!pkg.equals(proxyPkg)) &#123;  </div><div class="line">                    throw new IllegalArgumentException(  </div><div class="line">                        "non-public interfaces from different packages");  </div><div class="line">                &#125;  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">  </div><div class="line">        // 对于公共接口的包名，默认为com.sun.proxy  </div><div class="line">        if (proxyPkg == null) &#123;  </div><div class="line">            proxyPkg = ReflectUtil.PROXY_PACKAGE + ".";  </div><div class="line">        &#125;  </div><div class="line">  </div><div class="line">        // 获取计数  </div><div class="line">        long num = nextUniqueNumber.getAndIncrement();  </div><div class="line">        // 默认情况下，代理类的完全限定名为：com.sun.proxy.$Proxy0，com.sun.proxy.$Proxy1……依次递增  </div><div class="line">        String proxyName = proxyPkg + proxyClassNamePrefix + num;  </div><div class="line">  </div><div class="line">        // 这里才是真正的生成代理类的字节码的地方  </div><div class="line">        byte[] proxyClassFile = ProxyGenerator.generateProxyClass(  </div><div class="line">            proxyName, interfaces);  </div><div class="line">        try &#123;  </div><div class="line">            // 根据二进制字节码返回相应的Class实例  </div><div class="line">            return defineClass0(loader, proxyName,  </div><div class="line">                                proxyClassFile, 0, proxyClassFile.length);  </div><div class="line">        &#125; catch (ClassFormatError e) &#123;  </div><div class="line">            throw new IllegalArgumentException(e.toString());  </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们注意一下这行代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">byte</span>[] proxyClassFile = ProxyGenerator.generateProxyClass(</div><div class="line">               proxyName, interfaces, accessFlags);</div></pre></td></tr></table></figure>
+<p>进去：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">byte</span>[] generateProxyClass(<span class="keyword">final</span> String var0, Class&lt;?&gt;[] var1, <span class="keyword">int</span> var2) &#123;</div><div class="line">        ProxyGenerator var3 = <span class="keyword">new</span> ProxyGenerator(var0, var1, var2);</div><div class="line">        <span class="keyword">final</span> <span class="keyword">byte</span>[] var4 = var3.generateClassFile();</div><div class="line">   <span class="comment">//saveGeneratedFiles 这个参数是经我们配置的，默认是false，目的是是否保存在磁盘里面</span></div><div class="line">        <span class="keyword">if</span> (saveGeneratedFiles) &#123;</div><div class="line">            AccessController.doPrivileged(<span class="keyword">new</span> PrivilegedAction&lt;Void&gt;() &#123;</div><div class="line">                <span class="function"><span class="keyword">public</span> Void <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                    <span class="keyword">try</span> &#123;</div><div class="line">                        <span class="keyword">int</span> var1 = var0.lastIndexOf(<span class="number">46</span>);</div><div class="line">                        Path var2;</div><div class="line">                        <span class="keyword">if</span> (var1 &gt; <span class="number">0</span>) &#123;</div><div class="line">                            Path var3 = Paths.get(var0.substring(<span class="number">0</span>, var1).replace(<span class="string">'.'</span>, File.separatorChar));</div><div class="line">                            Files.createDirectories(var3);</div><div class="line">                            var2 = var3.resolve(var0.substring(var1 + <span class="number">1</span>, var0.length()) + <span class="string">".class"</span>);</div><div class="line">                        &#125; <span class="keyword">else</span> &#123;</div><div class="line">                            var2 = Paths.get(var0 + <span class="string">".class"</span>);</div><div class="line">                        &#125;</div><div class="line"></div><div class="line">                        Files.write(var2, var4, <span class="keyword">new</span> OpenOption[<span class="number">0</span>]);</div><div class="line">                        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">                    &#125; <span class="keyword">catch</span> (IOException var4x) &#123;</div><div class="line">                        <span class="keyword">throw</span> <span class="keyword">new</span> InternalError(<span class="string">"I/O exception saving generated file: "</span> + var4x);</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> var4;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">boolean</span> saveGeneratedFiles = ((Boolean)AccessController.doPrivileged(<span class="keyword">new</span> GetBooleanAction(<span class="string">"sun.misc.ProxyGenerator.saveGeneratedFiles"</span>))).booleanValue();</div></pre></td></tr></table></figure>
+<p>在启动项目的时候，虚拟机设置一下这个参数<code>sun.misc.ProxyGenerator.saveGeneratedFiles</code>为true，就可以打印出代理对象的字节码文件。</p>
+<p>PS:其实我们还有很多方法获取字节码文件，后文中介绍</p>
+<p>OK，我们看下我们生成的字节码文件长什么样子：</p>
+<p><img src="http://ojkdckcc1.bkt.clouddn.com//blog/weixin_43242342342342.jpg" alt="jdk代理class文件"></p>
+<p>我们可以清楚的看到生成的代理文件，实现了我们的自己需要的代理的接口<code>QueryUserInfoBiz</code> ，实现了<code>SpringProxy</code>接口 ，继承了<code>Proxy</code>类等。再来看看我们普通的一个方法，是如何被代理的。</p>
+<p><code>insertUserInfoV5</code>这个方法被代理之后，被植入了一段代码，<code>super.h.invoke</code>方法 , super表示Proxy这个夫类，h表示Proxy里面的一个属性，是<code>InvocationHandler</code>类型的，回忆一下，我们在手动创建jdk动态代理的时候，是不是需要指定一个<code>InvocationHandler</code>，这里就是起这个作用的，比如说在上个例子中，是我们自己写的<code>MyInvocationHandler</code>类，但是在Spring中，我们没有指定这个<code>handler</code>，那到底调用的是谁呢？</p>
+<p>接上回：</p>
+<p>在我们最开始用缓存创建那一段的时候，后面还有这样一段代码。这段代码的作用是让handler作为参数调用构造方法来获得代理类的实例</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">if</span> (sm != <span class="keyword">null</span>) &#123;</div><div class="line">                checkNewProxyPermission(Reflection.getCallerClass(), cl);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">final</span> Constructor&lt;?&gt; cons = cl.getConstructor(constructorParams);</div><div class="line">            <span class="keyword">final</span> InvocationHandler ih = h;</div><div class="line">            <span class="keyword">if</span> (!Modifier.isPublic(cl.getModifiers())) &#123;</div><div class="line">                AccessController.doPrivileged(<span class="keyword">new</span> PrivilegedAction&lt;Void&gt;() &#123;</div><div class="line">                    <span class="function"><span class="keyword">public</span> Void <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                        cons.setAccessible(<span class="keyword">true</span>);</div><div class="line">                        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">                    &#125;</div><div class="line">                &#125;);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> cons.newInstance(<span class="keyword">new</span> Object[]&#123;h&#125;);</div></pre></td></tr></table></figure>
+<p>实际上，调用者是，一般而言，谁去准备创建proxy，谁一般就是这个handler，比如我们这里讲的aop里面，创建者就是<code>JdkDynamicAopProxy</code>这个类，这个类他实现了<code>InvocationHandler</code>接口，所以他被作为参数传进去了，自然而言，当代理类里面的方法被调用的时候，他的invoke方法就会被唤醒。</p>
+<h4 id="二、CGLib原理介绍"><a href="#二、CGLib原理介绍" class="headerlink" title="二、CGLib原理介绍"></a>二、CGLib原理介绍</h4><p>我们再来看看Cglib代理  </p>
+<p>先来看看Cglib手动创建的一个简单代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Enhancer enhancer = <span class="keyword">new</span> Enhancer();</div><div class="line">enhancer.setSuperclass(RealSubject.class);<span class="comment">//继承被代理的那个类</span></div><div class="line">enhancer.setCallback(<span class="keyword">new</span> DynamicSubjectHandler())<span class="comment">//设置回调类</span></div><div class="line">RealSubject realSubject = (RealSubject)enhancer.create();<span class="comment">//创建代理对象</span></div></pre></td></tr></table></figure>
+<p>核心方法自然是<code>create</code>方法，走进去看一下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">create</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.classOnly = <span class="keyword">false</span>;</div><div class="line">        <span class="keyword">this</span>.argumentTypes = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.createHelper();</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p><code>createHelper</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> Object <span class="title">createHelper</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.validate();</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.superclass != <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">this</span>.setNamePrefix(<span class="keyword">this</span>.superclass.getName());</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">this</span>.interfaces != <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">this</span>.setNamePrefix(<span class="keyword">this</span>.interfaces[ReflectUtils.findPackageProtected(<span class="keyword">this</span>.interfaces)].getName());</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.create(KEY_FACTORY.newInstance(<span class="keyword">this</span>.superclass != <span class="keyword">null</span> ? <span class="keyword">this</span>.superclass.getName() : <span class="keyword">null</span>, ReflectUtils.getNames(<span class="keyword">this</span>.interfaces), <span class="keyword">this</span>.filter, <span class="keyword">this</span>.callbackTypes, <span class="keyword">this</span>.useFactory, <span class="keyword">this</span>.interceptDuringConstruction, <span class="keyword">this</span>.serialVersionUID));</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>调用了<code>super.create</code>方法，核心代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//如果还没有生成，就走生成逻辑</span></div><div class="line"><span class="keyword">if</span> (gen == <span class="keyword">null</span>) &#123;</div><div class="line">  <span class="keyword">byte</span>[] b = <span class="keyword">this</span>.strategy.generate(<span class="keyword">this</span>);</div><div class="line">  String className = ClassNameReader.getClassName(<span class="keyword">new</span> ClassReader(b));</div><div class="line">  <span class="keyword">this</span>.getClassNameCache(loader).add(className);</div><div class="line">  gen = ReflectUtils.defineClass(className, b, loader);</div><div class="line">&#125;</div><div class="line"><span class="comment">//生成的代理类放在缓存里面</span></div><div class="line"><span class="keyword">if</span> (<span class="keyword">this</span>.useCache) &#123;</div><div class="line">  ((Map)cache2).put(key, <span class="keyword">new</span> WeakReference(gen));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后看<code>generate方法</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">byte</span>[] generate(ClassGenerator cg) <span class="keyword">throws</span> Exception &#123;</div><div class="line">  DebuggingClassWriter cw = <span class="keyword">this</span>.getClassVisitor();</div><div class="line">  <span class="keyword">this</span>.transform(cg).generateClass(cw);</div><div class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.transform(cw.toByteArray());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>再看<code>generateClass</code>方法，这个就是生成代理文件的最核心逻辑了，先看<code>Enhancer</code>里面的<code>generateClass</code> 方法，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">ClassEmitter e = <span class="keyword">new</span> ClassEmitter(v);</div><div class="line">            e.begin_class(<span class="number">46</span>, <span class="number">1</span>, <span class="keyword">this</span>.getClassName(), Type.getType(sc), <span class="keyword">this</span>.useFactory ? TypeUtils.add(TypeUtils.getTypes(<span class="keyword">this</span>.interfaces), FACTORY) : TypeUtils.getTypes(<span class="keyword">this</span>.interfaces), <span class="string">"&lt;generated&gt;"</span>);</div><div class="line">            List constructorInfo = CollectionUtils.transform(constructors, MethodInfoTransformer.getInstance());</div><div class="line">            e.declare_field(<span class="number">2</span>, <span class="string">"CGLIB$BOUND"</span>, Type.BOOLEAN_TYPE, (Object)<span class="keyword">null</span>);</div><div class="line">            <span class="keyword">if</span> (!<span class="keyword">this</span>.interceptDuringConstruction) &#123;</div><div class="line">                e.declare_field(<span class="number">2</span>, <span class="string">"CGLIB$CONSTRUCTED"</span>, Type.BOOLEAN_TYPE, (Object)<span class="keyword">null</span>);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            e.declare_field(<span class="number">26</span>, <span class="string">"CGLIB$THREAD_CALLBACKS"</span>, THREAD_LOCAL, (Object)<span class="keyword">null</span>);</div><div class="line">            e.declare_field(<span class="number">26</span>, <span class="string">"CGLIB$STATIC_CALLBACKS"</span>, CALLBACK_ARRAY, (Object)<span class="keyword">null</span>);</div><div class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.serialVersionUID != <span class="keyword">null</span>) &#123;</div><div class="line">                e.declare_field(<span class="number">26</span>, <span class="string">"serialVersionUID"</span>, Type.LONG_TYPE, <span class="keyword">this</span>.serialVersionUID);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.callbackTypes.length; ++i) &#123;</div><div class="line">                e.declare_field(<span class="number">2</span>, getCallbackField(i), <span class="keyword">this</span>.callbackTypes[i], (Object)<span class="keyword">null</span>);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">this</span>.emitMethods(e, methods, actualMethods);</div><div class="line">            <span class="keyword">this</span>.emitConstructors(e, constructorInfo);</div><div class="line">            <span class="keyword">this</span>.emitSetThreadCallbacks(e);</div><div class="line">            <span class="keyword">this</span>.emitSetStaticCallbacks(e);</div><div class="line">            <span class="keyword">this</span>.emitBindCallbacks(e);</div><div class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.useFactory) &#123;</div><div class="line">                <span class="keyword">int</span>[] keys = <span class="keyword">this</span>.getCallbackKeys();</div><div class="line">                <span class="keyword">this</span>.emitNewInstanceCallbacks(e);</div><div class="line">                <span class="keyword">this</span>.emitNewInstanceCallback(e);</div><div class="line">                <span class="keyword">this</span>.emitNewInstanceMultiarg(e, constructorInfo);</div><div class="line">                <span class="keyword">this</span>.emitGetCallback(e, keys);</div><div class="line">                <span class="keyword">this</span>.emitSetCallback(e, keys);</div><div class="line">                <span class="keyword">this</span>.emitGetCallbacks(e);</div><div class="line">                <span class="keyword">this</span>.emitSetCallbacks(e);</div><div class="line">            &#125;</div></pre></td></tr></table></figure>
+<p>这段就是生成字节码的核心逻辑，这段里面有很复杂的调用逻辑，我们这里不作详细介绍。</p>
+<p>我们也有办法拿到CGLIB生成的代理文件，我这里不赘述，后面开一篇博客讲，这里面也挺麻烦的，当初我也找了很久。</p>
+<p>OK，我们来看一下某一份生成好的代理字节码文件</p>
+<p><img src="http://ojkdckcc1.bkt.clouddn.com//blog/微信图片_20171030165300.png" alt="CGlib生成的字节码文件"></p>
+<p>这个代理类继承了我们被代理的类或者接口，然后实现了<code>SpringProxy</code>、<code>Advised</code>接口等, 首先当我们调用<code>addOneCityV8</code>方法的时候，代理类会先去看<code>CGLIB$CALLBACK_0</code> 这个属性为不为空，这个是一个<code>MethodIntercepter</code>类型的 ，如果为空就调用一个绑定方法，<code>CGLIB$BIND_CALLBACKS</code> ，它负责从一个叫做<code>CGLIB$THREAD_CALLBACKS</code> 的ThreadLocal对象中拿或者叫做<code>CGLIB$STATIC_CALLBACKS</code>的<code>Callback</code>数组中拿。拿到了之后就执行<code>intercept</code>方法。</p>
+<p>那么这里有个问题，回调类到底是如何选择的呢？</p>
+<p>这里的处理逻辑和JDK动态代理类似，回调类基于一种，谁创建，谁负责的逻辑，已AOP创建动态代理为例，<code>CglibAopProxy</code>这个类在创建代理的时候，会调用一个 <code>getCallbacks</code>方法，在<code>CglibAopProxy</code> 中可以搜索到，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">boolean</span> exposeProxy = <span class="keyword">this</span>.advised.isExposeProxy();</div><div class="line">		<span class="keyword">boolean</span> isFrozen = <span class="keyword">this</span>.advised.isFrozen();</div><div class="line">		<span class="keyword">boolean</span> isStatic = <span class="keyword">this</span>.advised.getTargetSource().isStatic();</div><div class="line"></div><div class="line">		<span class="comment">// Choose an "aop" interceptor (used for AOP calls).</span></div><div class="line">		Callback aopInterceptor = <span class="keyword">new</span> DynamicAdvisedInterceptor(<span class="keyword">this</span>.advised);</div><div class="line"></div><div class="line">		<span class="comment">// Choose a "straight to target" interceptor. (used for calls that are</span></div><div class="line">		<span class="comment">// unadvised but can return this). May be required to expose the proxy.</span></div><div class="line">		Callback targetInterceptor;</div><div class="line">		<span class="keyword">if</span> (exposeProxy) &#123;</div><div class="line">			targetInterceptor = isStatic ?</div><div class="line">					<span class="keyword">new</span> StaticUnadvisedExposedInterceptor(<span class="keyword">this</span>.advised.getTargetSource().getTarget()) :</div><div class="line">					<span class="keyword">new</span> DynamicUnadvisedExposedInterceptor(<span class="keyword">this</span>.advised.getTargetSource());</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">else</span> &#123;</div><div class="line">			targetInterceptor = isStatic ?</div><div class="line">					<span class="keyword">new</span> StaticUnadvisedInterceptor(<span class="keyword">this</span>.advised.getTargetSource().getTarget()) :</div><div class="line">					<span class="keyword">new</span> DynamicUnadvisedInterceptor(<span class="keyword">this</span>.advised.getTargetSource());</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="comment">// Choose a "direct to target" dispatcher (used for</span></div><div class="line">		<span class="comment">// unadvised calls to static targets that cannot return this).</span></div><div class="line">		Callback targetDispatcher = isStatic ?</div><div class="line">				<span class="keyword">new</span> StaticDispatcher(<span class="keyword">this</span>.advised.getTargetSource().getTarget()) : <span class="keyword">new</span> SerializableNoOp();</div><div class="line"></div><div class="line">		Callback[] mainCallbacks = <span class="keyword">new</span> Callback[] &#123;</div><div class="line">				aopInterceptor,  <span class="comment">// for normal advice</span></div><div class="line">				targetInterceptor,  <span class="comment">// invoke target without considering advice, if optimized</span></div><div class="line">				<span class="keyword">new</span> SerializableNoOp(),  <span class="comment">// no override for methods mapped to this</span></div><div class="line">				targetDispatcher, <span class="keyword">this</span>.advisedDispatcher,</div><div class="line">				<span class="keyword">new</span> EqualsInterceptor(<span class="keyword">this</span>.advised),</div><div class="line">				<span class="keyword">new</span> HashCodeInterceptor(<span class="keyword">this</span>.advised)</div><div class="line">		&#125;;</div></pre></td></tr></table></figure>
+<p>根据摘取的部分片段可以得知，他是跟配置相关的，如果你没有作任何配置，那么系统一般首选<code>DynamicAdvisedInterceptor</code> 这个拦截器。也就是回调类就是<code>DynamicAdvisedInterceptor</code> ，会调用他里面的<code>intercept</code>方法。</p>
+<p>完毕。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2017/10/30/Spring AOP系列之AOP原理介绍/" data-id="cj9e0xmmw0008j0j3v15wg6tk" class="article-share-link" data-share="baidu" data-title="Spring Boot  AOP系列之AOP原理介绍">分享到</a>
+      
+
+      
+        <a href="http://yoursite.com/2017/10/30/Spring AOP系列之AOP原理介绍/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/10/30/Spring AOP系列之代理创建/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">Spring Boot  AOP系列之动态代理创建</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+  <section id="comments">
+    <div id="ds-thread" class="ds-thread" data-thread-key="2017/10/30/Spring AOP系列之AOP原理介绍/" data-title="Spring Boot  AOP系列之AOP原理介绍" data-url="http://yoursite.com/2017/10/30/Spring AOP系列之AOP原理介绍/"></div>
+  </section>
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Spring-Boot/" style="font-size: 15px;">Spring Boot</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 12.5px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 12.5px;">smarty</a> <a href="/tags/spring/" style="font-size: 12.5px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 17.5px;">多线程</a> <a href="/tags/大数据/" style="font-size: 12.5px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 12.5px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/10/30/Spring AOP系列之AOP原理介绍/">Spring Boot  AOP系列之AOP原理介绍</a>
+          </li>
+        
+          <li>
+            <a href="/2017/10/30/Spring AOP系列之代理创建/">Spring Boot  AOP系列之动态代理创建</a>
+          </li>
+        
+          <li>
+            <a href="/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/08/25/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/">Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://arvinxiang.com" target="_blank">主题作者</a>
+          </li>
+        
+          <li>
+            <a href="http://reqianduan.com" target="_blank">热前端</a>
+          </li>
+        
+          <li>
+            <a href="http://yuancheng.work" target="_blank">远程.work</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 itar<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/mustfun/landscape-plus-x" target="_blank">Landscape-plus-x by mustfun</a>
+    </div>
+  </div>
+  <script src="https://files.cnblogs.com/files/VergiLyn/canvas_nest.js"><script>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!-- 多说公共js代码 start -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"reqianduan"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共js代码 end -->
+
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+</div>
+</body>
+</html>

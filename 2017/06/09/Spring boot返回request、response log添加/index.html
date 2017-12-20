@@ -23,13 +23,13 @@
 <meta property="og:url" content="http://yoursite.com/2017/06/09/Spring boot返回request、response log添加/index.html">
 <meta property="og:site_name" content="dzy&#39;s blog">
 <meta property="og:description" content="Spring boot返回request、response 添加log目前有个需求需要给接口返回添加输入输出日志，目前比价常用的方法就是使用过滤器，就可以很方便的拦截到输入请求和输出请求，那么在过滤器里面如何HttpServletRequest HttpServletRequest这两个对象输入和输出日志呢？ 解决办法事实上javax包里面本来就提供HttpServletRequstWrapper">
-<meta property="og:image" content="http://ojkdckcc1.bkt.clouddn.com/微信截图_20170526190609.png">
-<meta property="og:image" content="http://ojkdckcc1.bkt.clouddn.com/微信截图_20170609133912.png">
-<meta property="og:updated_time" content="2017-06-09T06:47:45.893Z">
+<meta property="og:image" content="https://ojkdckcc1.bkt.clouddn.com/微信截图_20170526190609.png">
+<meta property="og:image" content="https://ojkdckcc1.bkt.clouddn.com/微信截图_20170609133912.png">
+<meta property="og:updated_time" content="2017-12-20T02:07:57.908Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="spring boot给接口返回添加输入输出日志">
 <meta name="twitter:description" content="Spring boot返回request、response 添加log目前有个需求需要给接口返回添加输入输出日志，目前比价常用的方法就是使用过滤器，就可以很方便的拦截到输入请求和输出请求，那么在过滤器里面如何HttpServletRequest HttpServletRequest这两个对象输入和输出日志呢？ 解决办法事实上javax包里面本来就提供HttpServletRequstWrapper">
-<meta name="twitter:image" content="http://ojkdckcc1.bkt.clouddn.com/微信截图_20170526190609.png">
+<meta name="twitter:image" content="https://ojkdckcc1.bkt.clouddn.com/微信截图_20170526190609.png">
   
     <link rel="alternative" href="/atom.xml" title="dzy&#39;s blog" type="application/atom+xml">
   
@@ -117,9 +117,9 @@
 <p>LoggingFilter是一种filter，继承OncePerRequestFilter，每次请求都会经过他。</p>
 <p>主要代码就是上面这样的，我把代码放到了<a href="https://git.oschina.net/mfun/request-response-test.git" target="_blank" rel="external">这里</a>大家可以下载借鉴</p>
 <h4 id="源码解析"><a href="#源码解析" class="headerlink" title="源码解析"></a>源码解析</h4><p>SpringMVC在处理完毕请求之后，会调用<code>AbstractMessageConverterMethodProcessor</code>里的<code>writeWithMessageConverters</code>方法，然后会调用<code>AbstractGenericHttpMessageConverter</code> 的write方法，把返回的接口输出到HttpOutputMessage里面去，事实上，然后会调用WriteInternal方法</p>
-<p><img src="http://ojkdckcc1.bkt.clouddn.com/微信截图_20170526190609.png" alt=""></p>
+<p><img src="https://ojkdckcc1.bkt.clouddn.com/微信截图_20170526190609.png" alt=""></p>
 <p>然后里面有getBody（）方法，然后里面就调用到了我们的getOutputStream方法，终于走到我们写的方法了</p>
-<p><img src="http://ojkdckcc1.bkt.clouddn.com/微信截图_20170609133912.png" alt=""></p>
+<p><img src="https://ojkdckcc1.bkt.clouddn.com/微信截图_20170609133912.png" alt=""></p>
 <p>然后我们就可以处理这个流了</p>
 <p>主要是copy了一份，然后再filter里面打印了出来</p>
 <p>完毕</p>
@@ -129,7 +129,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/06/09/Spring boot返回request、response log添加/" data-id="cjbdelvfy001gokj38x4xo82v" class="article-share-link" data-share="baidu" data-title="spring boot给接口返回添加输入输出日志">Share</a>
+        <a data-url="http://yoursite.com/2017/06/09/Spring boot返回request、response log添加/" data-id="cjbef577e0023mcj3ufarc0bx" class="article-share-link" data-share="baidu" data-title="spring boot给接口返回添加输入输出日志">Share</a>
       
 
       

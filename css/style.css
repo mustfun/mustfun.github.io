@@ -2131,7 +2131,7 @@ ol.toc {
 }
 .highlight {
   color: #ddd;
-  background: #272822;
+  background: url("images/code-bk.png");
 }
 .highlight .code .tag,
 .highlight .code .keyword,

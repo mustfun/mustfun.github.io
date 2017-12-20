@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-10-30T10:10:09.602Z</updated>
+  <updated>2017-12-20T05:34:43.239Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yoursite.com/2017/10/30/Spring%20AOP%E7%B3%BB%E5%88%97%E4%B9%8BAOP%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/"/>
     <id>http://yoursite.com/2017/10/30/Spring AOP系列之AOP原理介绍/</id>
     <published>2017-10-30T07:22:01.000Z</published>
-    <updated>2017-10-30T10:10:09.602Z</updated>
+    <updated>2017-12-20T05:34:43.239Z</updated>
     
     <content type="html"><![CDATA[<h3 id="Spring-Boot-AOP系列之AOP原理介绍"><a href="#Spring-Boot-AOP系列之AOP原理介绍" class="headerlink" title="Spring Boot  AOP系列之AOP原理介绍"></a>Spring Boot  AOP系列之AOP原理介绍</h3><hr>
 <blockquote>
@@ -92,6 +92,8 @@
     
     </summary>
     
+      <category term="Spring Boot" scheme="http://yoursite.com/categories/Spring-Boot/"/>
+    
     
       <category term="Spring Boot" scheme="http://yoursite.com/tags/Spring-Boot/"/>
     
@@ -102,7 +104,7 @@
     <link href="http://yoursite.com/2017/10/30/Spring%20AOP%E7%B3%BB%E5%88%97%E4%B9%8B%E4%BB%A3%E7%90%86%E5%88%9B%E5%BB%BA/"/>
     <id>http://yoursite.com/2017/10/30/Spring AOP系列之代理创建/</id>
     <published>2017-10-30T04:22:01.000Z</published>
-    <updated>2017-10-30T10:10:39.438Z</updated>
+    <updated>2017-12-20T05:34:54.039Z</updated>
     
     <content type="html"><![CDATA[<h3 id="Spring-Boot-AOP系列之动态代理创建"><a href="#Spring-Boot-AOP系列之动态代理创建" class="headerlink" title="Spring Boot  AOP系列之动态代理创建"></a>Spring Boot  AOP系列之动态代理创建</h3><hr>
 <blockquote>
@@ -152,6 +154,8 @@
     
     </summary>
     
+      <category term="Spring Boot" scheme="http://yoursite.com/categories/Spring-Boot/"/>
+    
     
       <category term="Spring Boot" scheme="http://yoursite.com/tags/Spring-Boot/"/>
     
@@ -159,10 +163,49 @@
   
   <entry>
     <title></title>
-    <link href="http://yoursite.com/2017/08/25/Spring%20Boot%20%E9%9B%86%E6%88%90%20resteasy%E7%AF%87%20%E2%80%94%20jax-rs%E5%88%9D%E6%AD%A5%E4%BB%8B%E7%BB%8D%E5%92%8Cspring%20boot%E9%9B%86%E6%88%90/"/>
-    <id>http://yoursite.com/2017/08/25/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/</id>
-    <published>2017-08-25T06:47:27.655Z</published>
-    <updated>2017-08-23T03:25:48.740Z</updated>
+    <link href="http://yoursite.com/2017/08/25/Fastjson%E8%A7%A3%E6%9E%90%E5%A4%9A%E7%BA%A7%E6%B3%9B%E5%9E%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F%E2%80%94%E6%96%B0%E5%A2%9E%E4%BD%BF%E7%94%A8class%E6%96%87%E4%BB%B6%E6%9D%A5%E8%A7%A3%E6%9E%90%E5%A4%9A%E7%BA%A7%E6%B3%9B%E5%9E%8B/"/>
+    <id>http://yoursite.com/2017/08/25/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/</id>
+    <published>2017-08-25T06:47:27.651Z</published>
+    <updated>2017-08-25T06:42:49.984Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="Fastjson解析多级泛型"><a href="#Fastjson解析多级泛型" class="headerlink" title="Fastjson解析多级泛型"></a>Fastjson解析多级泛型</h3><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>现在网上大多数是使用<code>TypeReference</code> 方式来解析JSON数据，这里我提供另外一种方式来解析，使用类文件进行解析，两种方式我都会给出实际代码</p>
+<h4 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h4><h5 id="TypeReference方式"><a href="#TypeReference方式" class="headerlink" title="TypeReference方式"></a>TypeReference方式</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span></div><div class="line">   <span class="meta">@Path</span>(<span class="string">"getUserCourse"</span>)</div><div class="line">   <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">   <span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourse()&#123;</div><div class="line">       <span class="keyword">return</span> externalBiz.getUserCourse();</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourse()&#123;</div><div class="line">        String result = restTemplate.getForObject(MOCK_JSON_URL, String.class);</div><div class="line">        <span class="keyword">return</span> JSONObject.parseObject(result, <span class="keyword">new</span> TypeReference&lt;Result&lt;List&lt;UserCourseDto&gt;&gt;&gt;() &#123;&#125;);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p><strong>浏览器访问：</strong><code>http://localhost:8080/v1/province/getUserCourse</code></p>
+<p>可以得到json返回的结果</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  status: 0,</div><div class="line">  message: "1",</div><div class="line">  data: [</div><div class="line">    &#123;</div><div class="line">      openType: "兑换 ",</div><div class="line">      userID: 30014,</div><div class="line">      classID: 10376,</div><div class="line">      className: "趣味职场俚语课程【11月班】",</div><div class="line">      chargeFee: 106,</div><div class="line">      classStudyTime: null,</div><div class="line">      openRMB: 0,</div><div class="line">      rechargeFee: 0,</div><div class="line">      awardFee: 0,</div><div class="line">      openFee: 0,</div><div class="line">      dateAdded: 1312175789393,</div><div class="line">      expiredDate: 1323964800000</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>介绍：</strong></p>
+<p>这里使用了提供的TypeReference进行包装，能够清晰明了进行解析多级泛型，但是有时候，我们做一些通用的解析框架的时候，可能会用T类型，T类型拿到的是字节码文件，或者class对象，又该怎么处理呢？请看下面介绍。</p>
+<h4 id="class类方式"><a href="#class类方式" class="headerlink" title="class类方式"></a>class类方式</h4><p><strong>接口：</strong></p>
+<p>接口之类用了一个注解来处理的，没有直接传class对象过去，因为在实际项目中，基本都是注解，没有谁会直接传class对象。所以我传的Annotation数组过去啦</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span></div><div class="line">   <span class="meta">@Reader</span>(extParamClass = &#123;Result.class,List.class,UserCourseDto.class&#125;)</div><div class="line">   <span class="meta">@Path</span>(<span class="string">"getUserCourseV2"</span>)</div><div class="line">   <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">   <span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourseV2()&#123;</div><div class="line">       Annotation[] annotations = <span class="keyword">new</span> Annotation[<span class="number">0</span>];</div><div class="line">       <span class="keyword">for</span> (Method method : <span class="keyword">this</span>.getClass().getMethods()) &#123;</div><div class="line">           <span class="keyword">if</span> (method.getName().equals(<span class="string">"getUserCourseV2"</span>))&#123;</div><div class="line">               annotations = method.getAnnotations();</div><div class="line">           &#125;</div><div class="line">       &#125;</div><div class="line">       <span class="keyword">return</span> externalBiz.getUserCourseV2(annotations);</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p><strong>处理：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourseV2(Annotation[] annotations) &#123;</div><div class="line">        <span class="keyword">final</span> Reader[] readers = &#123;<span class="keyword">null</span>&#125;;</div><div class="line">        <span class="keyword">if</span>(annotations != <span class="keyword">null</span>) &#123;</div><div class="line">            Arrays</div><div class="line">                    .stream(annotations)</div><div class="line">                    .filter(annotation -&gt; annotation.annotationType().equals(Reader.class))</div><div class="line">                    .findFirst().ifPresent(x -&gt; readers[<span class="number">0</span>] = (Reader) x);</div><div class="line">        &#125;</div><div class="line">        Class[] classes = readers[<span class="number">0</span>].extParamClass();</div><div class="line">        String result = restTemplate.getForObject(MOCK_JSON_URL, String.class);</div><div class="line">        <span class="comment">//这里不用TypeReference方式，直接用class对象来处理</span></div><div class="line"></div><div class="line">        ParameterizedTypeImpl beforeType = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">if</span> (classes.length!=<span class="number">0</span>)&#123;</div><div class="line">            <span class="comment">//支持多级泛型的解析</span></div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = classes.length-<span class="number">1</span>; i &gt;<span class="number">0</span> ; i--) &#123;</div><div class="line">                beforeType = <span class="keyword">new</span> ParameterizedTypeImpl(<span class="keyword">new</span> Type[]&#123;beforeType == <span class="keyword">null</span>? classes[i]:beforeType&#125;, <span class="keyword">null</span>, classes[i - <span class="number">1</span>]);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span>  JSON.parseObject(result,beforeType);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>代码评析：</strong></p>
+<p>主要起作用的还是这两行代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = classes.length-<span class="number">1</span>; i &gt;<span class="number">0</span> ; i--) &#123;</div><div class="line">                beforeType = <span class="keyword">new</span> ParameterizedTypeImpl(<span class="keyword">new</span> Type[]&#123;beforeType == <span class="keyword">null</span>? classes[i]:beforeType&#125;, <span class="keyword">null</span>, classes[i - <span class="number">1</span>]);</div><div class="line">            &#125;</div></pre></td></tr></table></figure>
+<p>主要意思是将你的class对象包装成一个ParameterizedTypeImpl，使用ParameterizedTypeImpl来解析多级泛型，但是要注意的是，每层泛型，都需要用一个ParameterizedTypeImpl对象进行包装起来才会起作用，因为他会有一个<code>actualTypeArguments</code> 和一个 <code>rawType</code> ，在多级泛型中，用我这里的例子说明，第一层的时候<code>rawType</code>  会是一个<code>Result</code>对象，而<code>actualTypeArguments</code> 会是一个包装过后的<code>ParameterizedTypeImpl</code>对象，第二层的时候，<code>rawType</code>  会是一个List对象，而<code>actualTypeArguments</code> 会是包装上一层的对象。后同。PS : 如果这里不知道我说的是什么，请调试的时候结合来看哈</p>
+<p>最后也可以正确解析哈~</p>
+<blockquote>
+<p>END</p>
+</blockquote>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;Fastjson解析多级泛型&quot;&gt;&lt;a href=&quot;#Fastjson解析多级泛型&quot; class=&quot;headerlink&quot; title=&quot;Fastjson解析多级泛型&quot;&gt;&lt;/a&gt;Fastjson解析多级泛型&lt;/h3&gt;&lt;h4 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot;
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成</title>
+    <link href="http://yoursite.com/2017/07/20/Spring%20Boot%20%E9%9B%86%E6%88%90%20resteasy%E7%AF%87%20%E2%80%94%20jax-rs%E5%88%9D%E6%AD%A5%E4%BB%8B%E7%BB%8D%E5%92%8Cspring%20boot%E9%9B%86%E6%88%90/"/>
+    <id>http://yoursite.com/2017/07/20/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/</id>
+    <published>2017-07-20T07:22:01.000Z</published>
+    <updated>2017-12-20T06:03:29.695Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Spring-Boot-集成-resteasy篇-—-jax-rs初步介绍和spring-boot集成"><a href="#Spring-Boot-集成-resteasy篇-—-jax-rs初步介绍和spring-boot集成" class="headerlink" title="Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成"></a>Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成</h2><p><strong>JAX-RS</strong> 是代表restful web service的一套规范API，JAX-RS规范基于JAVA编程语言，它是用来创建Restful 风格的web services服务的。Jax-rs使用一系列注解来简化java开发。  </p>
 <p>JAX-RS也称jsr339  (全称java specifications requests java规范提案第339个)，由jcp(java community process)组织经过投票通过。  </p>
@@ -260,6 +303,7 @@
 </tbody>
 </table>
 <h2 id="规范实现"><a href="#规范实现" class="headerlink" title="规范实现"></a>规范实现</h2><p>下文将以resteasy为例</p>
+<a id="more"></a>
 <h3 id="包引入"><a href="#包引入" class="headerlink" title="包引入"></a>包引入</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.jboss.resteasy<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>resteasy-jaxrs<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;resteasy.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.jboss.resteasy<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>resteasy-jaxb-provider<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;resteasy.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
 <p>resteasy使用<code>ServletContainerInitializer</code> 接口来初始化项目，如果要开启启动扫描，扫描providers和resources。还需要引入另外一个包。</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.jboss.resteasy<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>resteasy-servlet-initializer<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;resteasy.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
@@ -274,7 +318,7 @@
 <h3 id="Spring-Boot集成"><a href="#Spring-Boot集成" class="headerlink" title="Spring Boot集成"></a>Spring Boot集成</h3><p>另外我提供一种比较简单的方法，直接使用开源集成，这里使用的是paypal开源的一个集成方案。</p>
 <ul>
 <li><p>引入包</p>
- <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.paypal.springboot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>resteasy-spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.3.0-RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line"><span class="comment">&lt;!--PS，上面的那一堆包不用引了，这个就帮我们引入了--&gt;</span></div></pre></td></tr></table></figure>
+ <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"> <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.paypal.springboot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>resteasy-spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">version</span>&gt;</span>2.3.0-RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"> <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line"> <span class="comment">&lt;!--PS，上面的那一堆包不用引了，这个就帮我们引入了--&gt;</span></div></pre></td></tr></table></figure>
 </li>
 <li><p>引入spring boot的一堆包</p>
 </li>
@@ -296,49 +340,109 @@
     
     <summary type="html">
     
-      &lt;h2 id=&quot;Spring-Boot-集成-resteasy篇-—-jax-rs初步介绍和spring-boot集成&quot;&gt;&lt;a href=&quot;#Spring-Boot-集成-resteasy篇-—-jax-rs初步介绍和spring-boot集成&quot; class=&quot;headerlin
+      &lt;h2 id=&quot;Spring-Boot-集成-resteasy篇-—-jax-rs初步介绍和spring-boot集成&quot;&gt;&lt;a href=&quot;#Spring-Boot-集成-resteasy篇-—-jax-rs初步介绍和spring-boot集成&quot; class=&quot;headerlink&quot; title=&quot;Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成&quot;&gt;&lt;/a&gt;Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;JAX-RS&lt;/strong&gt; 是代表restful web service的一套规范API，JAX-RS规范基于JAVA编程语言，它是用来创建Restful 风格的web services服务的。Jax-rs使用一系列注解来简化java开发。  &lt;/p&gt;
+&lt;p&gt;JAX-RS也称jsr339  (全称java specifications requests java规范提案第339个)，由jcp(java community process)组织经过投票通过。  &lt;/p&gt;
+&lt;p&gt;为了加深对jsr的理解，举一个简单的例子，jsr 330标准就是依赖注入的提案，已经通过。&lt;/p&gt;
+&lt;h2 id=&quot;规范说明&quot;&gt;&lt;a href=&quot;#规范说明&quot; class=&quot;headerlink&quot; title=&quot;规范说明&quot;&gt;&lt;/a&gt;规范说明&lt;/h2&gt;&lt;p&gt;规范定义了一些常见的注解（见下表），用来标注一种资源文件为restfun风格的资源文件&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;序号&lt;/th&gt;
+&lt;th&gt;注解&lt;/th&gt;
+&lt;th&gt;描述&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;@Path&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;类或者方法的相对地址，标注在类或者方法上&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;@GET&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;HTTP GET请求用，用来获取资源&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;@PUT&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;HTTP PUT 请求，用来创建资源&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;@POST&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;HTTP POST 请求, 用来创建或者更新资源&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;@DELETE&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;HTTP DELETE请求, 用来删除资源&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;6&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;@HEAD&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;HTTP HEAD请求, 用来获取一个接口是否可用的状态&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;7&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;@Produces&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;返回数据的格式比如APPLICATION/XML, TEXT/HTML, APPLICATION/JSON&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;8&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;@Consumes&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;请求数据格式 , 如json&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;9&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;@PathParam&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;绑定url里面的参数&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;10&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;@QueryParam&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;绑定url后面的参数（？后面的）&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;11&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;@MatrixParam&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;绑定包含多个   property (属性)=value(值)   方法参数表达式&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;12&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;@HeaderParam&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;给header里面传参&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;13&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;@CookieParam&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;给cookie里面传参&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;14&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;@FormParam&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;给form传参&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;15&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;@DefaultValue&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;给参数一个默认值&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;16&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;@Context&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;可以注入HttpRequest，HttpResponse用&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&quot;规范实现&quot;&gt;&lt;a href=&quot;#规范实现&quot; class=&quot;headerlink&quot; title=&quot;规范实现&quot;&gt;&lt;/a&gt;规范实现&lt;/h2&gt;&lt;p&gt;下文将以resteasy为例&lt;/p&gt;
     
     </summary>
     
+      <category term="Spring Boot" scheme="http://yoursite.com/categories/Spring-Boot/"/>
     
-  </entry>
-  
-  <entry>
-    <title></title>
-    <link href="http://yoursite.com/2017/08/25/Fastjson%E8%A7%A3%E6%9E%90%E5%A4%9A%E7%BA%A7%E6%B3%9B%E5%9E%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F%E2%80%94%E6%96%B0%E5%A2%9E%E4%BD%BF%E7%94%A8class%E6%96%87%E4%BB%B6%E6%9D%A5%E8%A7%A3%E6%9E%90%E5%A4%9A%E7%BA%A7%E6%B3%9B%E5%9E%8B/"/>
-    <id>http://yoursite.com/2017/08/25/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/</id>
-    <published>2017-08-25T06:47:27.651Z</published>
-    <updated>2017-08-25T06:42:49.984Z</updated>
     
-    <content type="html"><![CDATA[<h3 id="Fastjson解析多级泛型"><a href="#Fastjson解析多级泛型" class="headerlink" title="Fastjson解析多级泛型"></a>Fastjson解析多级泛型</h3><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>现在网上大多数是使用<code>TypeReference</code> 方式来解析JSON数据，这里我提供另外一种方式来解析，使用类文件进行解析，两种方式我都会给出实际代码</p>
-<h4 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h4><h5 id="TypeReference方式"><a href="#TypeReference方式" class="headerlink" title="TypeReference方式"></a>TypeReference方式</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span></div><div class="line">   <span class="meta">@Path</span>(<span class="string">"getUserCourse"</span>)</div><div class="line">   <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">   <span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourse()&#123;</div><div class="line">       <span class="keyword">return</span> externalBiz.getUserCourse();</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourse()&#123;</div><div class="line">        String result = restTemplate.getForObject(MOCK_JSON_URL, String.class);</div><div class="line">        <span class="keyword">return</span> JSONObject.parseObject(result, <span class="keyword">new</span> TypeReference&lt;Result&lt;List&lt;UserCourseDto&gt;&gt;&gt;() &#123;&#125;);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<p><strong>浏览器访问：</strong><code>http://localhost:8080/v1/province/getUserCourse</code></p>
-<p>可以得到json返回的结果</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  status: 0,</div><div class="line">  message: "1",</div><div class="line">  data: [</div><div class="line">    &#123;</div><div class="line">      openType: "兑换 ",</div><div class="line">      userID: 30014,</div><div class="line">      classID: 10376,</div><div class="line">      className: "趣味职场俚语课程【11月班】",</div><div class="line">      chargeFee: 106,</div><div class="line">      classStudyTime: null,</div><div class="line">      openRMB: 0,</div><div class="line">      rechargeFee: 0,</div><div class="line">      awardFee: 0,</div><div class="line">      openFee: 0,</div><div class="line">      dateAdded: 1312175789393,</div><div class="line">      expiredDate: 1323964800000</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>介绍：</strong></p>
-<p>这里使用了提供的TypeReference进行包装，能够清晰明了进行解析多级泛型，但是有时候，我们做一些通用的解析框架的时候，可能会用T类型，T类型拿到的是字节码文件，或者class对象，又该怎么处理呢？请看下面介绍。</p>
-<h4 id="class类方式"><a href="#class类方式" class="headerlink" title="class类方式"></a>class类方式</h4><p><strong>接口：</strong></p>
-<p>接口之类用了一个注解来处理的，没有直接传class对象过去，因为在实际项目中，基本都是注解，没有谁会直接传class对象。所以我传的Annotation数组过去啦</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span></div><div class="line">   <span class="meta">@Reader</span>(extParamClass = &#123;Result.class,List.class,UserCourseDto.class&#125;)</div><div class="line">   <span class="meta">@Path</span>(<span class="string">"getUserCourseV2"</span>)</div><div class="line">   <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">   <span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourseV2()&#123;</div><div class="line">       Annotation[] annotations = <span class="keyword">new</span> Annotation[<span class="number">0</span>];</div><div class="line">       <span class="keyword">for</span> (Method method : <span class="keyword">this</span>.getClass().getMethods()) &#123;</div><div class="line">           <span class="keyword">if</span> (method.getName().equals(<span class="string">"getUserCourseV2"</span>))&#123;</div><div class="line">               annotations = method.getAnnotations();</div><div class="line">           &#125;</div><div class="line">       &#125;</div><div class="line">       <span class="keyword">return</span> externalBiz.getUserCourseV2(annotations);</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
-<p><strong>处理：</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourseV2(Annotation[] annotations) &#123;</div><div class="line">        <span class="keyword">final</span> Reader[] readers = &#123;<span class="keyword">null</span>&#125;;</div><div class="line">        <span class="keyword">if</span>(annotations != <span class="keyword">null</span>) &#123;</div><div class="line">            Arrays</div><div class="line">                    .stream(annotations)</div><div class="line">                    .filter(annotation -&gt; annotation.annotationType().equals(Reader.class))</div><div class="line">                    .findFirst().ifPresent(x -&gt; readers[<span class="number">0</span>] = (Reader) x);</div><div class="line">        &#125;</div><div class="line">        Class[] classes = readers[<span class="number">0</span>].extParamClass();</div><div class="line">        String result = restTemplate.getForObject(MOCK_JSON_URL, String.class);</div><div class="line">        <span class="comment">//这里不用TypeReference方式，直接用class对象来处理</span></div><div class="line"></div><div class="line">        ParameterizedTypeImpl beforeType = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">if</span> (classes.length!=<span class="number">0</span>)&#123;</div><div class="line">            <span class="comment">//支持多级泛型的解析</span></div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = classes.length-<span class="number">1</span>; i &gt;<span class="number">0</span> ; i--) &#123;</div><div class="line">                beforeType = <span class="keyword">new</span> ParameterizedTypeImpl(<span class="keyword">new</span> Type[]&#123;beforeType == <span class="keyword">null</span>? classes[i]:beforeType&#125;, <span class="keyword">null</span>, classes[i - <span class="number">1</span>]);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span>  JSON.parseObject(result,beforeType);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>代码评析：</strong></p>
-<p>主要起作用的还是这两行代码</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = classes.length-<span class="number">1</span>; i &gt;<span class="number">0</span> ; i--) &#123;</div><div class="line">                beforeType = <span class="keyword">new</span> ParameterizedTypeImpl(<span class="keyword">new</span> Type[]&#123;beforeType == <span class="keyword">null</span>? classes[i]:beforeType&#125;, <span class="keyword">null</span>, classes[i - <span class="number">1</span>]);</div><div class="line">            &#125;</div></pre></td></tr></table></figure>
-<p>主要意思是将你的class对象包装成一个ParameterizedTypeImpl，使用ParameterizedTypeImpl来解析多级泛型，但是要注意的是，每层泛型，都需要用一个ParameterizedTypeImpl对象进行包装起来才会起作用，因为他会有一个<code>actualTypeArguments</code> 和一个 <code>rawType</code> ，在多级泛型中，用我这里的例子说明，第一层的时候<code>rawType</code>  会是一个<code>Result</code>对象，而<code>actualTypeArguments</code> 会是一个包装过后的<code>ParameterizedTypeImpl</code>对象，第二层的时候，<code>rawType</code>  会是一个List对象，而<code>actualTypeArguments</code> 会是包装上一层的对象。后同。PS : 如果这里不知道我说的是什么，请调试的时候结合来看哈</p>
-<p>最后也可以正确解析哈~</p>
-<blockquote>
-<p>END</p>
-</blockquote>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h3 id=&quot;Fastjson解析多级泛型&quot;&gt;&lt;a href=&quot;#Fastjson解析多级泛型&quot; class=&quot;headerlink&quot; title=&quot;Fastjson解析多级泛型&quot;&gt;&lt;/a&gt;Fastjson解析多级泛型&lt;/h3&gt;&lt;h4 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot;
-    
-    </summary>
-    
+      <category term="Spring Boot" scheme="http://yoursite.com/tags/Spring-Boot/"/>
     
   </entry>
   
@@ -347,7 +451,7 @@
     <link href="http://yoursite.com/2017/07/19/Spring%20Boot%20%E9%9B%86%E6%88%90%20resteasy%E7%AF%87%20%E2%80%94%20jax-rs%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3%E4%BB%8B%E7%BB%8D/"/>
     <id>http://yoursite.com/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/</id>
     <published>2017-07-19T07:22:01.000Z</published>
-    <updated>2017-12-20T02:07:09.993Z</updated>
+    <updated>2017-12-20T05:35:04.879Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Spring-Boot-集成-resteasy篇-—-jax-rs常用注解介绍"><a href="#Spring-Boot-集成-resteasy篇-—-jax-rs常用注解介绍" class="headerlink" title="Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍"></a>Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍</h2><h3 id="GET"><a href="#GET" class="headerlink" title="@GET"></a>@GET</h3><p>http请求方式里面的get请求，标记这个请求方式为get</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * http://localhost:8080/v1/province/city/1</div><div class="line"> * <span class="doctag">@param</span> id</div><div class="line"> * <span class="doctag">@return</span></div><div class="line"> */</div><div class="line"><span class="meta">@Path</span>(<span class="string">"city/&#123;id&#125;"</span>)</div><div class="line"><span class="meta">@GET</span></div><div class="line"><span class="meta">@Produces</span>(MediaType.APPLICATION_JSON) <span class="comment">//表示输出json</span></div><div class="line"><span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON) <span class="comment">//表示输入为json</span></div><div class="line"><span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">getCity</span><span class="params">(@PathParam(<span class="string">"id"</span>)</span> Long id) </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -401,6 +505,8 @@
 &lt;figure class=&quot;highlight java&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;/**&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt; * http://localhost:8080/v1/province/city/1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt; * &lt;span class=&quot;doctag&quot;&gt;@param&lt;/span&gt; id&lt;/div&gt;&lt;div class=&quot;line&quot;&gt; * &lt;span class=&quot;doctag&quot;&gt;@return&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt; */&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;@Path&lt;/span&gt;(&lt;span class=&quot;string&quot;&gt;&quot;city/&amp;#123;id&amp;#125;&quot;&lt;/span&gt;)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;@GET&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;@Produces&lt;/span&gt;(MediaType.APPLICATION_JSON) &lt;span class=&quot;comment&quot;&gt;//表示输出json&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;@Consumes&lt;/span&gt;(MediaType.APPLICATION_JSON) &lt;span class=&quot;comment&quot;&gt;//表示输入为json&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;public&lt;/span&gt; Result&amp;lt;Boolean&amp;gt; &lt;span class=&quot;title&quot;&gt;getCity&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(@PathParam(&lt;span class=&quot;string&quot;&gt;&quot;id&quot;&lt;/span&gt;)&lt;/span&gt; Long id) &lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;new&lt;/span&gt; Result&amp;lt;&amp;gt;();&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
     
     </summary>
+    
+      <category term="Spring Boot" scheme="http://yoursite.com/categories/Spring-Boot/"/>
     
     
       <category term="Spring Boot" scheme="http://yoursite.com/tags/Spring-Boot/"/>

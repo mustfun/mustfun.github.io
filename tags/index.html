@@ -3,24 +3,15 @@
 <head>
     <meta charset="utf-8">
     
-    <title>Array.sort和Collections.sort实现原理解析 | itar&#39;s blog</title>
+    <title>tags | itar&#39;s blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="Arrays.sort和Collections.sort实现原理解析1、使用 排序  2、原理 事实上Collections.sort方法底层就是调用的array.sort方法，而且不论是Collections.sort或者是Arrays.sort方法，  跟踪下源代码吧，首先我们写个demo 12345678910public static void main(String[] args) &amp;#">
-<meta name="keywords" content="java基础">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Array.sort和Collections.sort实现原理解析">
-<meta property="og:url" content="http://yoursite.com/2017/02/13/Arrays.sort和Collections.sort实现原理解析/index.html">
+    <meta property="og:type" content="website">
+<meta property="og:title" content="tags">
+<meta property="og:url" content="http://yoursite.com/tags/index.html">
 <meta property="og:site_name" content="itar&#39;s blog">
-<meta property="og:description" content="Arrays.sort和Collections.sort实现原理解析1、使用 排序  2、原理 事实上Collections.sort方法底层就是调用的array.sort方法，而且不论是Collections.sort或者是Arrays.sort方法，  跟踪下源代码吧，首先我们写个demo 12345678910public static void main(String[] args) &amp;#">
-<meta property="og:image" content="http://img.blog.csdn.net/20170223115159596?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTQxMDUyOQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170223115251191?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTQxMDUyOQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170223115315664?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTQxMDUyOQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="http://img.blog.csdn.net/20170223115444176?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTQxMDUyOQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:updated_time" content="2017-02-23T03:55:06.000Z">
+<meta property="og:updated_time" content="2017-12-20T06:09:13.528Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Array.sort和Collections.sort实现原理解析">
-<meta name="twitter:description" content="Arrays.sort和Collections.sort实现原理解析1、使用 排序  2、原理 事实上Collections.sort方法底层就是调用的array.sort方法，而且不论是Collections.sort或者是Arrays.sort方法，  跟踪下源代码吧，首先我们写个demo 12345678910public static void main(String[] args) &amp;#">
-<meta name="twitter:image" content="http://img.blog.csdn.net/20170223115159596?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTQxMDUyOQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta name="twitter:title" content="tags">
     
 
     
@@ -215,7 +206,7 @@
 </aside>
 
             
-            <section id="main"><article id="post-Arrays.sort和Collections.sort实现原理解析" class="article article-type-post" itemscope itemprop="blogPost">
+            <section id="main"><article id="page-undefined" class="article article-type-page" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -223,29 +214,10 @@
                 
     
         <h1 class="article-title" itemprop="name">
-            Array.sort和Collections.sort实现原理解析
+            tags
         </h1>
     
 
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/02/13/Arrays.sort和Collections.sort实现原理解析/">
-            <time datetime="2017-02-13T11:22:01.000Z" itemprop="datePublished">2017-02-13</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/java基础/">java基础</a>
-    </div>
-
-                    </div>
                 
             </header>
         
@@ -253,46 +225,7 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <h1 id="Arrays-sort和Collections-sort实现原理解析"><a href="#Arrays-sort和Collections-sort实现原理解析" class="headerlink" title="Arrays.sort和Collections.sort实现原理解析"></a>Arrays.sort和Collections.sort实现原理解析</h1><h3 id="1、使用"><a href="#1、使用" class="headerlink" title="1、使用"></a>1、使用</h3><ul>
-<li>排序</li>
-</ul>
-<h3 id="2、原理"><a href="#2、原理" class="headerlink" title="2、原理"></a>2、原理</h3><ol>
-<li><p>事实上Collections.sort方法底层就是调用的array.sort方法，而且不论是Collections.sort或者是Arrays.sort方法，</p>
-</li>
-<li><p>跟踪下源代码吧，首先我们写个demo</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        List&lt;String&gt; strings = Arrays.asList(<span class="string">"6"</span>, <span class="string">"1"</span>, <span class="string">"3"</span>, <span class="string">"1"</span>,<span class="string">"2"</span>);</div><div class="line"></div><div class="line">        Collections.sort(strings);<span class="comment">//sort方法在这里</span></div><div class="line"></div><div class="line">        <span class="keyword">for</span> (String string : strings) &#123;</div><div class="line"></div><div class="line">            System.out.println(string);</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<p>   简单得不能再简单的方法了，让我们一步步跟踪</p>
-   <a id="more"></a>
-</li>
-<li><p>OK，往下面看，发现collections.sort方法调用的list.sort</p>
-<p>   <img src="http://img.blog.csdn.net/20170223115159596?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTQxMDUyOQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="QQ20170221-0@2x"></p>
-</li>
-<li><p>然后跟踪一下，list里面有个sort方法，但是list是一个接口，肯定是调用子类里面的实现，这里我们demo使用的是一个Arrays.asList方法，所以事实上我们的子类就是arraylist了。OK，看arraylist里面sort实现，选择第一个，为什么不选择第二个呢？（求解，我真不知道）</p>
-<p>   <img src="http://img.blog.csdn.net/20170223115251191?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTQxMDUyOQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="QQ20170221-1@2x"></p>
-<p>   ​</p>
-</li>
-<li><p>OK，发现里面调用的Arrays.sort(a, c);  a是list,c是一个比较器，我们来看一下这个方法</p>
-<p>   <img src="http://img.blog.csdn.net/20170223115315664?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTQxMDUyOQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="QQ20170221-2@2x"></p>
-<p>   我们没有写比较器，所以用的第二项，LegacyMergeSort.userRequested这个bool值是什么呢？</p>
-<p>   跟踪这个值，我们发现有这样的一段定义：</p>
-<blockquote>
-<p>Old merge sort implementation can be selected (for<br> compatibility with broken comparators) using a system property.<br> Cannot be a static boolean in the enclosing class due to<br> circular dependencies. To be removed in a future release.</p>
-</blockquote>
-<p>反正是一种老的归并排序，不用管了现在默认是关的</p>
-</li>
-<li><p>OK，我们走的是sort(a)这个方法，接着进入这个</p>
-<p>   <img src="http://img.blog.csdn.net/20170223115444176?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTQxMDUyOQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="QQ20170221-3@2x"></p>
-</li>
-<li><p>接着看我们重要的sort方法</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">sort</span><span class="params">(Object[] a, <span class="keyword">int</span> lo, <span class="keyword">int</span> hi, Object[] work, <span class="keyword">int</span> workBase, <span class="keyword">int</span> workLen)</span> </span>&#123;</div><div class="line">        <span class="keyword">assert</span> a != <span class="keyword">null</span> &amp;&amp; lo &gt;= <span class="number">0</span> &amp;&amp; lo &lt;= hi &amp;&amp; hi &lt;= a.length;</div><div class="line"></div><div class="line">        <span class="keyword">int</span> nRemaining  = hi - lo;</div><div class="line">        <span class="keyword">if</span> (nRemaining &lt; <span class="number">2</span>)</div><div class="line">            <span class="keyword">return</span>;  <span class="comment">// array的大小为0或者1就不用排了</span></div><div class="line"></div><div class="line">        <span class="comment">// 当数组大小小于MIN_MERGE(32)的时候，就用一个"mini-TimSort"的方法排序，jdk1.7新加</span></div><div class="line">        <span class="keyword">if</span> (nRemaining &lt; MIN_MERGE) &#123;</div><div class="line">          	<span class="comment">//这个方法比较有意思，其实就是将我们最长的递减序列，找出来，然后倒过来</span></div><div class="line">            <span class="keyword">int</span> initRunLen = countRunAndMakeAscending(a, lo, hi);</div><div class="line">            <span class="comment">//长度小于32的时候，是使用binarySort的</span></div><div class="line">            binarySort(a, lo, hi, lo + initRunLen);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">  	    <span class="comment">//先扫描一次array，找到已经排好的序列，然后再用刚才的mini-TimSort，然后合并，这就是TimSort的核心思想</span></div><div class="line">        ComparableTimSort ts = <span class="keyword">new</span> ComparableTimSort(a, work, workBase, workLen);</div><div class="line">        <span class="keyword">int</span> minRun = minRunLength(nRemaining);</div><div class="line">        <span class="keyword">do</span> &#123;</div><div class="line">            <span class="comment">// Identify next run</span></div><div class="line">            <span class="keyword">int</span> runLen = countRunAndMakeAscending(a, lo, hi);</div><div class="line"></div><div class="line">            <span class="comment">// If run is short, extend to min(minRun, nRemaining)</span></div><div class="line">            <span class="keyword">if</span> (runLen &lt; minRun) &#123;</div><div class="line">                <span class="keyword">int</span> force = nRemaining &lt;= minRun ? nRemaining : minRun;</div><div class="line">                binarySort(a, lo, lo + force, lo + runLen);</div><div class="line">                runLen = force;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="comment">// Push run onto pending-run stack, and maybe merge</span></div><div class="line">            ts.pushRun(lo, runLen);</div><div class="line">            ts.mergeCollapse();</div><div class="line"></div><div class="line">            <span class="comment">// Advance to find next run</span></div><div class="line">            lo += runLen;</div><div class="line">            nRemaining -= runLen;</div><div class="line">        &#125; <span class="keyword">while</span> (nRemaining != <span class="number">0</span>);</div><div class="line"></div><div class="line">        <span class="comment">// Merge all remaining runs to complete sort</span></div><div class="line">        <span class="keyword">assert</span> lo == hi;</div><div class="line">        ts.mergeForceCollapse();</div><div class="line">        <span class="keyword">assert</span> ts.stackSize == <span class="number">1</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-<li><p>回到5，我们可以看到当我们写了比较器的时候就调用了<code>TimSort.sort方法</code>，源码如下</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line">   <span class="keyword">static</span> &lt;T&gt; <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(T[] a, <span class="keyword">int</span> lo, <span class="keyword">int</span> hi, Comparator&lt;? <span class="keyword">super</span> T&gt; c,</span></span></div><div class="line">                            T[] work, <span class="keyword">int</span> workBase, <span class="keyword">int</span> workLen) &#123;</div><div class="line">           <span class="keyword">assert</span> c != <span class="keyword">null</span> &amp;&amp; a != <span class="keyword">null</span> &amp;&amp; lo &gt;= <span class="number">0</span> &amp;&amp; lo &lt;= hi &amp;&amp; hi &lt;= a.length;</div><div class="line"></div><div class="line">           <span class="keyword">int</span> nRemaining  = hi - lo;</div><div class="line">           <span class="keyword">if</span> (nRemaining &lt; <span class="number">2</span>)</div><div class="line">               <span class="keyword">return</span>;  <span class="comment">// Arrays of size 0 and 1 are always sorted</span></div><div class="line"></div><div class="line">           <span class="comment">// If array is small, do a "mini-TimSort" with no merges</span></div><div class="line">           <span class="keyword">if</span> (nRemaining &lt; MIN_MERGE) &#123;</div><div class="line">               <span class="keyword">int</span> initRunLen = countRunAndMakeAscending(a, lo, hi, c);</div><div class="line">               binarySort(a, lo, hi, lo + initRunLen, c);</div><div class="line">               <span class="keyword">return</span>;</div><div class="line">           &#125;</div><div class="line"></div><div class="line">           <span class="comment">/**</span></div><div class="line">            * March over the array once, left to right, finding natural runs,</div><div class="line">            * extending short natural runs to minRun elements, and merging runs</div><div class="line">            * to maintain stack invariant.</div><div class="line">            */</div><div class="line">     TimSort&lt;T&gt; ts = <span class="keyword">new</span> TimSort&lt;&gt;(a, c, work, workBase, workLen);</div><div class="line">          <span class="keyword">int</span> minRun = minRunLength(nRemaining);</div><div class="line">          <span class="keyword">do</span> &#123;</div><div class="line">              <span class="comment">// Identify next run</span></div><div class="line">              <span class="keyword">int</span> runLen = countRunAndMakeAscending(a, lo, hi, c);</div><div class="line"></div><div class="line">              <span class="comment">// If run is short, extend to min(minRun, nRemaining)</span></div><div class="line">              <span class="keyword">if</span> (runLen &lt; minRun) &#123;</div><div class="line">                  <span class="keyword">int</span> force = nRemaining &lt;= minRun ? nRemaining : minRun;</div><div class="line">                  binarySort(a, lo, lo + force, lo + runLen, c);</div><div class="line">                  runLen = force;</div><div class="line">              &#125;</div><div class="line"></div><div class="line">              <span class="comment">// Push run onto pending-run stack, and maybe merge</span></div><div class="line">              ts.pushRun(lo, runLen);</div><div class="line">              ts.mergeCollapse();</div><div class="line"></div><div class="line">              <span class="comment">// Advance to find next run</span></div><div class="line">              lo += runLen;</div><div class="line">              nRemaining -= runLen;</div><div class="line">          &#125; <span class="keyword">while</span> (nRemaining != <span class="number">0</span>);</div><div class="line"></div><div class="line">          <span class="comment">// Merge all remaining runs to complete sort</span></div><div class="line">          <span class="keyword">assert</span> lo == hi;</div><div class="line">          ts.mergeForceCollapse();</div><div class="line">          <span class="keyword">assert</span> ts.stackSize == <span class="number">1</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>和上面的sort方法是一样的，其实也就是TimSort的源代码</p>
-<h3 id="3、总结"><a href="#3、总结" class="headerlink" title="3、总结"></a>3、总结</h3><p>不论是Collections.sort方法或者是Arrays.sort方法，底层实现都是TimSort实现的，这是jdk1.7新增的，以前是归并排序。TimSort算法就是找到已经排好序数据的子序列，然后对剩余部分排序，然后合并起来</p>
-</li>
-</ol>
-
+            
         
         </div>
         <footer class="article-footer">
@@ -302,7 +235,7 @@
 
 </div>
 
-    <a data-url="http://yoursite.com/2017/02/13/Arrays.sort和Collections.sort实现原理解析/" data-id="cjbens19m0000hoj3cebsu019" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://yoursite.com/tags/index.html" data-id="cjbens1ad0003hoj3th4vr3z1" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -375,20 +308,6 @@
     </div>
     
         
-<nav id="article-nav">
-    
-        <a href="/2017/02/13/写给自己的2017/" id="article-nav-newer" class="article-nav-link-wrap">
-            <strong class="article-nav-caption">Newer</strong>
-            <div class="article-nav-title">
-                
-                    写给自己的2017
-                
-            </div>
-        </a>
-    
-    
-</nav>
-
 
     
 </article>

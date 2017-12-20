@@ -4,14 +4,21 @@
   <url>
     <loc>http://yoursite.com/tags/index.html</loc>
     
-    <lastmod>2017-12-20T06:09:13.528Z</lastmod>
+    <lastmod>2017-12-20T06:48:17.820Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/categories/index.html</loc>
+    
+    <lastmod>2017-12-20T06:47:45.655Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://yoursite.com/about/index.html</loc>
     
-    <lastmod>2017-12-20T06:08:56.531Z</lastmod>
+    <lastmod>2017-12-20T06:47:17.278Z</lastmod>
     
   </url>
   
@@ -40,13 +47,6 @@
     <loc>http://yoursite.com/2017/10/30/Spring%20AOP%E7%B3%BB%E5%88%97%E4%B9%8BAOP%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/</loc>
     
     <lastmod>2017-12-20T05:34:43.239Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/categories/index.html</loc>
-    
-    <lastmod>2017-12-20T05:33:37.323Z</lastmod>
     
   </url>
   

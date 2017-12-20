@@ -162,11 +162,11 @@
   </entry>
   
   <entry>
-    <title></title>
-    <link href="http://yoursite.com/2017/08/25/Fastjson%E8%A7%A3%E6%9E%90%E5%A4%9A%E7%BA%A7%E6%B3%9B%E5%9E%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F%E2%80%94%E6%96%B0%E5%A2%9E%E4%BD%BF%E7%94%A8class%E6%96%87%E4%BB%B6%E6%9D%A5%E8%A7%A3%E6%9E%90%E5%A4%9A%E7%BA%A7%E6%B3%9B%E5%9E%8B/"/>
-    <id>http://yoursite.com/2017/08/25/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/</id>
-    <published>2017-08-25T06:47:27.651Z</published>
-    <updated>2017-08-25T06:42:49.984Z</updated>
+    <title>Fastjson解析多级泛型</title>
+    <link href="http://yoursite.com/2017/08/16/Fastjson%E8%A7%A3%E6%9E%90%E5%A4%9A%E7%BA%A7%E6%B3%9B%E5%9E%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F%E2%80%94%E6%96%B0%E5%A2%9E%E4%BD%BF%E7%94%A8class%E6%96%87%E4%BB%B6%E6%9D%A5%E8%A7%A3%E6%9E%90%E5%A4%9A%E7%BA%A7%E6%B3%9B%E5%9E%8B/"/>
+    <id>http://yoursite.com/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/</id>
+    <published>2017-08-16T07:22:01.000Z</published>
+    <updated>2017-12-20T08:14:08.284Z</updated>
     
     <content type="html"><![CDATA[<h3 id="Fastjson解析多级泛型"><a href="#Fastjson解析多级泛型" class="headerlink" title="Fastjson解析多级泛型"></a>Fastjson解析多级泛型</h3><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>现在网上大多数是使用<code>TypeReference</code> 方式来解析JSON数据，这里我提供另外一种方式来解析，使用类文件进行解析，两种方式我都会给出实际代码</p>
 <h4 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h4><h5 id="TypeReference方式"><a href="#TypeReference方式" class="headerlink" title="TypeReference方式"></a>TypeReference方式</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span></div><div class="line">   <span class="meta">@Path</span>(<span class="string">"getUserCourse"</span>)</div><div class="line">   <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">   <span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourse()&#123;</div><div class="line">       <span class="keyword">return</span> externalBiz.getUserCourse();</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
@@ -197,6 +197,10 @@
     
     </summary>
     
+      <category term="JAVA" scheme="http://yoursite.com/categories/JAVA/"/>
+    
+    
+      <category term="java" scheme="http://yoursite.com/tags/java/"/>
     
   </entry>
   

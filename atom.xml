@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.vrzart.com/"/>
-  <updated>2017-12-20T05:34:43.239Z</updated>
+  <updated>2017-12-21T10:42:01.777Z</updated>
   <id>http://blog.vrzart.com/</id>
   
   <author>
@@ -14,6 +14,51 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Spring filter原理深入浅出</title>
+    <link href="http://blog.vrzart.com/2017/12/21/Spring%20filter%E5%8E%9F%E7%90%86%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA/"/>
+    <id>http://blog.vrzart.com/2017/12/21/Spring filter原理深入浅出/</id>
+    <published>2017-12-21T08:05:00.000Z</published>
+    <updated>2017-12-21T10:42:01.777Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Spring-filter原理深入浅出"><a href="#Spring-filter原理深入浅出" class="headerlink" title="Spring filter原理深入浅出"></a>Spring filter原理深入浅出</h1><blockquote>
+<p>在这篇文章中，我会介绍一个请求从浏览器进来，是如何被Spring拦截到的，Spring又是如何处理这个请求的，filter有什么作用，filter的原理等</p>
+</blockquote>
+<h3 id="一、前置知识"><a href="#一、前置知识" class="headerlink" title="一、前置知识"></a>一、前置知识</h3><p>OK，我们首先介绍一下，请求从浏览器过来，我们的服务器会经历些什么。先看一张jetty的内部结构图</p>
+<p><img src="http://static.open-open.com/lib/uploadImg/20130905/20130905174336_227.jpg" alt="jetty内部组成"></p>
+<p>我们看到jetty的核心组件包括了一大堆的<code>*Handler</code> ，对于这些handler，不论任何容器基本都有，可能名称不太相同，笔者这里以undertow这个容器为例，浏览器发送过来的请求，会经过一个<code>FilterHandler</code> 这个handler跟我们今天的主题相关。</p>
+<h3 id="二、Request阶段"><a href="#二、Request阶段" class="headerlink" title="二、Request阶段"></a>二、Request阶段</h3><p>先看一下这个handler的处理代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleRequest</span><span class="params">(HttpServerExchange exchange)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        ServletRequestContext servletRequestContext = (ServletRequestContext)exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);</div><div class="line">        ServletRequest request = servletRequestContext.getServletRequest();</div><div class="line">        ServletResponse response = servletRequestContext.getServletResponse();</div><div class="line">        DispatcherType dispatcher = servletRequestContext.getDispatcherType();</div><div class="line">        Boolean supported = (Boolean)<span class="keyword">this</span>.asyncSupported.get(dispatcher);</div><div class="line">        <span class="keyword">if</span> (supported != <span class="keyword">null</span> &amp;&amp; !supported.booleanValue()) &#123;</div><div class="line">            servletRequestContext.setAsyncSupported(<span class="keyword">false</span>);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        List&lt;ManagedFilter&gt; filters = (List)<span class="keyword">this</span>.filters.get(dispatcher);</div><div class="line">        <span class="keyword">if</span> (filters == <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">this</span>.next.handleRequest(exchange);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            FilterHandler.FilterChainImpl filterChain = <span class="keyword">new</span> FilterHandler.FilterChainImpl(exchange, filters, <span class="keyword">this</span>.next, <span class="keyword">this</span>.allowNonStandardWrappers);</div><div class="line">            filterChain.doFilter(request, response);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>前面都是拿request和response我们不用看，主要是看后面几行代码，<code>filters</code> 如果我们有配置自己的filter，这里肯定不会为空，那么就走下面的filter 链 ，我们看下FilterHandler里面的doFilter的代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> index = <span class="keyword">this</span>.location++;</div><div class="line"><span class="keyword">if</span> (index &gt;= <span class="keyword">this</span>.filters.size()) &#123;</div><div class="line">  <span class="keyword">this</span>.next.handleRequest(<span class="keyword">this</span>.exchange);</div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line">  ((ManagedFilter)<span class="keyword">this</span>.filters.get(index)).doFilter(request, response, <span class="keyword">this</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>​         location默认是0，所以会从list里面的第一个元素取起，依次执行，OK，我们知道，filter里面一般会有一个<code>filterChain.doFilter(request, response);</code> 这句话，代表filter链继续执行，这时候，这里的location就会+1 ，变成执行第二个，第三个，链条就转动起来了。终于执行到我们自己写的<code>ResponseWrapperFilter</code> ，这个filter大家可以在我后面的源码里看到，这里我先说有这么一个自己写的filter，我用来包装我们的response，给response做些手脚。哈哈。</p>
+<p>​         OK，我们继续，当所有的filter都执行完毕之后，就会开始执行this.next.handleRequest(exchange); 这段代码，也就是在继续执行我们刚才的handler链，next表示的是ServletHandler` 这个类，执行代码如下。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">                servlet = <span class="keyword">this</span>.managedServlet.getServlet();</div><div class="line">                ((Servlet)servlet.getInstance()).service(request, response);</div><div class="line">            &#125; <span class="keyword">catch</span> (UnavailableException var12) &#123;</div><div class="line">                <span class="keyword">if</span> (var12.isPermanent()) &#123;</div><div class="line">                    UndertowServletLogger.REQUEST_LOGGER.stoppingServletDueToPermanentUnavailability(<span class="keyword">this</span>.managedServlet.getServletInfo().getName(), var12);</div><div class="line">                    <span class="keyword">this</span>.managedServlet.stop();</div><div class="line">                    <span class="keyword">this</span>.managedServlet.setPermanentlyUnavailable(<span class="keyword">true</span>);</div><div class="line">                    exchange.setStatusCode(<span class="number">404</span>);</div><div class="line">                &#125; <span class="keyword">else</span> &#123;</div><div class="line">                    unavailableUntilUpdater.set(<span class="keyword">this</span>, System.currentTimeMillis() + (<span class="keyword">long</span>)(var12.getUnavailableSeconds() * <span class="number">1000</span>));</div><div class="line">                    UndertowServletLogger.REQUEST_LOGGER.stoppingServletUntilDueToTemporaryUnavailability(<span class="keyword">this</span>.managedServlet.getServletInfo().getName(), <span class="keyword">new</span> Date(until), var12);</div><div class="line">                    exchange.setStatusCode(<span class="number">503</span>);</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>一旦掉用了下面这段代码，我们的处理逻辑就会被调用，说白了就是我们Controller里面的那些逻辑就会被调用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">((Servlet)servlet.getInstance()).service(request, response);</div></pre></td></tr></table></figure>
+<p>这段代码很重要</p>
+<h3 id="三、reponse阶段"><a href="#三、reponse阶段" class="headerlink" title="三、reponse阶段"></a>三、reponse阶段</h3><p>​          经过了上面这段代码的执行，我们的filter开始收拢了，所有的filter在执行<code>filterChain.doFilter(request, response);</code>这段代码之后其实代码是还没有执行完的，如果你下面还有写代码的话，大家好好品味一下这句话，是不是这个意思。因为每个filter都去调用下一个filter了，等最后一个filter执行完毕之后，就开始慢慢收拢，这时候我们的reponse也有了。</p>
+<p>​           当所有的filter执行完毕自己的后置代码之后，就回到了我们最初的地方，我们的最初的FilterHandler开始调用的地方。undertow服务器就继续开始执行了，它就会执行下面的代码输出你想要的信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">if (!exchange.isDispatched() &amp;&amp; !(exchange.getConnection() instanceof ServletInitialHandler.MockServerConnection)) &#123;</div><div class="line">            servletRequestContext.getOriginalResponse().responseDone();</div><div class="line">            servletRequestContext.getOriginalRequest().clearAttributes();</div><div class="line">        &#125;</div></pre></td></tr></table></figure>
+<p>主要就是把输出流写入到socket中，然后客户端接收</p>
+<blockquote>
+<p>好啦，今天就讲到这里啦，这文章还没有结束，请期待后续   ^ _ ^</p>
+</blockquote>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;Spring-filter原理深入浅出&quot;&gt;&lt;a href=&quot;#Spring-filter原理深入浅出&quot; class=&quot;headerlink&quot; title=&quot;Spring filter原理深入浅出&quot;&gt;&lt;/a&gt;Spring filter原理深入浅出&lt;/h1&gt;&lt;bloc
+    
+    </summary>
+    
+      <category term="Spring" scheme="http://blog.vrzart.com/categories/Spring/"/>
+    
+    
+      <category term="Spring" scheme="http://blog.vrzart.com/tags/Spring/"/>
+    
+  </entry>
   
   <entry>
     <title>Spring Boot  AOP系列之AOP原理介绍</title>
@@ -525,7 +570,7 @@
     <link href="http://blog.vrzart.com/2017/07/04/%E9%AB%98%E5%8F%AF%E7%94%A8%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E6%96%B9%E6%A1%88-SqlServer%E8%BF%81%E7%A7%BBMysql%E5%AE%9E%E6%88%98/"/>
     <id>http://blog.vrzart.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/</id>
     <published>2017-07-04T07:22:01.000Z</published>
-    <updated>2017-07-04T11:02:09.556Z</updated>
+    <updated>2017-12-21T06:32:17.201Z</updated>
     
     <content type="html"><![CDATA[<h3 id="高可用数据同步方案-SqlServer迁移Mysql实战"><a href="#高可用数据同步方案-SqlServer迁移Mysql实战" class="headerlink" title="高可用数据同步方案-SqlServer迁移Mysql实战"></a>高可用数据同步方案-SqlServer迁移Mysql实战</h3><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>  随着业务量的上升，以前的架构已经不满足业务的发展，数据作为业务中最重要的一环，需要有更好的架构作为支撑。目前我司有sql server转mysql的需求，所以结合当前业务，我挑选了阿里云开源的一个很好用的同步工具DataX</p>
 <h5 id="DataX介绍"><a href="#DataX介绍" class="headerlink" title="DataX介绍"></a>DataX介绍</h5><blockquote>
@@ -538,6 +583,7 @@
 <li>Writer： Writer为数据写入模块，负责不断向Framework取数据，并将数据写入到目的端。</li>
 <li>Framework：Framework用于连接reader和writer，作为两者的数据传输通道，并处理缓冲，流控，并发，数据转换等核心技术问题。</li>
 </ul>
+<a id="more"></a>
 <h4 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h4><h5 id="下载安装部署"><a href="#下载安装部署" class="headerlink" title="下载安装部署"></a>下载安装部署</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> wget http://datax-opensource.oss-cn-hangzhou.aliyuncs.com/datax.tar.gz</div><div class="line"><span class="meta">$</span> tar zxvf datax.tar.gz</div><div class="line"><span class="meta">$</span> sudo chmod -R 755 &#123;YOUR_DATAX_HOME&#125;</div></pre></td></tr></table></figure>
 <p>也可以自己下载源码安装，不过需要安装maven</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> git clone git@github.com:alibaba/DataX.git</div><div class="line"><span class="meta">$</span> cd  &#123;DataX_source_code_home&#125;</div><div class="line"><span class="meta">$</span> mvn -U clean package assembly:assembly -Dmaven.test.skip=true</div></pre></td></tr></table></figure>
@@ -580,9 +626,21 @@
     
     <summary type="html">
     
-      &lt;h3 id=&quot;高可用数据同步方案-SqlServer迁移Mysql实战&quot;&gt;&lt;a href=&quot;#高可用数据同步方案-SqlServer迁移Mysql实战&quot; class=&quot;headerlink&quot; title=&quot;高可用数据同步方案-SqlServer迁移Mysql实战&quot;&gt;&lt;/a&gt;高可
+      &lt;h3 id=&quot;高可用数据同步方案-SqlServer迁移Mysql实战&quot;&gt;&lt;a href=&quot;#高可用数据同步方案-SqlServer迁移Mysql实战&quot; class=&quot;headerlink&quot; title=&quot;高可用数据同步方案-SqlServer迁移Mysql实战&quot;&gt;&lt;/a&gt;高可用数据同步方案-SqlServer迁移Mysql实战&lt;/h3&gt;&lt;h4 id=&quot;简介&quot;&gt;&lt;a href=&quot;#简介&quot; class=&quot;headerlink&quot; title=&quot;简介&quot;&gt;&lt;/a&gt;简介&lt;/h4&gt;&lt;p&gt;  随着业务量的上升，以前的架构已经不满足业务的发展，数据作为业务中最重要的一环，需要有更好的架构作为支撑。目前我司有sql server转mysql的需求，所以结合当前业务，我挑选了阿里云开源的一个很好用的同步工具DataX&lt;/p&gt;
+&lt;h5 id=&quot;DataX介绍&quot;&gt;&lt;a href=&quot;#DataX介绍&quot; class=&quot;headerlink&quot; title=&quot;DataX介绍&quot;&gt;&lt;/a&gt;DataX介绍&lt;/h5&gt;&lt;blockquote&gt;
+&lt;p&gt;DataX 是一个异构数据源离线同步工具，致力于实现包括关系型数据库(MySQL、Oracle等)、HDFS、Hive、MaxCompute(原ODPS)、HBase、FTP等各种异构数据源之间稳定高效的数据同步功能。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h5 id=&quot;框架设计&quot;&gt;&lt;a href=&quot;#框架设计&quot; class=&quot;headerlink&quot; title=&quot;框架设计&quot;&gt;&lt;/a&gt;框架设计&lt;/h5&gt;&lt;p&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/1067175/17879884/ec7e36f4-6927-11e6-8f5f-ffc43d6a468b.png&quot; alt=&quot;datax_framework_new&quot;&gt;&lt;/p&gt;
+&lt;p&gt;DataX本身作为离线数据同步框架，采用Framework + plugin架构构建。将数据源读取和写入抽象成为Reader/Writer插件，纳入到整个同步框架中。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Reader：Reader为数据采集模块，负责采集数据源的数据，将数据发送给Framework。&lt;/li&gt;
+&lt;li&gt;Writer： Writer为数据写入模块，负责不断向Framework取数据，并将数据写入到目的端。&lt;/li&gt;
+&lt;li&gt;Framework：Framework用于连接reader和writer，作为两者的数据传输通道，并处理缓冲，流控，并发，数据转换等核心技术问题。&lt;/li&gt;
+&lt;/ul&gt;
     
     </summary>
+    
+      <category term="mysql" scheme="http://blog.vrzart.com/categories/mysql/"/>
     
     
       <category term="mysql" scheme="http://blog.vrzart.com/tags/mysql/"/>
@@ -1428,40 +1486,6 @@
     
     
       <category term="mybatis" scheme="http://blog.vrzart.com/tags/mybatis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>linux相关</title>
-    <link href="http://blog.vrzart.com/2017/05/26/linux/"/>
-    <id>http://blog.vrzart.com/2017/05/26/linux/</id>
-    <published>2017-05-26T11:14:30.980Z</published>
-    <updated>2017-01-10T11:42:42.000Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="小葵花妈妈课堂又开课啦："><a href="#小葵花妈妈课堂又开课啦：" class="headerlink" title="小葵花妈妈课堂又开课啦："></a>小葵花妈妈课堂又开课啦：<img src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=82301314,1500636652&amp;fm=116&amp;gp=0.jpg" alt="小葵花妈妈课堂"></h3><p>​<strong>1、stb环境需要显示照片怎么办？</strong></p>
-<p>解决办法：将PHP和JAVA都挂载到nfs系统即可，我们stb环境的共有磁盘文件地址是192.168.3.109</p>
-<a id="more"></a>
-<p>JAVA stb服务器运行下面命令(如根目录)</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mount -t nfs 192.168.3.109:/NFS_Photos/Uploads  Uploads/</div></pre></td></tr></table></figure>
-<p>PHP stb 需要共享目录下运行下面命令（如到/usr/share/nginx/branch_db/Public/Files）</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mount -t nfs 192.168.3.109:/NFS_Photos/Uploads  Uploads/</div></pre></td></tr></table></figure>
-<p>这样传的照片就能在后台和前提显示了</p>
-<h3 id="小葵花妈妈周五最后一节课啦："><a href="#小葵花妈妈周五最后一节课啦：" class="headerlink" title="小葵花妈妈周五最后一节课啦："></a>小葵花妈妈周五最后一节课啦：<img src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=82301314,1500636652&amp;fm=116&amp;gp=0.jpg" alt="小葵花妈妈课堂"></h3><p>近期发现各位小伙伴本地PHP环境启动不起来，因为重构加入了大量的参数，请各位在配置文件里面加入下面4项即可，复制粘贴即可</p>
-<pre><code>static public $JAVA_LOAN_UPDATESTATUS=&quot;1&quot;;
-static public $mkt_url =&quot;www.stb.xxxxxx.com&quot;;
-static public $INVT_URL =&apos;www.stb.xxxxxxx.com&apos;;
-static public $PROD_URL=&quot;www.stb.xxxxxx.com&quot;;
-</code></pre>]]></content>
-    
-    <summary type="html">
-    
-      &lt;h3 id=&quot;小葵花妈妈课堂又开课啦：&quot;&gt;&lt;a href=&quot;#小葵花妈妈课堂又开课啦：&quot; class=&quot;headerlink&quot; title=&quot;小葵花妈妈课堂又开课啦：&quot;&gt;&lt;/a&gt;小葵花妈妈课堂又开课啦：&lt;img src=&quot;https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=82301314,1500636652&amp;amp;fm=116&amp;amp;gp=0.jpg&quot; alt=&quot;小葵花妈妈课堂&quot;&gt;&lt;/h3&gt;&lt;p&gt;​&lt;strong&gt;1、stb环境需要显示照片怎么办？&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;解决办法：将PHP和JAVA都挂载到nfs系统即可，我们stb环境的共有磁盘文件地址是192.168.3.109&lt;/p&gt;
-    
-    </summary>
-    
-    
-      <category term="linux" scheme="http://blog.vrzart.com/tags/linux/"/>
     
   </entry>
   

@@ -175,11 +175,11 @@ var _hmt = _hmt || [];
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                44
+                45
                 <span>posts</span>
             </div>
             <div class="article-info-block">
-                27
+                28
                 <span>tags</span>
             </div>
         </div>
@@ -228,6 +228,137 @@ var _hmt = _hmt || [];
 
             
             <section id="main">
+    <article id="post-day3" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/05/26/day3/">JAVA常用验证方法</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/05/26/day3/">
+            <time datetime="2017-05-26T11:14:30.867Z" itemprop="datePublished">2017-05-26</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/java/">java</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>#项目相关</p>
+<p>##maven模块划分</p>
+<p>###一、模块重用<br>1、命令行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd nono-parent</div><div class="line">call mvn clean install -Dmaven.test.skip=true</div></pre></td></tr></table></figure></p>
+<p>2、webAPP配置类<br>WebAppConfigure接口：得到域名、私有域名、顶级域名、静态域名、端口、contentPath、主题样式等配置<br>DefaultWebAppConfigure继承，可存放更多配置的变量</p>
+<p>##Object</p>
+<p>###requireNonNull/isNull<br>一般在构造函数中使用，或者直接进行验证；后者随时可用 前者返回T类型，后者返回bool<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//会检测是否为空，如果为空，直接抛异常</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">Foo</span><span class="params">(Bar bar)</span> </span>&#123;</div><div class="line">    <span class="keyword">this</span>.bar = Objects.requireNonNull(bar);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>###常用验证类<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div><div class="line">225</div><div class="line">226</div><div class="line">227</div></pre></td><td class="code"><pre><div class="line"> <span class="comment">/**</span></div><div class="line"> * 验证邮箱地址格式</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isEmail</span><span class="params">(String str)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (str == <span class="keyword">null</span> || <span class="string">""</span>.equals(str.trim()))</div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">    String regex = <span class="string">"^([\\w-\\.]+)@((\\[[0-9]&#123;1,3&#125;\\.[0-9]&#123;1,3&#125;\\.[0-9]&#123;1,3&#125;\\.)|(([\\w-]+\\.)+))([a-zA-Z]&#123;2,4&#125;|[0-9]&#123;1,3&#125;)(\\]?)$"</span>;</div><div class="line">    <span class="keyword">return</span> match(regex, str);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * 验证URL地址格式</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isUrl</span><span class="params">(String str)</span> </span>&#123;</div><div class="line">    String regex = <span class="string">"http(s)?://([\\w-]+\\.)+[\\w-]+(/[\\w- ./?%&amp;=]*)?"</span>;</div><div class="line">    <span class="keyword">return</span> match(regex, str);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * 验证是否IP地址</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isIP</span><span class="params">(String str)</span> </span>&#123;</div><div class="line">    String num = <span class="string">"(25[0-5]|2[0-4]\\d|[0-1]\\d&#123;2&#125;|[1-9]?\\d)"</span>;</div><div class="line">    String regex = <span class="string">"^"</span> + num + <span class="string">"\\."</span> + num + <span class="string">"\\."</span> + num + <span class="string">"\\."</span> + num + <span class="string">"$"</span>;</div><div class="line">    <span class="keyword">return</span> match(regex, str);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * 验证固定电话号码</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isTelephone</span><span class="params">(String str)</span> </span>&#123;</div><div class="line">    String regex = <span class="string">"^((\\d&#123;7,8&#125;)|(\\d&#123;4&#125;|\\d&#123;3&#125;)-(\\d&#123;7,8&#125;)|(\\d&#123;4&#125;|\\d&#123;3&#125;)-(\\d&#123;7,8&#125;)-(\\d&#123;4&#125;|\\d&#123;3&#125;|\\d&#123;2&#125;|\\d&#123;1&#125;)|(\\d&#123;7,8&#125;)-(\\d&#123;4&#125;|\\d&#123;3&#125;|\\d&#123;2&#125;|\\d&#123;1&#125;))$"</span>;</div><div class="line">    <span class="keyword">return</span> match(regex, str);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * 验证手机号码</div><div class="line"> *</div><div class="line"> * 移动：134、135、136、137、138、139、150、151、157(TD)、158、159、187、188</div><div class="line"> * 联通：130、131、132、152、155、156、185、186</div><div class="line"> * 电信：133、153、180、189、（1349卫通）</div><div class="line"> *  增加 17X  14X 19x号段</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isMobile</span><span class="params">(String str)</span> </span>&#123;</div><div class="line">    String regex = <span class="string">"^(((13[0-9]&#123;1&#125;)|(14[0-9]&#123;1&#125;)|(15[0-9]&#123;1&#125;)|(17[0-9]&#123;1&#125;)|(18[0-9]&#123;1&#125;)|(19[0-9]&#123;1&#125;))+\\d&#123;8&#125;)$"</span>;</div><div class="line">    <span class="keyword">return</span> match(regex, str);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * 判断用户的身份证是否满足要求</div><div class="line"> * <span class="doctag">@param</span> str</div><div class="line"> * <span class="doctag">@return</span></div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">IDCardValidate</span><span class="params">(String str)</span> </span>&#123;</div><div class="line">    </div><div class="line">     String[] ValCodeArr = &#123; <span class="string">"1"</span>, <span class="string">"0"</span>, <span class="string">"x"</span>, <span class="string">"9"</span>, <span class="string">"8"</span>, <span class="string">"7"</span>, <span class="string">"6"</span>, <span class="string">"5"</span>, <span class="string">"4"</span>,  </div><div class="line">             <span class="string">"3"</span>, <span class="string">"2"</span> &#125;;  </div><div class="line">     String[] Wi = &#123; <span class="string">"7"</span>, <span class="string">"9"</span>, <span class="string">"10"</span>, <span class="string">"5"</span>, <span class="string">"8"</span>, <span class="string">"4"</span>, <span class="string">"2"</span>, <span class="string">"1"</span>, <span class="string">"6"</span>, <span class="string">"3"</span>, <span class="string">"7"</span>,  </div><div class="line">             <span class="string">"9"</span>, <span class="string">"10"</span>, <span class="string">"5"</span>, <span class="string">"8"</span>, <span class="string">"4"</span>, <span class="string">"2"</span> &#125;;  </div><div class="line">     String Ai = <span class="string">""</span>;  </div><div class="line">     <span class="comment">// ================ 号码的长度 15位或18位 ================  </span></div><div class="line">     <span class="keyword">if</span> (str.length() != <span class="number">15</span> &amp;&amp; str.length() != <span class="number">18</span>) &#123;  </div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">     &#125; </div><div class="line">     <span class="comment">// =======================(end)========================  </span></div><div class="line">     </div><div class="line">     <span class="comment">// ================ 数字 除最后以为都为数字 ================</span></div><div class="line">     <span class="keyword">if</span> (str.length() == <span class="number">18</span>) &#123;  </div><div class="line">         Ai = str.substring(<span class="number">0</span>, <span class="number">17</span>);  </div><div class="line">     &#125; <span class="keyword">else</span> <span class="keyword">if</span> (str.length() == <span class="number">15</span>) &#123;  </div><div class="line">         Ai = str.substring(<span class="number">0</span>, <span class="number">6</span>) + <span class="string">"19"</span> + str.substring(<span class="number">6</span>, <span class="number">15</span>);  </div><div class="line">     &#125;  </div><div class="line">     <span class="keyword">if</span> (isNumeric(Ai) == <span class="keyword">false</span>) &#123;  </div><div class="line">        </div><div class="line">         <span class="keyword">return</span> <span class="keyword">false</span>;  </div><div class="line">     &#125;</div><div class="line">    <span class="comment">// =======================(end)======================== </span></div><div class="line">     <span class="comment">// ================ 出生年月是否有效 ================  </span></div><div class="line">     String strYear = Ai.substring(<span class="number">6</span>, <span class="number">10</span>);<span class="comment">// 年份  </span></div><div class="line">     String strMonth = Ai.substring(<span class="number">10</span>, <span class="number">12</span>);<span class="comment">// 月份  </span></div><div class="line">     String strDay = Ai.substring(<span class="number">12</span>, <span class="number">14</span>);<span class="comment">// 月份  </span></div><div class="line">     <span class="keyword">if</span> (isDate(strYear + <span class="string">"-"</span> + strMonth + <span class="string">"-"</span> + strDay) == <span class="keyword">false</span>) &#123;  </div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">     &#125;  </div><div class="line">     </div><div class="line">     GregorianCalendar gc = <span class="keyword">new</span> GregorianCalendar();  </div><div class="line">     SimpleDateFormat s = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd"</span>);  </div><div class="line">     <span class="keyword">try</span> &#123;  </div><div class="line">         <span class="keyword">if</span> ((gc.get(Calendar.YEAR) - Integer.parseInt(strYear)) &gt; <span class="number">150</span>  </div><div class="line">                 || (gc.getTime().getTime() - s.parse(  </div><div class="line">                         strYear + <span class="string">"-"</span> + strMonth + <span class="string">"-"</span> + strDay).getTime()) &lt; <span class="number">0</span>) &#123;  </div><div class="line">           </div><div class="line">             <span class="keyword">return</span> <span class="keyword">false</span>;  </div><div class="line">         &#125;  </div><div class="line">     &#125; <span class="keyword">catch</span> (NumberFormatException e) &#123;  </div><div class="line">         e.printStackTrace();  </div><div class="line">     &#125; <span class="keyword">catch</span> (java.text.ParseException e) &#123;  </div><div class="line">         e.printStackTrace();  </div><div class="line">     &#125;  </div><div class="line">     <span class="keyword">if</span> (Integer.parseInt(strMonth) &gt; <span class="number">12</span> || Integer.parseInt(strMonth) == <span class="number">0</span>) &#123;  </div><div class="line">         </div><div class="line">         <span class="keyword">return</span> <span class="keyword">false</span>; </div><div class="line">     &#125;  </div><div class="line">     <span class="keyword">if</span> (Integer.parseInt(strDay) &gt; <span class="number">31</span> || Integer.parseInt(strDay) == <span class="number">0</span>) &#123;  </div><div class="line">        </div><div class="line">         <span class="keyword">return</span> <span class="keyword">false</span>; </div><div class="line">     &#125; </div><div class="line">  <span class="comment">// =====================(end)=====================  </span></div><div class="line">  <span class="comment">// ================ 地区码时候有效 ================  </span></div><div class="line">     Hashtable h = GetAreaCode();  </div><div class="line">     <span class="keyword">if</span> (h.get(Ai.substring(<span class="number">0</span>, <span class="number">2</span>)) == <span class="keyword">null</span>) &#123;  </div><div class="line">        </div><div class="line">         <span class="keyword">return</span> <span class="keyword">false</span>; </div><div class="line">     &#125;  </div><div class="line">     <span class="comment">// ==============================================  </span></div><div class="line">     </div><div class="line">  <span class="comment">// ================ 判断最后一位的值 ================  </span></div><div class="line">     <span class="keyword">int</span> TotalmulAiWi = <span class="number">0</span>;  </div><div class="line">     <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">17</span>; i++) &#123;  </div><div class="line">         TotalmulAiWi = TotalmulAiWi  </div><div class="line">                 + Integer.parseInt(String.valueOf(Ai.charAt(i)))  </div><div class="line">                 * Integer.parseInt(Wi[i]);  </div><div class="line">     &#125;  </div><div class="line">     <span class="keyword">int</span> modValue = TotalmulAiWi % <span class="number">11</span>;  </div><div class="line">     String strVerifyCode = ValCodeArr[modValue];  </div><div class="line">     Ai = Ai + strVerifyCode;  </div><div class="line">     <span class="keyword">if</span> (str.length() == <span class="number">18</span>) &#123;  </div><div class="line">         <span class="keyword">if</span> (Ai.toUpperCase().equals(str.toUpperCase()) == <span class="keyword">false</span>) &#123;  </div><div class="line">              </div><div class="line">             <span class="keyword">return</span> <span class="keyword">false</span>; </div><div class="line">         &#125;  </div><div class="line">     &#125; </div><div class="line">     </div><div class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/**  </span></div><div class="line"> * 功能：设置地区编码  </div><div class="line"> *   </div><div class="line"> * <span class="doctag">@return</span> Hashtable 对象  </div><div class="line"> */  </div><div class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)  </div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Hashtable <span class="title">GetAreaCode</span><span class="params">()</span> </span>&#123;  </div><div class="line">    Hashtable hashtable = <span class="keyword">new</span> Hashtable();  </div><div class="line">    hashtable.put(<span class="string">"11"</span>, <span class="string">"北京"</span>);  </div><div class="line">    hashtable.put(<span class="string">"12"</span>, <span class="string">"天津"</span>);  </div><div class="line">    hashtable.put(<span class="string">"13"</span>, <span class="string">"河北"</span>);  </div><div class="line">    hashtable.put(<span class="string">"14"</span>, <span class="string">"山西"</span>);  </div><div class="line">    hashtable.put(<span class="string">"15"</span>, <span class="string">"内蒙古"</span>);  </div><div class="line">    hashtable.put(<span class="string">"21"</span>, <span class="string">"辽宁"</span>);  </div><div class="line">    hashtable.put(<span class="string">"22"</span>, <span class="string">"吉林"</span>);  </div><div class="line">    hashtable.put(<span class="string">"23"</span>, <span class="string">"黑龙江"</span>);  </div><div class="line">    hashtable.put(<span class="string">"31"</span>, <span class="string">"上海"</span>);  </div><div class="line">    hashtable.put(<span class="string">"32"</span>, <span class="string">"江苏"</span>);  </div><div class="line">    hashtable.put(<span class="string">"33"</span>, <span class="string">"浙江"</span>);  </div><div class="line">    hashtable.put(<span class="string">"34"</span>, <span class="string">"安徽"</span>);  </div><div class="line">    hashtable.put(<span class="string">"35"</span>, <span class="string">"福建"</span>);  </div><div class="line">    hashtable.put(<span class="string">"36"</span>, <span class="string">"江西"</span>);  </div><div class="line">    hashtable.put(<span class="string">"37"</span>, <span class="string">"山东"</span>);  </div><div class="line">    hashtable.put(<span class="string">"41"</span>, <span class="string">"河南"</span>);  </div><div class="line">    hashtable.put(<span class="string">"42"</span>, <span class="string">"湖北"</span>);  </div><div class="line">    hashtable.put(<span class="string">"43"</span>, <span class="string">"湖南"</span>);  </div><div class="line">    hashtable.put(<span class="string">"44"</span>, <span class="string">"广东"</span>);  </div><div class="line">    hashtable.put(<span class="string">"45"</span>, <span class="string">"广西"</span>);  </div><div class="line">    hashtable.put(<span class="string">"46"</span>, <span class="string">"海南"</span>);  </div><div class="line">    hashtable.put(<span class="string">"50"</span>, <span class="string">"重庆"</span>);  </div><div class="line">    hashtable.put(<span class="string">"51"</span>, <span class="string">"四川"</span>);  </div><div class="line">    hashtable.put(<span class="string">"52"</span>, <span class="string">"贵州"</span>);  </div><div class="line">    hashtable.put(<span class="string">"53"</span>, <span class="string">"云南"</span>);  </div><div class="line">    hashtable.put(<span class="string">"54"</span>, <span class="string">"西藏"</span>);  </div><div class="line">    hashtable.put(<span class="string">"61"</span>, <span class="string">"陕西"</span>);  </div><div class="line">    hashtable.put(<span class="string">"62"</span>, <span class="string">"甘肃"</span>);  </div><div class="line">    hashtable.put(<span class="string">"63"</span>, <span class="string">"青海"</span>);  </div><div class="line">    hashtable.put(<span class="string">"64"</span>, <span class="string">"宁夏"</span>);  </div><div class="line">    hashtable.put(<span class="string">"65"</span>, <span class="string">"新疆"</span>);  </div><div class="line">    hashtable.put(<span class="string">"71"</span>, <span class="string">"台湾"</span>);  </div><div class="line">    hashtable.put(<span class="string">"81"</span>, <span class="string">"香港"</span>);  </div><div class="line">    hashtable.put(<span class="string">"82"</span>, <span class="string">"澳门"</span>);  </div><div class="line">    hashtable.put(<span class="string">"91"</span>, <span class="string">"国外"</span>);  </div><div class="line">    <span class="keyword">return</span> hashtable;  </div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">match</span><span class="params">(String regex, String str)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (isNullOrEmpty(str)) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line">    Pattern pattern = Pattern.compile(regex);</div><div class="line">    Matcher matcher = pattern.matcher(str);</div><div class="line">    <span class="keyword">return</span> matcher.lookingAt();</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/**  </span></div><div class="line"> * 功能：判断字符串是否为数字  </div><div class="line"> *   </div><div class="line"> * <span class="doctag">@param</span> str  </div><div class="line"> * <span class="doctag">@return</span>  </div><div class="line"> */  </div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isNumeric</span><span class="params">(String str)</span> </span>&#123;  </div><div class="line">    Pattern pattern = Pattern.compile(<span class="string">"[0-9]*"</span>);  </div><div class="line">    Matcher isNum = pattern.matcher(str);  </div><div class="line">    <span class="keyword">if</span> (isNum.matches()) &#123;  </div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;  </div><div class="line">    &#125; <span class="keyword">else</span> &#123;  </div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;  </div><div class="line">    &#125;  </div><div class="line">&#125; </div><div class="line"></div><div class="line"><span class="comment">/**  </span></div><div class="line"> * 功能：判断字符串是否为日期格式  </div><div class="line"> *   </div><div class="line"> * <span class="doctag">@param</span> str  </div><div class="line"> * <span class="doctag">@return</span>  </div><div class="line"> */  </div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isDate</span><span class="params">(String strDate)</span> </span>&#123;  </div><div class="line">    Pattern pattern = Pattern  </div><div class="line">            .compile(<span class="string">"^((\\d&#123;2&#125;(([02468][048])|([13579][26]))[\\-\\/\\s]?((((0?[13578])|(1[02]))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(3[01])))|(((0?[469])|(11))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(30)))|(0?2[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])))))|(\\d&#123;2&#125;(([02468][1235679])|([13579][01345789]))[\\-\\/\\s]?((((0?[13578])|(1[02]))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(3[01])))|(((0?[469])|(11))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(30)))|(0?2[\\-\\/\\s]?((0?[1-9])|(1[0-9])|(2[0-8]))))))(\\s(((0?[0-9])|([1-2][0-3]))\\:([0-5]?[0-9])((\\s)|(\\:([0-5]?[0-9])))))?$"</span>);  </div><div class="line">    Matcher m = pattern.matcher(strDate);  </div><div class="line">    <span class="keyword">if</span> (m.matches()) &#123;  </div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;  </div><div class="line">    &#125; <span class="keyword">else</span> &#123;  </div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://blog.vrzart.com/2017/05/26/day3/" data-id="cjbg6tsxb0018t4j30y8awj6t" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-day2" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -279,7 +410,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/05/26/day2/" data-id="cjbg3ozoi001hdoj3ly80q5dp" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/05/26/day2/" data-id="cjbg6tsxe001bt4j3bpn80vml" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -407,7 +538,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/05/26/day14/" data-id="cjbg3ozoj001jdoj3g0mv4lah" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/05/26/day14/" data-id="cjbg6tsx90015t4j3nij879c1" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -535,7 +666,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/05/26/day13/" data-id="cjbg3ozo60015doj3wd773ypd" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/05/26/day13/" data-id="cjbg6tsx4000yt4j3nk1cv2iy" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -673,7 +804,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/05/26/day12/" data-id="cjbg3ozo40012doj3kugrknvg" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/05/26/day12/" data-id="cjbg6tsx2000wt4j3naphdt9m" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -801,7 +932,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/05/26/day11/" data-id="cjbg3ozo2000ydoj3ny9dr91j" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/05/26/day11/" data-id="cjbg6tswz000st4j3gma6lslp" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -930,7 +1061,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/05/26/day1/" data-id="cjbg3oznj000wdoj3i3wn6w6l" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/05/26/day1/" data-id="cjbg6tswy000rt4j3hyfbovs5" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1094,7 +1225,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/05/26/windows hexo 搭建教程/" data-id="cjbg3ozp20021doj3ab7jybe5" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/05/26/windows hexo 搭建教程/" data-id="cjbg6tsy0001zt4j33fnzw8ot" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1256,7 +1387,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/03/01/如何找到占用CPU和内存最高的线程/" data-id="cjbg3ozp70026doj39wlpqccz" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/03/01/如何找到占用CPU和内存最高的线程/" data-id="cjbg6tsy8002at4j3g038r9kp" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1406,138 +1537,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/03/01/JAVA面试题之基础篇/" data-id="cjbg3ozmw0009doj3uvyaczgs" class="article-share-link"><i class="fa fa-share"></i>Share</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-Logstash学习笔记" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/02/28/Logstash学习笔记/">Logstash学习经验</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/02/28/Logstash学习笔记/">
-            <time datetime="2017-02-27T16:00:00.000Z" itemprop="datePublished">2017-02-28</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/大数据/">大数据</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            <p><h1 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h1><ol>
-<li><p>Logstash是什么</p>
-<p>Logstash是一个内置有分析和转换工具的日志分析工具，是一个管道，可以把生产上面的日志从服务器移动到另外一个地方，支持多种格式</p>
-</li>
-<li><p>核心配置</p>
-<p>Logstash核心包括<code>inputs</code>、<code>codecs</code>、<code>filters</code>、<code>outputs</code>等，inputs负责将某种格式的日志数据传输到Logstash中，codecs对于数据流进行某种方式处理（如JSON、msgpack、plain等），filters用于过滤信息，outputs是Logstash的输出部分</p></p>
-            <p class="article-more-link">
-                <a href="/2017/02/28/Logstash学习笔记/#more">Read More</a>
-            </p>
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://blog.vrzart.com/2017/02/28/Logstash学习笔记/" data-id="cjbg3ozn4000ddoj3d2ej3x0s" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/03/01/JAVA面试题之基础篇/" data-id="cjbg6tswg0008t4j3qd6hobko" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1630,6 +1630,25 @@ var _hmt = _hmt || [];
                     <li>
                         
                         <div class="item-thumbnail">
+                            <a href="/2017/12/21/Spring filter原理深入浅出/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring/">Spring</a></p>
+                            <p class="item-title"><a href="/2017/12/21/Spring filter原理深入浅出/" class="title">Spring filter原理深入浅出</a></p>
+                            <p class="item-date"><time datetime="2017-12-21T08:05:00.000Z" itemprop="datePublished">2017-12-21</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
                             <a href="/2017/10/30/Spring AOP系列之AOP原理介绍/" class="thumbnail">
     
     
@@ -1703,25 +1722,6 @@ var _hmt = _hmt || [];
                         </div>
                     </li>
                 
-                    <li>
-                        
-                        <div class="item-thumbnail">
-                            <a href="/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" class="thumbnail">
-    
-    
-        <span class="thumbnail-image thumbnail-none"></span>
-    
-</a>
-
-                        </div>
-                        
-                        <div class="item-inner">
-                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-Boot/">Spring Boot</a></p>
-                            <p class="item-title"><a href="/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" class="title">Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍</a></p>
-                            <p class="item-date"><time datetime="2017-07-19T07:22:01.000Z" itemprop="datePublished">2017-07-19</time></p>
-                        </div>
-                    </li>
-                
             </ul>
         </div>
     </div>
@@ -1731,7 +1731,7 @@ var _hmt = _hmt || [];
     <div class="widget-wrap">
         <h3 class="widget-title">categories</h3>
         <div class="widget">
-            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Boot/">Spring Boot</a><span class="category-list-count">4</span></li></ul>
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring/">Spring</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Boot/">Spring Boot</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1740,7 +1740,7 @@ var _hmt = _hmt || [];
     <div class="widget-wrap">
         <h3 class="widget-title">archives</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
         </div>
     </div>
 
@@ -1749,7 +1749,7 @@ var _hmt = _hmt || [];
     <div class="widget-wrap">
         <h3 class="widget-title">tags</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1758,7 +1758,7 @@ var _hmt = _hmt || [];
     <div class="widget-wrap">
         <h3 class="widget-title">tag cloud</h3>
         <div class="widget tagcloud">
-            <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Spring-Boot/" style="font-size: 16.67px;">Spring Boot</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+            <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/Spring-Boot/" style="font-size: 16.67px;">Spring Boot</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
         </div>
     </div>
 

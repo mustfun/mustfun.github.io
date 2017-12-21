@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    
+    <title>Spring filter原理深入浅出 | 程序员的天花板</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="Spring filter原理深入浅出 在这篇文章中，我会介绍一个请求从浏览器进来，是如何被Spring拦截到的，Spring又是如何处理这个请求的，filter有什么作用，filter的原理等  一、前置知识OK，我们首先介绍一下，请求从浏览器过来，我们的服务器会经历些什么。先看一张jetty的内部结构图  我们看到jetty的核心组件包括了一大堆的*Handler ，对于这些handler，不">
+<meta name="keywords" content="Spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring filter原理深入浅出">
+<meta property="og:url" content="http://blog.vrzart.com/2017/12/21/Spring filter原理深入浅出/index.html">
+<meta property="og:site_name" content="程序员的天花板">
+<meta property="og:description" content="Spring filter原理深入浅出 在这篇文章中，我会介绍一个请求从浏览器进来，是如何被Spring拦截到的，Spring又是如何处理这个请求的，filter有什么作用，filter的原理等  一、前置知识OK，我们首先介绍一下，请求从浏览器过来，我们的服务器会经历些什么。先看一张jetty的内部结构图  我们看到jetty的核心组件包括了一大堆的*Handler ，对于这些handler，不">
+<meta property="og:image" content="http://static.open-open.com/lib/uploadImg/20130905/20130905174336_227.jpg">
+<meta property="og:updated_time" content="2017-12-21T10:42:01.777Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring filter原理深入浅出">
+<meta name="twitter:description" content="Spring filter原理深入浅出 在这篇文章中，我会介绍一个请求从浏览器进来，是如何被Spring拦截到的，Spring又是如何处理这个请求的，filter有什么作用，filter的原理等  一、前置知识OK，我们首先介绍一下，请求从浏览器过来，我们的服务器会经历些什么。先看一张jetty的内部结构图  我们看到jetty的核心组件包括了一大堆的*Handler ，对于这些handler，不">
+<meta name="twitter:image" content="http://static.open-open.com/lib/uploadImg/20130905/20130905174336_227.jpg">
+    
+
+    
+        <link rel="alternate" href="/" title="程序员的天花板" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-109857411-3', 'auto');
+ga('send', 'pageview');
+
+</script>
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?5439be9e87cb495d516d07ea884f36aa";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">程序员的天花板</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/categories">Categories</a>
+                
+                    <a class="main-nav-link" href="/tags">Tags</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">Categories</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">Tags</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.png" />
+            <h2 id="name">itar</h2>
+            <h3 id="title">Senior Software Enginee</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>shanghai, China</span>
+            <a id="follow" target="_blank" href="https://github.com/mustfun/">FOLLOW</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                45
+                <span>posts</span>
+            </div>
+            <div class="article-info-block">
+                28
+                <span>tags</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="https://github.com/mustfun/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-Spring filter原理深入浅出" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            Spring filter原理深入浅出
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/12/21/Spring filter原理深入浅出/">
+            <time datetime="2017-12-21T08:05:00.000Z" itemprop="datePublished">2017-12-21</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/Spring/">Spring</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Spring/">Spring</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h1 id="Spring-filter原理深入浅出"><a href="#Spring-filter原理深入浅出" class="headerlink" title="Spring filter原理深入浅出"></a>Spring filter原理深入浅出</h1><blockquote>
+<p>在这篇文章中，我会介绍一个请求从浏览器进来，是如何被Spring拦截到的，Spring又是如何处理这个请求的，filter有什么作用，filter的原理等</p>
+</blockquote>
+<h3 id="一、前置知识"><a href="#一、前置知识" class="headerlink" title="一、前置知识"></a>一、前置知识</h3><p>OK，我们首先介绍一下，请求从浏览器过来，我们的服务器会经历些什么。先看一张jetty的内部结构图</p>
+<p><img src="http://static.open-open.com/lib/uploadImg/20130905/20130905174336_227.jpg" alt="jetty内部组成"></p>
+<p>我们看到jetty的核心组件包括了一大堆的<code>*Handler</code> ，对于这些handler，不论任何容器基本都有，可能名称不太相同，笔者这里以undertow这个容器为例，浏览器发送过来的请求，会经过一个<code>FilterHandler</code> 这个handler跟我们今天的主题相关。</p>
+<h3 id="二、Request阶段"><a href="#二、Request阶段" class="headerlink" title="二、Request阶段"></a>二、Request阶段</h3><p>先看一下这个handler的处理代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleRequest</span><span class="params">(HttpServerExchange exchange)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        ServletRequestContext servletRequestContext = (ServletRequestContext)exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);</div><div class="line">        ServletRequest request = servletRequestContext.getServletRequest();</div><div class="line">        ServletResponse response = servletRequestContext.getServletResponse();</div><div class="line">        DispatcherType dispatcher = servletRequestContext.getDispatcherType();</div><div class="line">        Boolean supported = (Boolean)<span class="keyword">this</span>.asyncSupported.get(dispatcher);</div><div class="line">        <span class="keyword">if</span> (supported != <span class="keyword">null</span> &amp;&amp; !supported.booleanValue()) &#123;</div><div class="line">            servletRequestContext.setAsyncSupported(<span class="keyword">false</span>);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        List&lt;ManagedFilter&gt; filters = (List)<span class="keyword">this</span>.filters.get(dispatcher);</div><div class="line">        <span class="keyword">if</span> (filters == <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">this</span>.next.handleRequest(exchange);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            FilterHandler.FilterChainImpl filterChain = <span class="keyword">new</span> FilterHandler.FilterChainImpl(exchange, filters, <span class="keyword">this</span>.next, <span class="keyword">this</span>.allowNonStandardWrappers);</div><div class="line">            filterChain.doFilter(request, response);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>前面都是拿request和response我们不用看，主要是看后面几行代码，<code>filters</code> 如果我们有配置自己的filter，这里肯定不会为空，那么就走下面的filter 链 ，我们看下FilterHandler里面的doFilter的代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> index = <span class="keyword">this</span>.location++;</div><div class="line"><span class="keyword">if</span> (index &gt;= <span class="keyword">this</span>.filters.size()) &#123;</div><div class="line">  <span class="keyword">this</span>.next.handleRequest(<span class="keyword">this</span>.exchange);</div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line">  ((ManagedFilter)<span class="keyword">this</span>.filters.get(index)).doFilter(request, response, <span class="keyword">this</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>​         location默认是0，所以会从list里面的第一个元素取起，依次执行，OK，我们知道，filter里面一般会有一个<code>filterChain.doFilter(request, response);</code> 这句话，代表filter链继续执行，这时候，这里的location就会+1 ，变成执行第二个，第三个，链条就转动起来了。终于执行到我们自己写的<code>ResponseWrapperFilter</code> ，这个filter大家可以在我后面的源码里看到，这里我先说有这么一个自己写的filter，我用来包装我们的response，给response做些手脚。哈哈。</p>
+<p>​         OK，我们继续，当所有的filter都执行完毕之后，就会开始执行this.next.handleRequest(exchange); 这段代码，也就是在继续执行我们刚才的handler链，next表示的是ServletHandler` 这个类，执行代码如下。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">                servlet = <span class="keyword">this</span>.managedServlet.getServlet();</div><div class="line">                ((Servlet)servlet.getInstance()).service(request, response);</div><div class="line">            &#125; <span class="keyword">catch</span> (UnavailableException var12) &#123;</div><div class="line">                <span class="keyword">if</span> (var12.isPermanent()) &#123;</div><div class="line">                    UndertowServletLogger.REQUEST_LOGGER.stoppingServletDueToPermanentUnavailability(<span class="keyword">this</span>.managedServlet.getServletInfo().getName(), var12);</div><div class="line">                    <span class="keyword">this</span>.managedServlet.stop();</div><div class="line">                    <span class="keyword">this</span>.managedServlet.setPermanentlyUnavailable(<span class="keyword">true</span>);</div><div class="line">                    exchange.setStatusCode(<span class="number">404</span>);</div><div class="line">                &#125; <span class="keyword">else</span> &#123;</div><div class="line">                    unavailableUntilUpdater.set(<span class="keyword">this</span>, System.currentTimeMillis() + (<span class="keyword">long</span>)(var12.getUnavailableSeconds() * <span class="number">1000</span>));</div><div class="line">                    UndertowServletLogger.REQUEST_LOGGER.stoppingServletUntilDueToTemporaryUnavailability(<span class="keyword">this</span>.managedServlet.getServletInfo().getName(), <span class="keyword">new</span> Date(until), var12);</div><div class="line">                    exchange.setStatusCode(<span class="number">503</span>);</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>一旦掉用了下面这段代码，我们的处理逻辑就会被调用，说白了就是我们Controller里面的那些逻辑就会被调用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">((Servlet)servlet.getInstance()).service(request, response);</div></pre></td></tr></table></figure>
+<p>这段代码很重要</p>
+<h3 id="三、reponse阶段"><a href="#三、reponse阶段" class="headerlink" title="三、reponse阶段"></a>三、reponse阶段</h3><p>​          经过了上面这段代码的执行，我们的filter开始收拢了，所有的filter在执行<code>filterChain.doFilter(request, response);</code>这段代码之后其实代码是还没有执行完的，如果你下面还有写代码的话，大家好好品味一下这句话，是不是这个意思。因为每个filter都去调用下一个filter了，等最后一个filter执行完毕之后，就开始慢慢收拢，这时候我们的reponse也有了。</p>
+<p>​           当所有的filter执行完毕自己的后置代码之后，就回到了我们最初的地方，我们的最初的FilterHandler开始调用的地方。undertow服务器就继续开始执行了，它就会执行下面的代码输出你想要的信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">if (!exchange.isDispatched() &amp;&amp; !(exchange.getConnection() instanceof ServletInitialHandler.MockServerConnection)) &#123;</div><div class="line">            servletRequestContext.getOriginalResponse().responseDone();</div><div class="line">            servletRequestContext.getOriginalRequest().clearAttributes();</div><div class="line">        &#125;</div></pre></td></tr></table></figure>
+<p>主要就是把输出流写入到socket中，然后客户端接收</p>
+<blockquote>
+<p>好啦，今天就讲到这里啦，这文章还没有结束，请期待后续   ^ _ ^</p>
+</blockquote>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://blog.vrzart.com/2017/12/21/Spring filter原理深入浅出/" data-id="cjbgd2qnu00005oj3se15tv81" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2017/10/30/Spring AOP系列之AOP原理介绍/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Older</strong>
+            <div class="article-nav-title">Spring Boot  AOP系列之AOP原理介绍</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">recent</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/12/21/Spring filter原理深入浅出/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring/">Spring</a></p>
+                            <p class="item-title"><a href="/2017/12/21/Spring filter原理深入浅出/" class="title">Spring filter原理深入浅出</a></p>
+                            <p class="item-date"><time datetime="2017-12-21T08:05:00.000Z" itemprop="datePublished">2017-12-21</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/10/30/Spring AOP系列之AOP原理介绍/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-Boot/">Spring Boot</a></p>
+                            <p class="item-title"><a href="/2017/10/30/Spring AOP系列之AOP原理介绍/" class="title">Spring Boot  AOP系列之AOP原理介绍</a></p>
+                            <p class="item-date"><time datetime="2017-10-30T07:22:01.000Z" itemprop="datePublished">2017-10-30</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/10/30/Spring AOP系列之代理创建/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-Boot/">Spring Boot</a></p>
+                            <p class="item-title"><a href="/2017/10/30/Spring AOP系列之代理创建/" class="title">Spring Boot  AOP系列之动态代理创建</a></p>
+                            <p class="item-date"><time datetime="2017-10-30T04:22:01.000Z" itemprop="datePublished">2017-10-30</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/JAVA/">JAVA</a></p>
+                            <p class="item-title"><a href="/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" class="title">Fastjson解析多级泛型</a></p>
+                            <p class="item-date"><time datetime="2017-08-16T07:22:01.000Z" itemprop="datePublished">2017-08-16</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/07/20/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-Boot/">Spring Boot</a></p>
+                            <p class="item-title"><a href="/2017/07/20/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/" class="title">Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成</a></p>
+                            <p class="item-date"><time datetime="2017-07-20T07:22:01.000Z" itemprop="datePublished">2017-07-20</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">categories</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring/">Spring</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Boot/">Spring Boot</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">archives</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tags</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tag cloud</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/Spring-Boot/" style="font-size: 16.67px;">Spring Boot</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">links</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2017 itar<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. itar all rights reserved
+        </div>
+    </div>
+</footer>
+        
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

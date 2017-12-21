@@ -175,11 +175,11 @@ var _hmt = _hmt || [];
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                44
+                45
                 <span>posts</span>
             </div>
             <div class="article-info-block">
-                27
+                28
                 <span>tags</span>
             </div>
         </div>
@@ -228,6 +228,158 @@ var _hmt = _hmt || [];
 
             
             <section id="main">
+    <article id="post-Spring filter原理深入浅出" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/12/21/Spring filter原理深入浅出/">Spring filter原理深入浅出</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/12/21/Spring filter原理深入浅出/">
+            <time datetime="2017-12-21T08:05:00.000Z" itemprop="datePublished">2017-12-21</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/Spring/">Spring</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Spring/">Spring</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h1 id="Spring-filter原理深入浅出"><a href="#Spring-filter原理深入浅出" class="headerlink" title="Spring filter原理深入浅出"></a>Spring filter原理深入浅出</h1><blockquote>
+<p>在这篇文章中，我会介绍一个请求从浏览器进来，是如何被Spring拦截到的，Spring又是如何处理这个请求的，filter有什么作用，filter的原理等</p>
+</blockquote>
+<h3 id="一、前置知识"><a href="#一、前置知识" class="headerlink" title="一、前置知识"></a>一、前置知识</h3><p>OK，我们首先介绍一下，请求从浏览器过来，我们的服务器会经历些什么。先看一张jetty的内部结构图</p>
+<p><img src="http://static.open-open.com/lib/uploadImg/20130905/20130905174336_227.jpg" alt="jetty内部组成"></p>
+<p>我们看到jetty的核心组件包括了一大堆的<code>*Handler</code> ，对于这些handler，不论任何容器基本都有，可能名称不太相同，笔者这里以undertow这个容器为例，浏览器发送过来的请求，会经过一个<code>FilterHandler</code> 这个handler跟我们今天的主题相关。</p>
+<h3 id="二、Request阶段"><a href="#二、Request阶段" class="headerlink" title="二、Request阶段"></a>二、Request阶段</h3><p>先看一下这个handler的处理代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleRequest</span><span class="params">(HttpServerExchange exchange)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        ServletRequestContext servletRequestContext = (ServletRequestContext)exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);</div><div class="line">        ServletRequest request = servletRequestContext.getServletRequest();</div><div class="line">        ServletResponse response = servletRequestContext.getServletResponse();</div><div class="line">        DispatcherType dispatcher = servletRequestContext.getDispatcherType();</div><div class="line">        Boolean supported = (Boolean)<span class="keyword">this</span>.asyncSupported.get(dispatcher);</div><div class="line">        <span class="keyword">if</span> (supported != <span class="keyword">null</span> &amp;&amp; !supported.booleanValue()) &#123;</div><div class="line">            servletRequestContext.setAsyncSupported(<span class="keyword">false</span>);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        List&lt;ManagedFilter&gt; filters = (List)<span class="keyword">this</span>.filters.get(dispatcher);</div><div class="line">        <span class="keyword">if</span> (filters == <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">this</span>.next.handleRequest(exchange);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            FilterHandler.FilterChainImpl filterChain = <span class="keyword">new</span> FilterHandler.FilterChainImpl(exchange, filters, <span class="keyword">this</span>.next, <span class="keyword">this</span>.allowNonStandardWrappers);</div><div class="line">            filterChain.doFilter(request, response);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>前面都是拿request和response我们不用看，主要是看后面几行代码，<code>filters</code> 如果我们有配置自己的filter，这里肯定不会为空，那么就走下面的filter 链 ，我们看下FilterHandler里面的doFilter的代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> index = <span class="keyword">this</span>.location++;</div><div class="line"><span class="keyword">if</span> (index &gt;= <span class="keyword">this</span>.filters.size()) &#123;</div><div class="line">  <span class="keyword">this</span>.next.handleRequest(<span class="keyword">this</span>.exchange);</div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line">  ((ManagedFilter)<span class="keyword">this</span>.filters.get(index)).doFilter(request, response, <span class="keyword">this</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>​         location默认是0，所以会从list里面的第一个元素取起，依次执行，OK，我们知道，filter里面一般会有一个<code>filterChain.doFilter(request, response);</code> 这句话，代表filter链继续执行，这时候，这里的location就会+1 ，变成执行第二个，第三个，链条就转动起来了。终于执行到我们自己写的<code>ResponseWrapperFilter</code> ，这个filter大家可以在我后面的源码里看到，这里我先说有这么一个自己写的filter，我用来包装我们的response，给response做些手脚。哈哈。</p>
+<p>​         OK，我们继续，当所有的filter都执行完毕之后，就会开始执行this.next.handleRequest(exchange); 这段代码，也就是在继续执行我们刚才的handler链，next表示的是ServletHandler` 这个类，执行代码如下。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">                servlet = <span class="keyword">this</span>.managedServlet.getServlet();</div><div class="line">                ((Servlet)servlet.getInstance()).service(request, response);</div><div class="line">            &#125; <span class="keyword">catch</span> (UnavailableException var12) &#123;</div><div class="line">                <span class="keyword">if</span> (var12.isPermanent()) &#123;</div><div class="line">                    UndertowServletLogger.REQUEST_LOGGER.stoppingServletDueToPermanentUnavailability(<span class="keyword">this</span>.managedServlet.getServletInfo().getName(), var12);</div><div class="line">                    <span class="keyword">this</span>.managedServlet.stop();</div><div class="line">                    <span class="keyword">this</span>.managedServlet.setPermanentlyUnavailable(<span class="keyword">true</span>);</div><div class="line">                    exchange.setStatusCode(<span class="number">404</span>);</div><div class="line">                &#125; <span class="keyword">else</span> &#123;</div><div class="line">                    unavailableUntilUpdater.set(<span class="keyword">this</span>, System.currentTimeMillis() + (<span class="keyword">long</span>)(var12.getUnavailableSeconds() * <span class="number">1000</span>));</div><div class="line">                    UndertowServletLogger.REQUEST_LOGGER.stoppingServletUntilDueToTemporaryUnavailability(<span class="keyword">this</span>.managedServlet.getServletInfo().getName(), <span class="keyword">new</span> Date(until), var12);</div><div class="line">                    exchange.setStatusCode(<span class="number">503</span>);</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>一旦掉用了下面这段代码，我们的处理逻辑就会被调用，说白了就是我们Controller里面的那些逻辑就会被调用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">((Servlet)servlet.getInstance()).service(request, response);</div></pre></td></tr></table></figure>
+<p>这段代码很重要</p>
+<h3 id="三、reponse阶段"><a href="#三、reponse阶段" class="headerlink" title="三、reponse阶段"></a>三、reponse阶段</h3><p>​          经过了上面这段代码的执行，我们的filter开始收拢了，所有的filter在执行<code>filterChain.doFilter(request, response);</code>这段代码之后其实代码是还没有执行完的，如果你下面还有写代码的话，大家好好品味一下这句话，是不是这个意思。因为每个filter都去调用下一个filter了，等最后一个filter执行完毕之后，就开始慢慢收拢，这时候我们的reponse也有了。</p>
+<p>​           当所有的filter执行完毕自己的后置代码之后，就回到了我们最初的地方，我们的最初的FilterHandler开始调用的地方。undertow服务器就继续开始执行了，它就会执行下面的代码输出你想要的信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">if (!exchange.isDispatched() &amp;&amp; !(exchange.getConnection() instanceof ServletInitialHandler.MockServerConnection)) &#123;</div><div class="line">            servletRequestContext.getOriginalResponse().responseDone();</div><div class="line">            servletRequestContext.getOriginalRequest().clearAttributes();</div><div class="line">        &#125;</div></pre></td></tr></table></figure>
+<p>主要就是把输出流写入到socket中，然后客户端接收</p>
+<blockquote>
+<p>好啦，今天就讲到这里啦，这文章还没有结束，请期待后续   ^ _ ^</p>
+</blockquote>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://blog.vrzart.com/2017/12/21/Spring filter原理深入浅出/" data-id="cjbgd2qnu00005oj3se15tv81" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-Spring AOP系列之AOP原理介绍" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -291,7 +443,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之AOP原理介绍/" data-id="cjbg3ozna000kdoj3vuvqj1t5" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之AOP原理介绍/" data-id="cjbg6tsws000kt4j3oh6eo07r" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -429,7 +581,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之代理创建/" data-id="cjbg3oznb000mdoj3ij4ts823" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之代理创建/" data-id="cjbg6tswu000mt4j3xgtbzpio" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -562,7 +714,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" data-id="cjbg3ozm60002doj37ers9dn0" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" data-id="cjbg6tsvz0002t4j3s5uys2c3" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -788,7 +940,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/07/20/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/" data-id="cjbg3oznf000rdoj373oheuw0" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/07/20/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/" data-id="cjbg6tsx70013t4j3fwy6zm8x" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -920,7 +1072,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" data-id="cjbg3oznd000pdoj3a4h8vggr" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" data-id="cjbg6tsx60010t4j3xhcy9xya" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1020,6 +1172,11 @@ var _hmt = _hmt || [];
 
 
                         
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/mysql/">mysql</a>
+    </div>
+
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
@@ -1033,8 +1190,7 @@ var _hmt = _hmt || [];
         
         <div class="article-entry" itemprop="articleBody">
         
-            
-            <h3 id="高可用数据同步方案-SqlServer迁移Mysql实战"><a href="#高可用数据同步方案-SqlServer迁移Mysql实战" class="headerlink" title="高可用数据同步方案-SqlServer迁移Mysql实战"></a>高可用数据同步方案-SqlServer迁移Mysql实战</h3><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>  随着业务量的上升，以前的架构已经不满足业务的发展，数据作为业务中最重要的一环，需要有更好的架构作为支撑。目前我司有sql server转mysql的需求，所以结合当前业务，我挑选了阿里云开源的一个很好用的同步工具DataX</p>
+            <p><h3 id="高可用数据同步方案-SqlServer迁移Mysql实战"><a href="#高可用数据同步方案-SqlServer迁移Mysql实战" class="headerlink" title="高可用数据同步方案-SqlServer迁移Mysql实战"></a>高可用数据同步方案-SqlServer迁移Mysql实战</h3><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>  随着业务量的上升，以前的架构已经不满足业务的发展，数据作为业务中最重要的一环，需要有更好的架构作为支撑。目前我司有sql server转mysql的需求，所以结合当前业务，我挑选了阿里云开源的一个很好用的同步工具DataX</p>
 <h5 id="DataX介绍"><a href="#DataX介绍" class="headerlink" title="DataX介绍"></a>DataX介绍</h5><blockquote>
 <p>DataX 是一个异构数据源离线同步工具，致力于实现包括关系型数据库(MySQL、Oracle等)、HDFS、Hive、MaxCompute(原ODPS)、HBase、FTP等各种异构数据源之间稳定高效的数据同步功能。</p>
 </blockquote>
@@ -1044,46 +1200,10 @@ var _hmt = _hmt || [];
 <li>Reader：Reader为数据采集模块，负责采集数据源的数据，将数据发送给Framework。</li>
 <li>Writer： Writer为数据写入模块，负责不断向Framework取数据，并将数据写入到目的端。</li>
 <li>Framework：Framework用于连接reader和writer，作为两者的数据传输通道，并处理缓冲，流控，并发，数据转换等核心技术问题。</li>
-</ul>
-<h4 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h4><h5 id="下载安装部署"><a href="#下载安装部署" class="headerlink" title="下载安装部署"></a>下载安装部署</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> wget http://datax-opensource.oss-cn-hangzhou.aliyuncs.com/datax.tar.gz</div><div class="line"><span class="meta">$</span> tar zxvf datax.tar.gz</div><div class="line"><span class="meta">$</span> sudo chmod -R 755 &#123;YOUR_DATAX_HOME&#125;</div></pre></td></tr></table></figure>
-<p>也可以自己下载源码安装，不过需要安装maven</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> git clone git@github.com:alibaba/DataX.git</div><div class="line"><span class="meta">$</span> cd  &#123;DataX_source_code_home&#125;</div><div class="line"><span class="meta">$</span> mvn -U clean package assembly:assembly -Dmaven.test.skip=true</div></pre></td></tr></table></figure>
-<p>打包成功后的DataX包位于 {DataX_source_code_home}/target/datax/datax/ ，结构如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> cd  &#123;DataX_source_code_home&#125;</div><div class="line"><span class="meta">$</span> ls ./target/datax/datax/</div><div class="line">   bin		conf		job		lib		log		log_perf	plugin</div></pre></td></tr></table></figure>
-<h5 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h5><p>你需要编写一个基本信息配置文件，文件包括原库到写入库的表字段对应关系。基本信息包括</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  "job": &#123;</div><div class="line">    "content": [</div><div class="line">      &#123;</div><div class="line">        "reader": &#123;        //读入库配置，比如说是sql server</div><div class="line">          "name": "",      //数据源名称，别瞎写</div><div class="line">          "parameter": &#123;&#125;  //数据库配置信息</div><div class="line">        &#125;,</div><div class="line">        "writer": &#123;        //写入库配置，比如说是mysql</div><div class="line">          "name": "",      //数据源名称，别瞎写</div><div class="line">          "parameter": &#123;&#125;  //数据库配置信息</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">    ],</div><div class="line">    "setting": &#123;            //基本设置</div><div class="line">      "speed": &#123;            //流量控制</div><div class="line">        "channel": 1,       //同步时候的并发数</div><div class="line">        "byte": 104857600   //同步时候的字节大小，影响速度</div><div class="line">      &#125;,</div><div class="line">      "errorLimit": &#123;       //脏数据控制</div><div class="line">        "record": 10,       //脏数据最大记录数阈值</div><div class="line">        "percentage": 0.05  //脏数据占比阈值</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>下面给一个配置demo，大家根据自己的需要修改demo，然后使用</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">     "job": &#123;</div><div class="line">          "setting": &#123;</div><div class="line">               "speed": &#123;</div><div class="line">                    "byte": 1073741824</div><div class="line">               &#125;</div><div class="line">          &#125;,</div><div class="line">          "content": [</div><div class="line">               &#123;</div><div class="line">                    "reader": &#123;</div><div class="line">                         "name": "sqlserverreader",</div><div class="line">                         "parameter": &#123;</div><div class="line">                              "username": "root",  //自己根据需要修改数据库用户名</div><div class="line">                              "password": "admin", //密码</div><div class="line">                              "where": "",</div><div class="line">                              "connection": [</div><div class="line">                                   &#123;</div><div class="line">                                        "querySql": [</div><div class="line">                                             "SELECT Id,MyReasonId,MyProductType,MyReason FROM dbo.MyReason  WITH ( NOLOCK )"</div><div class="line">                                        ],//全量sql,根据自己需要写增量sql也可以</div><div class="line">                                        "jdbcUrl": [</div><div class="line">                                             "jdbc:sqlserver://192.168.1.1:1433;DatabaseName=XXXX"</div><div class="line">                                        ]//自己根据需要修改数据库连接</div><div class="line">                                   &#125;</div><div class="line">                              ]</div><div class="line">                         &#125;</div><div class="line">                    &#125;,</div><div class="line">                    "writer": &#123;</div><div class="line">                         "name": "mysqlwriter",</div><div class="line">                         "parameter": &#123;</div><div class="line">                              "writeMode": "insert",  //写入模式，这里写插入</div><div class="line">                              "username": "root",//自己根据需要修改数据库用户名</div><div class="line">                              "password": "admin",//密码</div><div class="line">                              "column": [</div><div class="line">                                    "id",       //注意与上面的列一一对应</div><div class="line">                                    "my_reason_id",</div><div class="line">                                    "my_product_type",</div><div class="line">                                    "my_reason" </div><div class="line">                                    ],</div><div class="line">                              "connection": [</div><div class="line">                                   &#123;</div><div class="line">                                        "jdbcUrl": "jdbc:mysql://192.168.1.2:3306/XXX?useUnicode=true&amp;characterEncoding=utf-8",</div><div class="line">                                        "table": [</div><div class="line">                                             "my_reason"</div><div class="line">                                        ]</div><div class="line">                                   &#125;</div><div class="line">                              ]</div><div class="line">                         &#125;</div><div class="line">                    &#125;</div><div class="line">               &#125;</div><div class="line">          ]</div><div class="line">     &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>编辑好之后，放到新建work目录里面，然后存为mssql_to_mysql.json，下面就可以运行了</p>
-<h5 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> cd  &#123;YOUR_DATAX_HOME&#125;/bin</div><div class="line"><span class="meta">$</span> python datax.py ../work/mssql_to_mysql.json</div></pre></td></tr></table></figure>
-<p>同步结束，显示日志如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line">2015-12-17 11:20:25.263 [job-0] INFO  JobContainer - </div><div class="line">任务启动时刻                    : 2015-12-17 11:20:15</div><div class="line">任务结束时刻                    : 2015-12-17 11:20:25</div><div class="line">任务总计耗时                    :                 10s</div><div class="line">任务平均流量                    :              205B/s</div><div class="line">记录写入速度                    :              5rec/s</div><div class="line">读出记录总数                    :                  50</div><div class="line">读写失败总数                    :                   0</div></pre></td></tr></table></figure>
-<p>这样就说明成功啦</p>
-<h4 id="进阶"><a href="#进阶" class="headerlink" title="进阶"></a>进阶</h4><h5 id="job配置"><a href="#job配置" class="headerlink" title="job配置"></a>job配置</h5><p>将你需要同步的增量数据放入到安装目录job下面，存为myjob.json，名称随意</p>
-<p>linux下通过crontab命令实现</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>查看crond服务是否启动，出现以下日志表示已启动</div><div class="line"><span class="meta">$</span>/sbin/service crond status</div><div class="line"> crond (pid  30742) is running...</div></pre></td></tr></table></figure>
-<ul>
-<li><p>第一步：创建作业的配置文件（json格式） 参考上节内容。这里假设已配置好MySQL到ODPS的配置文件mysql2odps.json</p>
-</li>
-<li><p>第二步：列出列出crontab文件，命令： crontab -l<br>（1）若出现以下日志，表示当前用户没有定时任务，用户需要新建crontab文件，并提交crontab文件，参考第三步。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$crontab -l</div><div class="line"> no crontab for xxx</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>（2）若出现以下日志，表示当前用户已经有正在运行的定时任务，用户只需用命令crontab -e 来编辑crontab文件，参考第四步。 <code>shell $ crontab -l 0,10,20,35,44,50 * * * * python /home/admin/datax3/bin/datax.py /home/admin/mysql2odps.json &gt;&gt;/home/hanfa.shf/log.</code>date +\%Y\%m\%d\%H\%M\%S<code>2&gt;&amp;1</code></p>
-<ul>
-<li><p>第三步：若当前用户没有定时任务（之前从未创建过crontab任务)</p>
-<p>​</p>
-<p>（1）创建一个新的crontab文件，如取名crondatax</p>
-<p>​</p>
-<p>示例1：每天13点5分进行同步作业，并把运行日志输出到目录/home/hanfa.shf/下log.运行时间 文件中,如定时运行是在2016-3-26 13:10:13运行的，产生的日志文件名为：log.20160326131023</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$ vim crondatax</div><div class="line">#输入以下内容</div><div class="line">5  13 * * *  python /home/admin/datax3/bin/datax.py /home/admin/mysql2odps.json  &gt;&gt;/home/hanfa.shf/log.`date +\%Y\%m\%d\%H\%M\%S`  2&gt;&amp;1</div><div class="line">#/home/admin/datax3/bin/datax.py 表示你安装的DataX datax.py所在目录（请替换为您真实的绝对路径目录）；</div><div class="line">#/home/admin/mysql2odps.json  表示作业的配置文件目录（请替换为您真实的绝对路径目录）；</div><div class="line">#/home/hanfa.shf/log.`date +\%Y\%m\%d\%H\%M\%S` 表示日志输出位置，并以log.当前时间 命名（请替换为您真实的绝对路径目录）</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>（2）提交你刚刚创建的crontab文件 <code>shell $ crontab crondatax #crondatax 你创建的crontab文件名</code>（3）重启crontab服务 <code>shell $ sudo /etc/init.d/crond restart Stopping crond: [ OK ] Starting crond: [ OK ]</code> （4）在13点5分过后，在日志目录会看到对应的日文件 <code>shell $ ls -al /home/hanfa.shf/ -rw-r--r-- 1 hanfa.shf users 12062 Mar 26 13:05 log.20160326130501</code></p>
-<blockquote>
-<p>进阶内容引自官方教程 ^_^</p>
-</blockquote>
-<div style="color:red">感谢我媳妇儿品品支持创作</div>
+</ul></p>
+            <p class="article-more-link">
+                <a href="/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/#more">Read More</a>
+            </p>
         
         </div>
         <footer class="article-footer">
@@ -1093,7 +1213,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/" data-id="cjbg3ozpl002rdoj3kvn73p4m" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/" data-id="cjbg6tsyq002rt4j3612q4jek" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1234,7 +1354,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/06/09/Spring boot返回request、response log添加/" data-id="cjbg3ozng000sdoj3gnbuqtop" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/06/09/Spring boot返回request、response log添加/" data-id="cjbg6tsww000pt4j3qtfqmtxf" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1367,7 +1487,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/05/26/高并发的核心技术-幂等的实现方案/" data-id="cjbg3ozpk002pdoj37wdksvkw" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/05/26/高并发的核心技术-幂等的实现方案/" data-id="cjbg6tsyo002pt4j37c1bang0" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1499,141 +1619,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/05/26/面试大全/" data-id="cjbg3ozpi002mdoj3nsud3a5a" class="article-share-link"><i class="fa fa-share"></i>Share</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-自己收集的面试题" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/05/26/自己收集的面试题/">自己收集的面试题</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/05/26/自己收集的面试题/">
-            <time datetime="2017-05-26T11:14:31.064Z" itemprop="datePublished">2017-05-26</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/面试题/">面试题</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            <p><p>1、描述一下你最近的的一个项目架构</p>
-<p>资金平台平台重构+后台对账业务？</p>
-<p>如何快速接入银行、怎么保证可扩展性</p>
-<p>针对银行接口的变化有哪些考虑</p>
-<p>怎么考虑调单情况？</p>
-<p>2、描述一下http请求到服务器返回发生了哪些过程</p>
-<p>3、数据库死锁？线上怎么定位？怎么解决</p>
-<p>4、为什么mysql中主键要自增？</p>
-<p>5、你了解哪些sql优化</p></p>
-            <p class="article-more-link">
-                <a href="/2017/05/26/自己收集的面试题/#more">Read More</a>
-            </p>
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://blog.vrzart.com/2017/05/26/自己收集的面试题/" data-id="cjbg3ozph002kdoj3rgqm3gfo" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/05/26/面试大全/" data-id="cjbg6tsyl002mt4j3il6cscwu" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1726,6 +1712,25 @@ var _hmt = _hmt || [];
                     <li>
                         
                         <div class="item-thumbnail">
+                            <a href="/2017/12/21/Spring filter原理深入浅出/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring/">Spring</a></p>
+                            <p class="item-title"><a href="/2017/12/21/Spring filter原理深入浅出/" class="title">Spring filter原理深入浅出</a></p>
+                            <p class="item-date"><time datetime="2017-12-21T08:05:00.000Z" itemprop="datePublished">2017-12-21</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
                             <a href="/2017/10/30/Spring AOP系列之AOP原理介绍/" class="thumbnail">
     
     
@@ -1799,25 +1804,6 @@ var _hmt = _hmt || [];
                         </div>
                     </li>
                 
-                    <li>
-                        
-                        <div class="item-thumbnail">
-                            <a href="/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" class="thumbnail">
-    
-    
-        <span class="thumbnail-image thumbnail-none"></span>
-    
-</a>
-
-                        </div>
-                        
-                        <div class="item-inner">
-                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-Boot/">Spring Boot</a></p>
-                            <p class="item-title"><a href="/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" class="title">Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍</a></p>
-                            <p class="item-date"><time datetime="2017-07-19T07:22:01.000Z" itemprop="datePublished">2017-07-19</time></p>
-                        </div>
-                    </li>
-                
             </ul>
         </div>
     </div>
@@ -1827,7 +1813,7 @@ var _hmt = _hmt || [];
     <div class="widget-wrap">
         <h3 class="widget-title">categories</h3>
         <div class="widget">
-            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Boot/">Spring Boot</a><span class="category-list-count">4</span></li></ul>
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring/">Spring</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Boot/">Spring Boot</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1836,7 +1822,7 @@ var _hmt = _hmt || [];
     <div class="widget-wrap">
         <h3 class="widget-title">archives</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
         </div>
     </div>
 
@@ -1845,7 +1831,7 @@ var _hmt = _hmt || [];
     <div class="widget-wrap">
         <h3 class="widget-title">tags</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1854,7 +1840,7 @@ var _hmt = _hmt || [];
     <div class="widget-wrap">
         <h3 class="widget-title">tag cloud</h3>
         <div class="widget tagcloud">
-            <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Spring-Boot/" style="font-size: 16.67px;">Spring Boot</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+            <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/Spring-Boot/" style="font-size: 16.67px;">Spring Boot</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
         </div>
     </div>
 

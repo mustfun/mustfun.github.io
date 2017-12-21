@@ -291,7 +291,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之AOP原理介绍/" data-id="cjbfuwqm6000kmcj35o7u5zr7" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之AOP原理介绍/" data-id="cjbg3ozna000kdoj3vuvqj1t5" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -429,7 +429,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之代理创建/" data-id="cjbfuwqm8000mmcj3btpgmem4" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之代理创建/" data-id="cjbg3oznb000mdoj3ij4ts823" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -547,29 +547,12 @@ var _hmt = _hmt || [];
         
         <div class="article-entry" itemprop="articleBody">
         
-            
-            <h3 id="Fastjson解析多级泛型"><a href="#Fastjson解析多级泛型" class="headerlink" title="Fastjson解析多级泛型"></a>Fastjson解析多级泛型</h3><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>现在网上大多数是使用<code>TypeReference</code> 方式来解析JSON数据，这里我提供另外一种方式来解析，使用类文件进行解析，两种方式我都会给出实际代码</p>
+            <p><h3 id="Fastjson解析多级泛型"><a href="#Fastjson解析多级泛型" class="headerlink" title="Fastjson解析多级泛型"></a>Fastjson解析多级泛型</h3><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>现在网上大多数是使用<code>TypeReference</code> 方式来解析JSON数据，这里我提供另外一种方式来解析，使用类文件进行解析，两种方式我都会给出实际代码</p>
 <h4 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h4><h5 id="TypeReference方式"><a href="#TypeReference方式" class="headerlink" title="TypeReference方式"></a>TypeReference方式</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span></div><div class="line">   <span class="meta">@Path</span>(<span class="string">"getUserCourse"</span>)</div><div class="line">   <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">   <span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourse()&#123;</div><div class="line">       <span class="keyword">return</span> externalBiz.getUserCourse();</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourse()&#123;</div><div class="line">        String result = restTemplate.getForObject(MOCK_JSON_URL, String.class);</div><div class="line">        <span class="keyword">return</span> JSONObject.parseObject(result, <span class="keyword">new</span> TypeReference&lt;Result&lt;List&lt;UserCourseDto&gt;&gt;&gt;() &#123;&#125;);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-<p><strong>浏览器访问：</strong><code>http://localhost:8080/v1/province/getUserCourse</code></p>
-<p>可以得到json返回的结果</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  status: 0,</div><div class="line">  message: "1",</div><div class="line">  data: [</div><div class="line">    &#123;</div><div class="line">      openType: "兑换 ",</div><div class="line">      userID: 30014,</div><div class="line">      classID: 10376,</div><div class="line">      className: "趣味职场俚语课程【11月班】",</div><div class="line">      chargeFee: 106,</div><div class="line">      classStudyTime: null,</div><div class="line">      openRMB: 0,</div><div class="line">      rechargeFee: 0,</div><div class="line">      awardFee: 0,</div><div class="line">      openFee: 0,</div><div class="line">      dateAdded: 1312175789393,</div><div class="line">      expiredDate: 1323964800000</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>介绍：</strong></p>
-<p>这里使用了提供的TypeReference进行包装，能够清晰明了进行解析多级泛型，但是有时候，我们做一些通用的解析框架的时候，可能会用T类型，T类型拿到的是字节码文件，或者class对象，又该怎么处理呢？请看下面介绍。</p>
-<h4 id="class类方式"><a href="#class类方式" class="headerlink" title="class类方式"></a>class类方式</h4><p><strong>接口：</strong></p>
-<p>接口之类用了一个注解来处理的，没有直接传class对象过去，因为在实际项目中，基本都是注解，没有谁会直接传class对象。所以我传的Annotation数组过去啦</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span></div><div class="line">   <span class="meta">@Reader</span>(extParamClass = &#123;Result.class,List.class,UserCourseDto.class&#125;)</div><div class="line">   <span class="meta">@Path</span>(<span class="string">"getUserCourseV2"</span>)</div><div class="line">   <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">   <span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourseV2()&#123;</div><div class="line">       Annotation[] annotations = <span class="keyword">new</span> Annotation[<span class="number">0</span>];</div><div class="line">       <span class="keyword">for</span> (Method method : <span class="keyword">this</span>.getClass().getMethods()) &#123;</div><div class="line">           <span class="keyword">if</span> (method.getName().equals(<span class="string">"getUserCourseV2"</span>))&#123;</div><div class="line">               annotations = method.getAnnotations();</div><div class="line">           &#125;</div><div class="line">       &#125;</div><div class="line">       <span class="keyword">return</span> externalBiz.getUserCourseV2(annotations);</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
-<p><strong>处理：</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourseV2(Annotation[] annotations) &#123;</div><div class="line">        <span class="keyword">final</span> Reader[] readers = &#123;<span class="keyword">null</span>&#125;;</div><div class="line">        <span class="keyword">if</span>(annotations != <span class="keyword">null</span>) &#123;</div><div class="line">            Arrays</div><div class="line">                    .stream(annotations)</div><div class="line">                    .filter(annotation -&gt; annotation.annotationType().equals(Reader.class))</div><div class="line">                    .findFirst().ifPresent(x -&gt; readers[<span class="number">0</span>] = (Reader) x);</div><div class="line">        &#125;</div><div class="line">        Class[] classes = readers[<span class="number">0</span>].extParamClass();</div><div class="line">        String result = restTemplate.getForObject(MOCK_JSON_URL, String.class);</div><div class="line">        <span class="comment">//这里不用TypeReference方式，直接用class对象来处理</span></div><div class="line"></div><div class="line">        ParameterizedTypeImpl beforeType = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">if</span> (classes.length!=<span class="number">0</span>)&#123;</div><div class="line">            <span class="comment">//支持多级泛型的解析</span></div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = classes.length-<span class="number">1</span>; i &gt;<span class="number">0</span> ; i--) &#123;</div><div class="line">                beforeType = <span class="keyword">new</span> ParameterizedTypeImpl(<span class="keyword">new</span> Type[]&#123;beforeType == <span class="keyword">null</span>? classes[i]:beforeType&#125;, <span class="keyword">null</span>, classes[i - <span class="number">1</span>]);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span>  JSON.parseObject(result,beforeType);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>代码评析：</strong></p>
-<p>主要起作用的还是这两行代码</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = classes.length-<span class="number">1</span>; i &gt;<span class="number">0</span> ; i--) &#123;</div><div class="line">                beforeType = <span class="keyword">new</span> ParameterizedTypeImpl(<span class="keyword">new</span> Type[]&#123;beforeType == <span class="keyword">null</span>? classes[i]:beforeType&#125;, <span class="keyword">null</span>, classes[i - <span class="number">1</span>]);</div><div class="line">            &#125;</div></pre></td></tr></table></figure>
-<p>主要意思是将你的class对象包装成一个ParameterizedTypeImpl，使用ParameterizedTypeImpl来解析多级泛型，但是要注意的是，每层泛型，都需要用一个ParameterizedTypeImpl对象进行包装起来才会起作用，因为他会有一个<code>actualTypeArguments</code> 和一个 <code>rawType</code> ，在多级泛型中，用我这里的例子说明，第一层的时候<code>rawType</code>  会是一个<code>Result</code>对象，而<code>actualTypeArguments</code> 会是一个包装过后的<code>ParameterizedTypeImpl</code>对象，第二层的时候，<code>rawType</code>  会是一个List对象，而<code>actualTypeArguments</code> 会是包装上一层的对象。后同。PS : 如果这里不知道我说的是什么，请调试的时候结合来看哈</p>
-<p>最后也可以正确解析哈~</p>
-<blockquote>
-<p>END</p>
-</blockquote>
-
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourse()&#123;</div><div class="line">        String result = restTemplate.getForObject(MOCK_JSON_URL, String.class);</div><div class="line">        <span class="keyword">return</span> JSONObject.parseObject(result, <span class="keyword">new</span> TypeReference&lt;Result&lt;List&lt;UserCourseDto&gt;&gt;&gt;() &#123;&#125;);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+            <p class="article-more-link">
+                <a href="/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/#more">Read More</a>
+            </p>
         
         </div>
         <footer class="article-footer">
@@ -579,7 +562,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" data-id="cjbfuwqli0002mcj3wn9g0y0p" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" data-id="cjbg3ozm60002doj37ers9dn0" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -805,7 +788,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/07/20/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/" data-id="cjbfuwqma000pmcj31bwetrj3" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/07/20/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/" data-id="cjbg3oznf000rdoj373oheuw0" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -937,7 +920,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" data-id="cjbfuwqmb000rmcj3lvwge45i" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" data-id="cjbg3oznd000pdoj3a4h8vggr" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1110,7 +1093,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/" data-id="cjbfuwqnq002pmcj35zgwohqa" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/" data-id="cjbg3ozpl002rdoj3kvn73p4m" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1251,7 +1234,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/06/09/Spring boot返回request、response log添加/" data-id="cjbfuwqmc000smcj3z7snw4iz" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/06/09/Spring boot返回request、response log添加/" data-id="cjbg3ozng000sdoj3gnbuqtop" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1384,7 +1367,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/05/26/高并发的核心技术-幂等的实现方案/" data-id="cjbfuwqnr002rmcj3bgqgiyg0" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/05/26/高并发的核心技术-幂等的实现方案/" data-id="cjbg3ozpk002pdoj37wdksvkw" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1516,7 +1499,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/05/26/面试大全/" data-id="cjbfuwqnn002kmcj33kji1bdk" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/05/26/面试大全/" data-id="cjbg3ozpi002mdoj3nsud3a5a" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1650,7 +1633,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/05/26/自己收集的面试题/" data-id="cjbfuwqnl002hmcj300xvk99o" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/05/26/自己收集的面试题/" data-id="cjbg3ozph002kdoj3rgqm3gfo" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding

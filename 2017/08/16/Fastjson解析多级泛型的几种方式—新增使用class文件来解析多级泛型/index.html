@@ -12,7 +12,7 @@
 <meta property="og:url" content="http://blog.vrzart.com/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/index.html">
 <meta property="og:site_name" content="程序员的天花板">
 <meta property="og:description" content="Fastjson解析多级泛型前言现在网上大多数是使用TypeReference 方式来解析JSON数据，这里我提供另外一种方式来解析，使用类文件进行解析，两种方式我都会给出实际代码 实例TypeReference方式123456@GET   @Path(&quot;getUserCourse&quot;)   @Produces(MediaType.APPLICATION_JSON)   public Result&amp;">
-<meta property="og:updated_time" content="2017-12-20T08:14:08.284Z">
+<meta property="og:updated_time" content="2017-12-21T06:22:59.601Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Fastjson解析多级泛型">
 <meta name="twitter:description" content="Fastjson解析多级泛型前言现在网上大多数是使用TypeReference 方式来解析JSON数据，这里我提供另外一种方式来解析，使用类文件进行解析，两种方式我都会给出实际代码 实例TypeReference方式123456@GET   @Path(&quot;getUserCourse&quot;)   @Produces(MediaType.APPLICATION_JSON)   public Result&amp;">
@@ -278,6 +278,7 @@ var _hmt = _hmt || [];
             <h3 id="Fastjson解析多级泛型"><a href="#Fastjson解析多级泛型" class="headerlink" title="Fastjson解析多级泛型"></a>Fastjson解析多级泛型</h3><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>现在网上大多数是使用<code>TypeReference</code> 方式来解析JSON数据，这里我提供另外一种方式来解析，使用类文件进行解析，两种方式我都会给出实际代码</p>
 <h4 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h4><h5 id="TypeReference方式"><a href="#TypeReference方式" class="headerlink" title="TypeReference方式"></a>TypeReference方式</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span></div><div class="line">   <span class="meta">@Path</span>(<span class="string">"getUserCourse"</span>)</div><div class="line">   <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">   <span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourse()&#123;</div><div class="line">       <span class="keyword">return</span> externalBiz.getUserCourse();</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourse()&#123;</div><div class="line">        String result = restTemplate.getForObject(MOCK_JSON_URL, String.class);</div><div class="line">        <span class="keyword">return</span> JSONObject.parseObject(result, <span class="keyword">new</span> TypeReference&lt;Result&lt;List&lt;UserCourseDto&gt;&gt;&gt;() &#123;&#125;);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<a id="more"></a>
 <p><strong>浏览器访问：</strong><code>http://localhost:8080/v1/province/getUserCourse</code></p>
 <p>可以得到json返回的结果</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  status: 0,</div><div class="line">  message: "1",</div><div class="line">  data: [</div><div class="line">    &#123;</div><div class="line">      openType: "兑换 ",</div><div class="line">      userID: 30014,</div><div class="line">      classID: 10376,</div><div class="line">      className: "趣味职场俚语课程【11月班】",</div><div class="line">      chargeFee: 106,</div><div class="line">      classStudyTime: null,</div><div class="line">      openRMB: 0,</div><div class="line">      rechargeFee: 0,</div><div class="line">      awardFee: 0,</div><div class="line">      openFee: 0,</div><div class="line">      dateAdded: 1312175789393,</div><div class="line">      expiredDate: 1323964800000</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -306,7 +307,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" data-id="cjbfuwqli0002mcj3wn9g0y0p" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" data-id="cjbg3ozm60002doj37ers9dn0" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding

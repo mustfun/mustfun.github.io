@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    
+    <title>HttpServletResponseWrapper包装reponse | 程序员的天花板</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="利用HttpServletResponseWrapper包装reponse  题记： 很多人或许用Spring的时候统一修改一下reponse信息，比较常见的就是给所有的response加一个status、code、message之类的要求，也有的想把response和request的日志打印出来，那么该如何做呢？那就耐心看看吧  一、背景介绍　　对于上述我们说到的这个需求，有很多中实现方式，比较">
+<meta name="keywords" content="Spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HttpServletResponseWrapper包装reponse">
+<meta property="og:url" content="http://blog.vrzart.com/2017/12/22/利用HttpServletResponseWrapper对reponse进行包装/index.html">
+<meta property="og:site_name" content="程序员的天花板">
+<meta property="og:description" content="利用HttpServletResponseWrapper包装reponse  题记： 很多人或许用Spring的时候统一修改一下reponse信息，比较常见的就是给所有的response加一个status、code、message之类的要求，也有的想把response和request的日志打印出来，那么该如何做呢？那就耐心看看吧  一、背景介绍　　对于上述我们说到的这个需求，有很多中实现方式，比较">
+<meta property="og:updated_time" content="2017-12-22T06:22:08.008Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HttpServletResponseWrapper包装reponse">
+<meta name="twitter:description" content="利用HttpServletResponseWrapper包装reponse  题记： 很多人或许用Spring的时候统一修改一下reponse信息，比较常见的就是给所有的response加一个status、code、message之类的要求，也有的想把response和request的日志打印出来，那么该如何做呢？那就耐心看看吧  一、背景介绍　　对于上述我们说到的这个需求，有很多中实现方式，比较">
+    
+
+    
+        <link rel="alternate" href="/" title="程序员的天花板" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-109857411-3', 'auto');
+ga('send', 'pageview');
+
+</script>
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?5439be9e87cb495d516d07ea884f36aa";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">程序员的天花板</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/categories">Categories</a>
+                
+                    <a class="main-nav-link" href="/tags">Tags</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">Categories</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">Tags</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.png" />
+            <h2 id="name">itar</h2>
+            <h3 id="title">Senior Software Enginee</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>shanghai, China</span>
+            <a id="follow" target="_blank" href="https://github.com/mustfun/">FOLLOW</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                46
+                <span>posts</span>
+            </div>
+            <div class="article-info-block">
+                28
+                <span>tags</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="https://github.com/mustfun/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-利用HttpServletResponseWrapper对reponse进行包装" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            HttpServletResponseWrapper包装reponse
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/12/22/利用HttpServletResponseWrapper对reponse进行包装/">
+            <time datetime="2017-12-22T02:54:10.000Z" itemprop="datePublished">2017-12-22</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/Spring/">Spring</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Spring/">Spring</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>利用HttpServletResponseWrapper包装reponse</p>
+<blockquote>
+<p>题记： 很多人或许用Spring的时候统一修改一下reponse信息，比较常见的就是给所有的response加一个status、code、message之类的要求，也有的想把response和request的日志打印出来，那么该如何做呢？那就耐心看看吧</p>
+</blockquote>
+<h3 id="一、背景介绍"><a href="#一、背景介绍" class="headerlink" title="一、背景介绍"></a>一、背景介绍</h3><p>　　对于上述我们说到的这个需求，有很多中实现方式，比较容易想到的就是拦截器，过滤器等，这里我使用的是过滤器的方式来实现的，一是因为Spring天然就对Filter支持得比较好，二是开发方便容易。</p>
+<p>　　对于过滤器的实现方式，我这里也提供2种方式来实现，一种是复制<code>ServletOutputStream</code>的方式，一种是不复制<code>ServletOutputStream</code>的方式，两种方式各有用处，随君选择，后续我会开一篇原理的文章</p>
+<a id="more"></a>
+<p>　　这里可能有读者疑问了，<code>ServletOutputStream</code> 是什么呀？我们看一下官方文档</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Provides an output stream <span class="keyword">for</span> sending binary data to the client. A ServletOutputStream object is normally retrieved via the ServletResponse.getOutputStream method.</div><div class="line">This is an <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">that</span> <span class="title">the</span> <span class="title">servlet</span> <span class="title">container</span> <span class="keyword">implements</span>. <span class="title">Subclasses</span> <span class="title">of</span> <span class="title">this</span> <span class="title">class</span> <span class="title">must</span> <span class="title">implement</span> <span class="title">the</span> <span class="title">java</span>.<span class="title">io</span>.<span class="title">OutputStream</span>.<span class="title">write</span>(<span class="title">int</span>) <span class="title">method</span>.</span></div></pre></td></tr></table></figure>
+<p>　　文档里面写得很清楚，说提供一个输出流来向客户端发送数据，一个<code>ServletOutputStream</code>通常是<code>reponse.getOutputStream()</code>方法来得到，子类必须实现write方法。OK，说明我们最后要改的就是这个了，且要通过<code>reponse.getOutputStream()</code>这种方法得到。</p>
+<h3 id="二、不复制输出流方式（推荐，简便）"><a href="#二、不复制输出流方式（推荐，简便）" class="headerlink" title="二、不复制输出流方式（推荐，简便）"></a>二、不复制输出流方式（推荐，简便）</h3><ol>
+<li><p>首先我们要创建一个Filter，这个Filter继承Spring的`OncePerRequestFilter</p>
+<p>　继承这个<code>Filter</code> 跟继承普通的Filter主要区别就是它只会执行一次，在Servlet 3.0 之后，一个Filter可以被多个线程唤醒，这样就可能出现一些问题，所以我们这里使用这个</p>
+<p>参考文档：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">The dispatcher type javax.servlet.DispatcherType.ASYNC introduced in Servlet <span class="number">3.0</span> means a filter can be invoked in more than one thread over the course of a single request. <span class="function">Some filters only need to filter the initial <span class="title">thread</span> <span class="params">(e.g. request wrapping)</span> <span class="keyword">while</span> others may need to be invoked at least once in each additional thread <span class="keyword">for</span> example <span class="keyword">for</span> setting up thread locals or to perform <span class="keyword">final</span> processing at the very end.</span></div></pre></td></tr></table></figure>
+</li>
+<li><p><code>ResponseWrapperFilter</code> 代码如下</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Order</span>(Ordered.LOWEST_PRECEDENCE - <span class="number">1</span>)</div><div class="line"><span class="meta">@WebFilter</span>(urlPatterns = &#123;<span class="string">"/common/*"</span>&#125;,filterName = <span class="string">"responseWrapperFilter"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ResponseWrapperFilter</span> <span class="keyword">extends</span> <span class="title">OncePerRequestFilter</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(ResponseWrapperFilter.class);</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doFilterInternal</span><span class="params">(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)</span> <span class="keyword">throws</span> ServletException, IOException </span>&#123;</div><div class="line">        ResponseWrapper wrapper = <span class="keyword">new</span> ResponseWrapper(response);</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            filterChain.doFilter(request,wrapper);</div><div class="line"></div><div class="line">            String responseStr = <span class="keyword">new</span> String(wrapper.toByteArray(), response.getCharacterEncoding());</div><div class="line">            Object parse = JSON.parse(responseStr);</div><div class="line"></div><div class="line">            BaseResult&lt;Object&gt; baseResult = <span class="keyword">new</span> BaseResult&lt;&gt;();</div><div class="line">            baseResult.setData(parse);</div><div class="line">            <span class="keyword">if</span> (parse <span class="keyword">instanceof</span> JSONObject)&#123;</div><div class="line">                JSONObject resultObject = (JSONObject) parse;</div><div class="line">                <span class="keyword">if</span> (resultObject.containsKey(<span class="string">"status"</span>)&amp;&amp;resultObject.containsKey(<span class="string">"message"</span>)&amp;&amp;resultObject.containsKey(<span class="string">"data"</span>))&#123;</div><div class="line">                    baseResult = JSONObject.parseObject(resultObject.toJSONString(),<span class="keyword">new</span> TypeReference&lt;BaseResult&lt;Object&gt;&gt;()&#123;&#125;);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            LOGGER.info(<span class="string">"response is ============&#123;&#125;"</span>,baseResult);</div><div class="line"></div><div class="line">            <span class="comment">//必须设置ContentLength</span></div><div class="line">            response.setContentLength(JSON.toJSONBytes(baseResult).length);</div><div class="line">            <span class="comment">//根据http accept来设置，我这里为了简便直接写json了</span></div><div class="line">            response.setContentType(<span class="string">"application/json;charset=utf-8"</span>);</div><div class="line">            response.getOutputStream().write(JSON.toJSONBytes(baseResult));</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            LOGGER.error(<span class="string">"数据包装器执行出错....&#123;&#125;"</span>, e);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我这个Filter主要作用就是给我们的Reponse加上status，把Controller里面的数据放到data字段里面去，加一个包装。</p>
+</li>
+<li><p>ResponseWrapper类源代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> ByteArrayOutputStream output;</div><div class="line"><span class="keyword">private</span> ServletOutputStream filterOutput;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">ResponseWrapper</span><span class="params">(HttpServletResponse response)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>(response);</div><div class="line">    output = <span class="keyword">new</span> ByteArrayOutputStream();</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * 巧妙将ServletOutputStream放到公共变量，解决不能多次读写问题</div><div class="line"> * <span class="doctag">@return</span></div><div class="line"> * <span class="doctag">@throws</span> IOException</div><div class="line"> */</div><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> ServletOutputStream <span class="title">getOutputStream</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">    <span class="keyword">if</span> (filterOutput == <span class="keyword">null</span>) &#123;</div><div class="line">        filterOutput = <span class="keyword">new</span> ServletOutputStream() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">write</span><span class="params">(<span class="keyword">int</span> b)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">                output.write(b);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isReady</span><span class="params">()</span> </span>&#123;</div><div class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setWriteListener</span><span class="params">(WriteListener writeListener)</span> </span>&#123;</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> filterOutput;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">byte</span>[] toByteArray() &#123;</div><div class="line">    <span class="keyword">return</span> output.toByteArray();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>BaseResult类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseResult</span>&lt;<span class="title">T</span>&gt; <span class="keyword">implements</span> <span class="title">Serializable</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">2120267584344923858L</span>;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> Integer status = <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> String message = <span class="keyword">null</span>;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> T data = <span class="keyword">null</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BaseResult</span><span class="params">()</span></span>&#123;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BaseResult</span><span class="params">(Integer status, String message, T data)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.status = status;</div><div class="line">        <span class="keyword">this</span>.message = message;</div><div class="line">        <span class="keyword">this</span>.data = data;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">getStatus</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> status;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setStatus</span><span class="params">(Integer status)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.status = status;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getMessage</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> message;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setMessage</span><span class="params">(String message)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.message = message;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getData</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> data;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setData</span><span class="params">(T data)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.data = data;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"Result&#123;"</span> +</div><div class="line">                <span class="string">"status="</span> + status +</div><div class="line">                <span class="string">", message='"</span> + message + <span class="string">'\''</span> +</div><div class="line">                <span class="string">", data="</span> + data +</div><div class="line">                <span class="string">'&#125;'</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>​</p>
+</li>
+<li><p>这两个类与现有的Spring项目集成就可以实现将reponse修改的目的了</p>
+</li>
+<li><p>使用，浏览器访问：<code>localhost:8080/common/getBaseResult</code> 看效果</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">data: &#123;</div><div class="line">imgUrl: "htt://img.baidu.com/images/11.jpg",</div><div class="line">name: "itar"</div><div class="line">&#125;,</div><div class="line">status: 0</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>是不是还漏了一个Controller</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RestController</span></div><div class="line"><span class="meta">@RequestMapping</span>(&#123;<span class="string">"/common"</span>,<span class="string">"/never"</span>&#125;)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CommonControllerImpl</span></span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@RequestMapping</span>(value = <span class="string">"/getBaseResult"</span>,method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_UTF8_VALUE) <span class="meta">@ResponseBody</span> <span class="function"><span class="keyword">public</span> JSONObject <span class="title">getBaseResult</span><span class="params">()</span> </span>&#123;</div><div class="line">        JSONObject jsonObject = <span class="keyword">new</span> JSONObject();</div><div class="line">        jsonObject.put(<span class="string">"imgUrl"</span>,<span class="string">"htt://img.baidu.com/images/11.jpg"</span>);</div><div class="line">        jsonObject.put(<span class="string">"name"</span>,<span class="string">"itar"</span>);</div><div class="line">        <span class="keyword">return</span> jsonObject;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="三、复制输出流方式"><a href="#三、复制输出流方式" class="headerlink" title="三、复制输出流方式"></a>三、复制输出流方式</h3><ol>
+<li><p>我们这里的复制输出流主要就是将<code>ServletOutputStream</code> 这个流复制一份，复制出来之后大家可以写写日志呀，做些特殊处理什么的。</p>
+</li>
+<li><p>主要使用的是apache提供的<code>TeeOutputStream</code>类将输出流复制一份出来。</p>
+</li>
+<li><p><code>BranchResponseWrapper</code> 类源代码如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BranchResponseWrapper</span> <span class="keyword">extends</span> <span class="title">HttpServletResponseWrapper</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 我们的分支流</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> ByteArrayOutputStream output;</div><div class="line">    <span class="keyword">private</span> ServletOutputStream filterOutput;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> OutputStream bufferOutputStream;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BranchResponseWrapper</span><span class="params">(HttpServletResponse response)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(response);</div><div class="line">        <span class="comment">/*try &#123;</span></div><div class="line">            bufferOutputStream = response.getOutputStream();</div><div class="line">        &#125; catch (IOException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;*/</div><div class="line">        output = <span class="keyword">new</span> ByteArrayOutputStream();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 利用TeeOutputStream复制流，解决多次读写问题</div><div class="line">     * 用super.getOutputStream来获取源outputstream，也可以用注释的那种方式获取，传过来</div><div class="line">     * <span class="doctag">@return</span></div><div class="line">     * <span class="doctag">@throws</span> IOException</div><div class="line">     */</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> ServletOutputStream <span class="title">getOutputStream</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        <span class="keyword">if</span> (filterOutput == <span class="keyword">null</span>) &#123;</div><div class="line">            filterOutput = <span class="keyword">new</span> ServletOutputStream() &#123;</div><div class="line"></div><div class="line">                <span class="comment">//替换构造方法</span></div><div class="line">                <span class="comment">//拿父类的response，初始化的时候，里面还没有数据，只有一些request信息和response信息,但是调用了创建outputStream,</span></div><div class="line">                <span class="comment">//private TeeOutputStream teeOutputStream = new TeeOutputStream(bufferOutputStream,output);</span></div><div class="line">                <span class="keyword">private</span> TeeOutputStream teeOutputStream = <span class="keyword">new</span> TeeOutputStream(BranchResponseWrapper.<span class="keyword">super</span>.getOutputStream(),output);</div><div class="line"></div><div class="line">                <span class="meta">@Override</span></div><div class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isReady</span><span class="params">()</span> </span>&#123;</div><div class="line">                    <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                <span class="meta">@Override</span></div><div class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setWriteListener</span><span class="params">(WriteListener writeListener)</span> </span>&#123;</div><div class="line"></div><div class="line">                &#125;</div><div class="line"></div><div class="line">                <span class="meta">@Override</span></div><div class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">write</span><span class="params">(<span class="keyword">int</span> b)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">                    teeOutputStream.write(b);</div><div class="line">                &#125;</div><div class="line">            &#125;;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> filterOutput;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">byte</span>[] toByteArray() &#123;</div><div class="line">        <span class="keyword">return</span> output.toByteArray();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>BranchResponseWrapperFilter源代码如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Order</span>(Ordered.LOWEST_PRECEDENCE - <span class="number">1</span>)</div><div class="line"><span class="meta">@WebFilter</span>(urlPatterns = &#123;<span class="string">"/never/*"</span>&#125;,filterName = <span class="string">"branchResponseWrapperFilter"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BranchResponseWrapperFilter</span> <span class="keyword">extends</span> <span class="title">OncePerRequestFilter</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(BranchResponseWrapperFilter.class);</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doFilterInternal</span><span class="params">(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)</span> <span class="keyword">throws</span> ServletException, IOException </span>&#123;</div><div class="line">        BranchResponseWrapper wrapper = <span class="keyword">new</span> BranchResponseWrapper(response);</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            filterChain.doFilter(request,wrapper);</div><div class="line"></div><div class="line">            String respStr= <span class="keyword">new</span> String(wrapper.toByteArray(), response.getCharacterEncoding());</div><div class="line">            Object parse = JSON.parse(respStr);</div><div class="line">            JSONObject jsonObject = <span class="keyword">new</span> JSONObject();</div><div class="line">            jsonObject.put(<span class="string">"status"</span>,<span class="number">0</span>);</div><div class="line">            jsonObject.put(<span class="string">"data"</span>,parse);</div><div class="line">            LOGGER.info(<span class="string">"response is ============&#123;&#125;"</span>,jsonObject);</div><div class="line">            response.setContentType(<span class="string">"application/json;charset=utf-8"</span>);</div><div class="line">            <span class="comment">//将buffer重置，因为我们要重新写入流进去</span></div><div class="line">            response.resetBuffer();</div><div class="line">            response.setContentLength(JSON.toJSONBytes(jsonObject).length);</div><div class="line">            response.getOutputStream().write(JSON.toJSONBytes(jsonObject));</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            LOGGER.error(<span class="string">"数据包装器执行出错....&#123;&#125;"</span>, e);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>使用，浏览器访问：<code>localhost:8080/never/getBaseResult</code> 看效果</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">data: &#123;</div><div class="line">imgUrl: "htt://img.baidu.com/images/11.jpg",</div><div class="line">name: "itar"</div><div class="line">&#125;,</div><div class="line">status: 0</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="四、细节"><a href="#四、细节" class="headerlink" title="四、细节"></a>四、细节</h3><ol>
+<li>可能大家注意到了，我这里Filter都是有URLPattern的，都需要配置@WebFilter注解的，Spring Boot中这个注解要生效必须在启动类中写上 <code>@ServletComponentScan</code> ，单纯Spring 应用需要在Web.xml中配置filter。</li>
+<li>第二种方式中<code>response.resetBuffer();</code>这句话非常重要，不然会出现<code>FixedLengthOverflowException</code> , 主要作用就是将buffer里面的数据清空</li>
+<li>原理说白了就是提前通过你的Filter将ServletOutputStream输出到页面上去，只要执行了write方法，页面就有数据了，大家可以执行测试</li>
+</ol>
+<h3 id="五、代码下载"><a href="#五、代码下载" class="headerlink" title="五、代码下载"></a>五、代码下载</h3><p>​      <a href="https://github.com/mustfun/resteasy-demo.git" target="_blank" rel="external">点击这里</a> 注意切换到 duplicate_submissions 这个分支</p>
+<blockquote>
+<p>END ，希望有所帮助</p>
+</blockquote>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://blog.vrzart.com/2017/12/22/利用HttpServletResponseWrapper对reponse进行包装/" data-id="cjbhj472o0028gsj32f3qsfym" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2017/12/21/Spring filter原理深入浅出/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Older</strong>
+            <div class="article-nav-title">Spring filter原理深入浅出</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">recent</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/12/22/利用HttpServletResponseWrapper对reponse进行包装/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring/">Spring</a></p>
+                            <p class="item-title"><a href="/2017/12/22/利用HttpServletResponseWrapper对reponse进行包装/" class="title">HttpServletResponseWrapper包装reponse</a></p>
+                            <p class="item-date"><time datetime="2017-12-22T02:54:10.000Z" itemprop="datePublished">2017-12-22</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/12/21/Spring filter原理深入浅出/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring/">Spring</a></p>
+                            <p class="item-title"><a href="/2017/12/21/Spring filter原理深入浅出/" class="title">Spring filter原理深入浅出</a></p>
+                            <p class="item-date"><time datetime="2017-12-21T08:05:00.000Z" itemprop="datePublished">2017-12-21</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/10/30/Spring AOP系列之AOP原理介绍/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-Boot/">Spring Boot</a></p>
+                            <p class="item-title"><a href="/2017/10/30/Spring AOP系列之AOP原理介绍/" class="title">Spring Boot  AOP系列之AOP原理介绍</a></p>
+                            <p class="item-date"><time datetime="2017-10-30T07:22:01.000Z" itemprop="datePublished">2017-10-30</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/10/30/Spring AOP系列之代理创建/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-Boot/">Spring Boot</a></p>
+                            <p class="item-title"><a href="/2017/10/30/Spring AOP系列之代理创建/" class="title">Spring Boot  AOP系列之动态代理创建</a></p>
+                            <p class="item-date"><time datetime="2017-10-30T04:22:01.000Z" itemprop="datePublished">2017-10-30</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/JAVA/">JAVA</a></p>
+                            <p class="item-title"><a href="/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" class="title">Fastjson解析多级泛型</a></p>
+                            <p class="item-date"><time datetime="2017-08-16T07:22:01.000Z" itemprop="datePublished">2017-08-16</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">categories</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring/">Spring</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Boot/">Spring Boot</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">archives</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tags</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tag cloud</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Spring/" style="font-size: 13.33px;">Spring</a> <a href="/tags/Spring-Boot/" style="font-size: 16.67px;">Spring Boot</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">links</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2017 itar<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. itar all rights reserved
+        </div>
+    </div>
+</footer>
+        
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

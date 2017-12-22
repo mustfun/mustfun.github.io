@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.vrzart.com/"/>
-  <updated>2017-12-21T10:42:01.777Z</updated>
+  <updated>2017-12-22T02:08:23.477Z</updated>
   <id>http://blog.vrzart.com/</id>
   
   <author>
@@ -20,12 +20,13 @@
     <link href="http://blog.vrzart.com/2017/12/21/Spring%20filter%E5%8E%9F%E7%90%86%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA/"/>
     <id>http://blog.vrzart.com/2017/12/21/Spring filter原理深入浅出/</id>
     <published>2017-12-21T08:05:00.000Z</published>
-    <updated>2017-12-21T10:42:01.777Z</updated>
+    <updated>2017-12-22T02:08:23.477Z</updated>
     
     <content type="html"><![CDATA[<h1 id="Spring-filter原理深入浅出"><a href="#Spring-filter原理深入浅出" class="headerlink" title="Spring filter原理深入浅出"></a>Spring filter原理深入浅出</h1><blockquote>
 <p>在这篇文章中，我会介绍一个请求从浏览器进来，是如何被Spring拦截到的，Spring又是如何处理这个请求的，filter有什么作用，filter的原理等</p>
 </blockquote>
 <h3 id="一、前置知识"><a href="#一、前置知识" class="headerlink" title="一、前置知识"></a>一、前置知识</h3><p>OK，我们首先介绍一下，请求从浏览器过来，我们的服务器会经历些什么。先看一张jetty的内部结构图</p>
+<a id="more"></a>
 <p><img src="http://static.open-open.com/lib/uploadImg/20130905/20130905174336_227.jpg" alt="jetty内部组成"></p>
 <p>我们看到jetty的核心组件包括了一大堆的<code>*Handler</code> ，对于这些handler，不论任何容器基本都有，可能名称不太相同，笔者这里以undertow这个容器为例，浏览器发送过来的请求，会经过一个<code>FilterHandler</code> 这个handler跟我们今天的主题相关。</p>
 <h3 id="二、Request阶段"><a href="#二、Request阶段" class="headerlink" title="二、Request阶段"></a>二、Request阶段</h3><p>先看一下这个handler的处理代码</p>
@@ -49,7 +50,10 @@
     
     <summary type="html">
     
-      &lt;h1 id=&quot;Spring-filter原理深入浅出&quot;&gt;&lt;a href=&quot;#Spring-filter原理深入浅出&quot; class=&quot;headerlink&quot; title=&quot;Spring filter原理深入浅出&quot;&gt;&lt;/a&gt;Spring filter原理深入浅出&lt;/h1&gt;&lt;bloc
+      &lt;h1 id=&quot;Spring-filter原理深入浅出&quot;&gt;&lt;a href=&quot;#Spring-filter原理深入浅出&quot; class=&quot;headerlink&quot; title=&quot;Spring filter原理深入浅出&quot;&gt;&lt;/a&gt;Spring filter原理深入浅出&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;在这篇文章中，我会介绍一个请求从浏览器进来，是如何被Spring拦截到的，Spring又是如何处理这个请求的，filter有什么作用，filter的原理等&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&quot;一、前置知识&quot;&gt;&lt;a href=&quot;#一、前置知识&quot; class=&quot;headerlink&quot; title=&quot;一、前置知识&quot;&gt;&lt;/a&gt;一、前置知识&lt;/h3&gt;&lt;p&gt;OK，我们首先介绍一下，请求从浏览器过来，我们的服务器会经历些什么。先看一张jetty的内部结构图&lt;/p&gt;
     
     </summary>
     

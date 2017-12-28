@@ -3,24 +3,14 @@
 <head>
     <meta charset="utf-8">
     
-    <title>RocketMq小解 | 程序员的天花板</title>
+    <title>Kategori: 前端 | 程序员的天花板</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="notify是淘宝的一个消息中间件，它用创新地方式解决了分布式事务的问题，用相对较低的成本，实现了跨微服务的最终一致性 消息系统的核心作用就是三点：解耦，异步和并行">
-<meta name="keywords" content="消息中间件">
-<meta property="og:type" content="article">
-<meta property="og:title" content="RocketMq小解">
-<meta property="og:url" content="http://blog.vrzart.com/2017/05/26/RocketMq/index.html">
+    <meta property="og:type" content="website">
+<meta property="og:title" content="程序员的天花板">
+<meta property="og:url" content="http://blog.vrzart.com/categories/前端/index.html">
 <meta property="og:site_name" content="程序员的天花板">
-<meta property="og:description" content="notify是淘宝的一个消息中间件，它用创新地方式解决了分布式事务的问题，用相对较低的成本，实现了跨微服务的最终一致性 消息系统的核心作用就是三点：解耦，异步和并行">
-<meta property="og:image" content="http://segmentfault.com/img/bVm0uI">
-<meta property="og:image" content="http://segmentfault.com/img/bVm0uK">
-<meta property="og:image" content="http://segmentfault.com/img/bVm0uL">
-<meta property="og:image" content="http://segmentfault.com/img/bVm0uM">
-<meta property="og:updated_time" content="2017-01-10T11:39:08.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="RocketMq小解">
-<meta name="twitter:description" content="notify是淘宝的一个消息中间件，它用创新地方式解决了分布式事务的问题，用相对较低的成本，实现了跨微服务的最终一致性 消息系统的核心作用就是三点：解耦，异步和并行">
-<meta name="twitter:image" content="http://segmentfault.com/img/bVm0uI">
+<meta name="twitter:title" content="程序员的天花板">
     
 
     
@@ -237,199 +227,50 @@ var _hmt = _hmt || [];
 </aside>
 
             
-            <section id="main"><article id="post-RocketMq" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
+            <section id="main">
+<div class="timeline timeline-wrap">
+    <div class="timeline-row timeline-row-major">
+        <span class="node"><i class="fa fa-folder"></i></span>
+        <h1 class="title">前端</h1>
+    </div>
+    
+        <div class="timeline-row">
+            <span class="node"></span>
+            <div class="content">
                 
     
-        <h1 class="article-title" itemprop="name">
-            RocketMq小解
+        <h1 itemprop="name">
+            <a class="timeline-article-title" href="/2017/12/28/datatables服务端分页配置最新教程2018/">datatables服务端分页配置</a>
         </h1>
     
 
-                
-                    <div class="article-meta">
-                        
+                <div class="article-meta">
+                    
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2017/05/26/RocketMq/">
-            <time datetime="2017-05-26T11:14:31.019Z" itemprop="datePublished">2017-05-26</time>
+        <a href="/2017/12/28/datatables服务端分页配置最新教程2018/">
+            <time datetime="2017-12-28T09:12:11.509Z" itemprop="datePublished">2017-12-28</time>
         </a>
     </div>
 
 
-                        
-                        
+                    
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/前端/">前端</a>
+    </div>
+
+                    
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/消息中间件/">消息中间件</a>
+        <a class="tag-link" href="/tags/前端/">前端</a>
     </div>
 
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <p>notify是淘宝的一个消息中间件，它用创新地方式解决了分布式事务的问题，用相对较低的成本，实现了跨微服务的最终一致性</p>
-<p>消息系统的核心作用就是三点：<strong>解耦，异步和并行</strong></p>
-<a id="more"></a>
-<p>假设我们有这么一个应用场景，为了完成一个用户注册淘宝的操作，可能需要将用户信息写入到用户库中，然后通知给红包中心给用户发新手红包，然后还需要通知支付宝给用户准备对应的支付宝账号，进行合法性验证，告知sns系统给用户导入新的用户等10步操作。</p>
-<p><a href="http://segmentfault.com/img/bVm0uI" target="_blank" rel="external">串行设计</a></p>
-<p><img src="http://segmentfault.com/img/bVm0uI" alt="串行设计"></p>
-<p>这种方式的最大问题是，随着后端流程越来越多，每步流程都需要额外的耗费很多时间，从而会导致用户更长的等待延迟。自然的，我们可以采用并行的方式来完成业务，能够极大的减少延迟</p>
-<p><img src="http://segmentfault.com/img/bVm0uK" alt="串行设计"></p>
-<p>但是其实这样也是有问题的，在用户注册这一步，系统并行请求发起4个请求，如果说通知SNS这一步需要时间比较长，即使其他步骤再快，用户任然需要等待10秒才能注册，假如说发红包服务器宕机了，那就不能注册了。</p>
-<p>通过业务分析我们能够得知，用户的实际的核心流程其实只有一个，就是用户注册。而后续的准备支付宝，通知sns等操作虽然必须要完成，但却是不需要让用户等待的。</p>
-<p>这种模式有个专业的名词，就叫最终一致。为了达到最终一致，我们引入了MQ系统</p>
-<p><img src="http://segmentfault.com/img/bVm0uL" alt="主流程"></p>
-<p>异步流程如下：</p>
-<p><img src="http://segmentfault.com/img/bVm0uM" alt="异步流程"></p>
-
-        
-        </div>
-	
-		<! -- 添加捐赠图标 -->
-<div class ="post-donate">
-    <div id="donate_board" class="donate_bar center">
-	<span class="donate_txt">
-		   坚持原创技术分享，您的支持将鼓励我创作！
-        </span>
-        <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏">打赏</a>
-        <br>
-      </div>  
-	<div id="donate_guide" class="donate_bar center hidden" >
-		<div style="float:left">
-			<div>微信扫一扫</div>
-			<!-- 微信打赏图案 -->
-			<img src="/css/images/wechat.png" style="width:150px;height:150px" alt="微信打赏">
-		</div>  
-		<div style="float:right">
-			<div>支付宝扫一扫</div>
-			<!-- 支付宝打赏图案 -->
-			<img src="/css/images/zhifubao.png" style="width:150px;height:150px" alt="支付宝打赏"> 
-		</div>
-    </div>
-	<script type="text/javascript">
-		document.getElementById('btn_donate').onclick = function(){
-			$('#donate_board').addClass('hidden');
-			$('#donate_guide').removeClass('hidden');
-		}
-	</script>
-</div>
-<! -- 添加捐赠图标 -->
-	
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://blog.vrzart.com/2017/05/26/RocketMq/" data-id="cjbq9tpav000wesj3x6g5fhza" class="article-share-link"><i class="fa fa-share"></i>Bagikan</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-        
-<nav id="article-nav">
-    
-        <a href="/2017/05/26/单例模式/" id="article-nav-newer" class="article-nav-link-wrap">
-            <strong class="article-nav-caption">Lebih baru</strong>
-            <div class="article-nav-title">
-                
-                    单例模式大比拼
-                
+                </div>
             </div>
-        </a>
+        </div>
     
-    
-        <a href="/2017/05/26/redis/" id="article-nav-older" class="article-nav-link-wrap">
-            <strong class="article-nav-caption">Lebih lama</strong>
-            <div class="article-nav-title">redis安装配置</div>
-        </a>
-    
-</nav>
-
-
-    
-</article>
-
-
-    
-    
-
+</div>
 </section>
             
                 

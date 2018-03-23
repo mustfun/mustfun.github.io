@@ -175,7 +175,7 @@ var _hmt = _hmt || [];
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                47
+                48
                 <span>Entradas</span>
             </div>
             <div class="article-info-block">
@@ -228,6 +228,190 @@ var _hmt = _hmt || [];
 
             
             <section id="main">
+    <article id="post-Transaction在Controller层的探索" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2018/03/23/Transaction在Controller层的探索/">Transaction在Controller层的探索</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/03/23/Transaction在Controller层的探索/">
+            <time datetime="2018-03-23T10:40:56.467Z" itemprop="datePublished">2018-03-23</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/spring-boot/">spring boot</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h2 id="Transaction在Controller层的探索"><a href="#Transaction在Controller层的探索" class="headerlink" title="Transaction在Controller层的探索"></a>Transaction在Controller层的探索</h2><blockquote>
+<p>一般开发中事务要求我们放在Service层，可是有些情况，我们可能会要求放在Controller层，你有没有碰到过这样的需求呢？那么放到Controller层事务会生效吗？会产生什么问题呢？下面一起来看看</p>
+</blockquote>
+<h3 id="I、透过现象看本质"><a href="#I、透过现象看本质" class="headerlink" title="I、透过现象看本质"></a>I、透过现象看本质</h3><h4 id="第一种情况"><a href="#第一种情况" class="headerlink" title="第一种情况"></a>第一种情况</h4><ul>
+<li><p>Controller层代码如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RestController</span></div><div class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/city"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CityControllerImpl</span> <span class="keyword">implements</span> <span class="title">CityController</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Autowired</span></div><div class="line">    <span class="keyword">private</span> CityService cityService;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="meta">@RequestMapping</span>(value = <span class="string">"getCity"</span>,method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_UTF8_VALUE)</div><div class="line">  	<span class="meta">@Transcational</span></div><div class="line">    <span class="function"><span class="keyword">public</span> BaseResult&lt;City&gt; <span class="title">getCity</span><span class="params">(@RequestParam(<span class="string">"id"</span>)</span> Integer id) </span>&#123;</div><div class="line">        City one = cityService.getOne(id);</div><div class="line">        BaseResult&lt;City&gt; baseResult=<span class="keyword">new</span> BaseResult&lt;&gt;();</div><div class="line">        baseResult.setData(one);</div><div class="line">        <span class="keyword">return</span> baseResult;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>运行结果</p>
+<p><img src="http://ojkdckcc1.bkt.clouddn.com/blog/2018/微信截图_20180320184140.png" alt="Transaction ERROR controller"></p>
+</li>
+<li><p>对的，你没有看错，当Transactional加载Controller层时出现404异常</p>
+</li>
+</ul>
+<p>####　第二种情况</p>
+<ul>
+<li><p>Controller层代码如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RestController</span></div><div class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/city"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CityControllerImpl</span>  </span>&#123;</div><div class="line">    <span class="meta">@Autowired</span></div><div class="line">    <span class="keyword">private</span> CityService cityService;</div><div class="line">  </div><div class="line">    <span class="meta">@RequestMapping</span>(value = <span class="string">"getCity"</span>,method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_UTF8_VALUE)</div><div class="line">    <span class="meta">@Transactional</span></div><div class="line">    <span class="function"><span class="keyword">public</span> BaseResult&lt;City&gt; <span class="title">getCity</span><span class="params">(@RequestParam(<span class="string">"id"</span>)</span> Integer id) </span>&#123;</div><div class="line">        City one = cityService.getOne(id);</div><div class="line">        BaseResult&lt;City&gt; baseResult=<span class="keyword">new</span> BaseResult&lt;&gt;();</div><div class="line">        baseResult.setData(one);</div><div class="line">        <span class="keyword">return</span> baseResult;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>跟上面的区别，就是没有实现CityController接口了，那么我们运行一下，会有什么结果呢？</p>
+</li>
+<li><p>运行结果如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  data: null,</div><div class="line">  message: null,</div><div class="line">  status: 0</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>第二种情况居然没有啥问题，那么Transactional是否正常回滚呢？这里答案我直接告诉大家了，即使是换成有数据更改的接口，我们的事务是生效的。</p>
+</li>
+<li><p>下面我为大家看源码解释一下</p>
+</li>
+</ul>
+<h4 id="第三种情况"><a href="#第三种情况" class="headerlink" title="第三种情况"></a>第三种情况</h4><ul>
+<li>笔者测试使用支持==JAX-RS 2.0==的 <strong>Resteasy</strong> 测试，发现是没有这个问题的，大家可以自测一下Jersey是不是存在这个问题，推断应该没有</li>
+</ul>
+<h3 id="II、熟悉本质解现象"><a href="#II、熟悉本质解现象" class="headerlink" title="II、熟悉本质解现象"></a>II、熟悉本质解现象</h3><h4 id="1-区别"><a href="#1-区别" class="headerlink" title="1. 区别"></a>1. 区别</h4><p>  可以看出，我们两个Controller的区别就是一个有实现接口，一个没有实现，为什么差别会这么大呢？</p>
+<h4 id="2-事务的本质"><a href="#2-事务的本质" class="headerlink" title="2. 事务的本质"></a>2. 事务的本质</h4><p>   我们知道事务是基于代理实现的，目前Spring中有JDK动态代理和CGLIB代理两种代理，那么跟Spring选择的代理有没有关系呢？我们看一下Spring在代理类的时候选择使用何种代理的源代码。如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">public</span> AopProxy <span class="title">createAopProxy</span><span class="params">(AdvisedSupport config)</span> <span class="keyword">throws</span> AopConfigException </span>&#123;</div><div class="line">		<span class="keyword">if</span> (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) &#123;</div><div class="line">			Class&lt;?&gt; targetClass = config.getTargetClass();</div><div class="line">			<span class="keyword">if</span> (targetClass == <span class="keyword">null</span>) &#123;</div><div class="line">				<span class="keyword">throw</span> <span class="keyword">new</span> AopConfigException(<span class="string">"TargetSource cannot determine target class: "</span> +</div><div class="line">						<span class="string">"Either an interface or a target is required for proxy creation."</span>);</div><div class="line">			&#125;</div><div class="line">			<span class="keyword">if</span> (targetClass.isInterface() || Proxy.isProxyClass(targetClass)) &#123;</div><div class="line">				<span class="keyword">return</span> <span class="keyword">new</span> JdkDynamicAopProxy(config);</div><div class="line">			&#125;</div><div class="line">			<span class="keyword">return</span> <span class="keyword">new</span> ObjenesisCglibAopProxy(config);</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">else</span> &#123;</div><div class="line">			<span class="keyword">return</span> <span class="keyword">new</span> JdkDynamicAopProxy(config);</div><div class="line">		&#125;</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<p>这是Spring创建代理比较核心的一段代码，在类  <code>DefaultAopProxyFactory</code> 中，不管加没有加接口，Spring看到了<code>@Transactional</code>注解都会给我们的Controller注册为一个代理对象。注意：<code>Spring并非对所有的Controller都会创建代理类，假如我们的Controller没有暴露任何切面，Spring并不会创建一个代理类</code>，这里可能大家会感到奇怪，我们这里打个TAG，文末讲解。</p>
+<p>  继续刚刚的话题，第一种情况，由于我们的Controller有接口，所以就走了JDK代理，相反第二种走了Cglib代理。OK， 我们的CityControllerImpl现在是一个代理类。那么为什么会发生404异常呢？</p>
+<h4 id="3-SpringMvc的原理"><a href="#3-SpringMvc的原理" class="headerlink" title="3. SpringMvc的原理"></a>3. SpringMvc的原理</h4><p>  为什么Controller变成代理之后，就会404异常了，肯定跟我们的SpringMVC有关，我们看一下SpringMVC的核心类 <code>AbstractHandlerMethodMapping</code> 这个类可以绑定URL和需要执行处理器的哪个方法。这个抽象类实现了<code>initializingBean</code>接口，其实主要的注册URL操作则是通过这个接口的afterPropertiesSet()接口方法来调用的。然后调用<code>initHandlerMethods</code> 方法进行绑定URL。方法详细如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initHandlerMethods</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</div><div class="line">			logger.debug(<span class="string">"Looking for request mappings in application context: "</span> + getApplicationContext());</div><div class="line">		&#125;</div><div class="line">		String[] beanNames = (<span class="keyword">this</span>.detectHandlerMethodsInAncestorContexts ?</div><div class="line">				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(getApplicationContext(), Object.class) :</div><div class="line">				getApplicationContext().getBeanNamesForType(Object.class));</div><div class="line"></div><div class="line">		<span class="keyword">for</span> (String beanName : beanNames) &#123;</div><div class="line">			<span class="keyword">if</span> (!beanName.startsWith(SCOPED_TARGET_NAME_PREFIX)) &#123;</div><div class="line">				Class&lt;?&gt; beanType = <span class="keyword">null</span>;</div><div class="line">				<span class="keyword">try</span> &#123;</div><div class="line">					beanType = getApplicationContext().getType(beanName);</div><div class="line">				&#125;</div><div class="line">				<span class="keyword">catch</span> (Throwable ex) &#123;</div><div class="line">					<span class="comment">// An unresolvable bean type, probably from a lazy bean - let's ignore it.</span></div><div class="line">					<span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</div><div class="line">						logger.debug(<span class="string">"Could not resolve target class for bean with name '"</span> + beanName + <span class="string">"'"</span>, ex);</div><div class="line">					&#125;</div><div class="line">				&#125;</div><div class="line">				<span class="keyword">if</span> (beanType != <span class="keyword">null</span> &amp;&amp; isHandler(beanType)) &#123;</div><div class="line">					detectHandlerMethods(beanName);</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		handlerMethodsInitialized(getHandlerMethods());</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<p>beanType中取出来是 <code>CityControllerImpl</code> 代理类，这里大家注意，代码第21行，有一个<code>isHandler</code>方法，这个方法用于判定这个类是不是Handler，其中代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">isHandler</span><span class="params">(Class&lt;?&gt; beanType)</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> (AnnotatedElementUtils.hasAnnotation(beanType, Controller.class) ||</div><div class="line">				AnnotatedElementUtils.hasAnnotation(beanType, RequestMapping.class));</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<p>看到这里相信大家已经很明白了，这里就是看你这个类上面有没有Controller注解和RequestMapping注解。如果有，就建立相关的映射关系（URL-&gt;Handler）</p>
+<ul>
+<li><p>其中有接口的是被JDK代理的，生成的是JDK代理类</p>
+<blockquote>
+<p>JDK的动态代理是靠多态和反射来实现的，它生成的代理类需要实现你传入的接口，并通过反射来得到接口的方法对象，并将此方法对象传参给增强类的invoke方法去执行，从而实现了代理功能。</p>
+</blockquote>
+<p>CityController生成的代理类文件如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">cityControllerImpl</span> <span class="keyword">extends</span> <span class="title">Proxy</span> <span class="keyword">implements</span> <span class="title">Proxy86</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Method m1;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Method m32;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Method m7;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">cityControllerImpl</span><span class="params">(InvocationHandler var1)</span> <span class="keyword">throws</span>  </span>&#123;</div><div class="line">        <span class="keyword">super</span>(var1);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> TargetSource <span class="title">getTargetSource</span><span class="params">()</span> <span class="keyword">throws</span>  </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">return</span> (TargetSource)<span class="keyword">super</span>.h.invoke(<span class="keyword">this</span>, m8, (Object[])<span class="keyword">null</span>);</div><div class="line">        &#125; <span class="keyword">catch</span> (RuntimeException | Error var2) &#123;</div><div class="line">            <span class="keyword">throw</span> var2;</div><div class="line">        &#125; <span class="keyword">catch</span> (Throwable var3) &#123;</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> UndeclaredThrowableException(var3);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">addAdvice</span><span class="params">(<span class="keyword">int</span> var1, Advice var2)</span> <span class="keyword">throws</span> AopConfigException </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">super</span>.h.invoke(<span class="keyword">this</span>, m21, <span class="keyword">new</span> Object[]&#123;var1, var2&#125;);</div><div class="line">        &#125; <span class="keyword">catch</span> (RuntimeException | Error var4) &#123;</div><div class="line">            <span class="keyword">throw</span> var4;</div><div class="line">        &#125; <span class="keyword">catch</span> (Throwable var5) &#123;</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> UndeclaredThrowableException(var5);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> BaseResult <span class="title">getCity</span><span class="params">(Integer var1)</span> <span class="keyword">throws</span>  </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">return</span> (BaseResult)<span class="keyword">super</span>.h.invoke(<span class="keyword">this</span>, m27, <span class="keyword">new</span> Object[]&#123;var1&#125;);</div><div class="line">        &#125; <span class="keyword">catch</span> (RuntimeException | Error var3) &#123;</div><div class="line">            <span class="keyword">throw</span> var3;</div><div class="line">        &#125; <span class="keyword">catch</span> (Throwable var4) &#123;</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> UndeclaredThrowableException(var4);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>类已经被精简过，我们看到生成的代理类中完全没有<code>@Controller</code> <code>@RequestMapping</code> 注解，所以isHandler方法执行失败，所以根本不会加到SpringMvc的控制器处理方法中去，当URL请求过来的时候，找不到对应的处理器处理，所以就报404错误啦</p>
+</li>
+<li><p>没有接口的是被CGLIB代理的，生成的是CGlib代理类</p>
+<blockquote>
+<p>CGLib采用了非常底层的字节码技术，其原理是通过字节码技术为一个类创建子类，并在子类中采用方法拦截的技术拦截所有父类方法的调用，顺势织入横切逻辑。JDK动态代理与CGLib动态代理均是实现Spring AOP的基础</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CityControllerImpl</span>$$<span class="title">EnhancerBySpringCGLIB</span>$$8<span class="title">cae5808</span> <span class="keyword">extends</span> <span class="title">CityControllerImpl</span> <span class="keyword">implements</span> <span class="title">SpringProxy</span>, <span class="title">Advised</span>, <span class="title">Factory</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> CGLIB$BOUND;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object CGLIB$FACTORY_DATA;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal CGLIB$THREAD_CALLBACKS;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Callback[] CGLIB$STATIC_CALLBACKS;</div><div class="line">  </div><div class="line">    <span class="keyword">final</span> BaseResult CGLIB$getCity$<span class="number">0</span>(Integer var1) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.getCity(var1);</div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> BaseResult <span class="title">getCity</span><span class="params">(Integer var1)</span> </span>&#123;</div><div class="line">        MethodInterceptor var10000 = <span class="keyword">this</span>.CGLIB$CALLBACK_0;</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.CGLIB$CALLBACK_0 == <span class="keyword">null</span>) &#123;</div><div class="line">            CGLIB$BIND_CALLBACKS(<span class="keyword">this</span>);</div><div class="line">            var10000 = <span class="keyword">this</span>.CGLIB$CALLBACK_0;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> var10000 != <span class="keyword">null</span> ? (BaseResult)var10000.intercept(<span class="keyword">this</span>, CGLIB$getCity$<span class="number">0</span>$Method, <span class="keyword">new</span> Object[]&#123;var1&#125;, CGLIB$getCity$<span class="number">0</span>$Proxy) : <span class="keyword">super</span>.getCity(var1);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>==其实isHandler方法会代理类的接口和父类进行扫描==，看你有没有这个注解，JDK代理中cityControllerImpl接口和父类都没有注解，而CGlib代理的父类是<code>CityControllerImpl</code> 这个原始的类， 所以返回为真</p>
+</li>
+</ul>
+<h4 id="4-思考"><a href="#4-思考" class="headerlink" title="4. 思考"></a>4. 思考</h4><p>   如果Controller层不加<code>@Transcational</code>注解的时候，为什么又不会产生404异常呢？其实如果你Controller不加任何织入代码的话（自定义aop切面等，有兴趣的可以用AspectJ试一下织入Controller层的Method方法会发生什么事情），Spring是不会给你的类生成代理的，也就是在<code>AbstractHandlerMethodMapping</code> 绑定的时候，这个类不是一个代理，所以才会匹配成功。</p>
+
+        
+        </div>
+	
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://blog.vrzart.com/2018/03/23/Transaction在Controller层的探索/" data-id="cjf3tfb2w000av8j3rpg3oizs" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-datatables服务端分页配置最新教程2018" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -291,7 +475,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/12/28/datatables服务端分页配置最新教程2018/" data-id="cjcg181xr0016mgj39wk1wo1x" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
+    <a data-url="http://blog.vrzart.com/2017/12/28/datatables服务端分页配置最新教程2018/" data-id="cjf3tfb39000pv8j387zr4bnw" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -438,7 +622,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/12/22/利用HttpServletResponseWrapper对reponse进行包装/" data-id="cjcg1822n003qmgj3uf8wx8a0" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
+    <a data-url="http://blog.vrzart.com/2017/12/22/利用HttpServletResponseWrapper对reponse进行包装/" data-id="cjf3tfb7l003uv8j3g75qoi0w" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -573,7 +757,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/12/21/Spring filter原理深入浅出/" data-id="cjcg181xp0015mgj3zbw4z0ap" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
+    <a data-url="http://blog.vrzart.com/2017/12/21/Spring filter原理深入浅出/" data-id="cjf3tfb4d0021v8j3k8768r6j" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -713,7 +897,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之AOP原理介绍/" data-id="cjcg181wl000dmgj35ep8azeu" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
+    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之AOP原理介绍/" data-id="cjf3tfb3g0011v8j38d2rruzx" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -852,7 +1036,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之代理创建/" data-id="cjcg181wr000imgj30ej4xw13" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
+    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之代理创建/" data-id="cjf3tfb4a001zv8j3yfxy7ltb" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -986,7 +1170,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" data-id="cjcg181un0000mgj33jjjh4ux" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
+    <a data-url="http://blog.vrzart.com/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" data-id="cjf3tfb2m0004v8j3hbyvucmu" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1213,7 +1397,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/07/20/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/" data-id="cjcg181x0000mmgj38bz4pmnx" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
+    <a data-url="http://blog.vrzart.com/2017/07/20/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/" data-id="cjf3tfb30000hv8j3d0bkdfwb" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1346,7 +1530,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" data-id="cjcg181wu000kmgj3teelwb2u" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
+    <a data-url="http://blog.vrzart.com/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" data-id="cjf3tfb32000jv8j356mgijal" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1488,151 +1672,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/" data-id="cjcg1822b003kmgj3luoiotmv" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-Spring boot返回request、response log添加" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/06/09/Spring boot返回request、response log添加/">spring boot给接口返回添加输入输出日志</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/06/09/Spring boot返回request、response log添加/">
-            <time datetime="2017-06-09T06:49:57.295Z" itemprop="datePublished">2017-06-09</time>
-        </a>
-    </div>
-
-
-                        
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/spring-boot/">spring boot</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            
-            <h3 id="Spring-boot返回request、response-添加log"><a href="#Spring-boot返回request、response-添加log" class="headerlink" title="Spring boot返回request、response 添加log"></a>Spring boot返回request、response 添加log</h3><p>目前有个需求需要给接口返回添加输入输出日志，目前比价常用的方法就是使用过滤器，就可以很方便的拦截到输入请求和输出请求，那么在过滤器里面如何<code>HttpServletRequest</code> <code>HttpServletRequest</code>这两个对象输入和输出日志呢？</p>
-<h4 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h4><p>事实上javax包里面本来就提供HttpServletRequstWrapper、HttpServletResponseWrapper两个包装类进行对请求、和放回进行拦截、我们实现这两个，这样我们就能够写一些单独的东西，就可以实现我们的效果</p>
-<h4 id="上代码"><a href="#上代码" class="headerlink" title="上代码"></a>上代码</h4><p>request代码如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RequestWrapper</span> <span class="keyword">extends</span> <span class="title">HttpServletRequestWrapper</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span>  <span class="keyword">static</span> Logger logger = LoggerFactory.getLogger(RequestWrapper.class);</div><div class="line"></div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">byte</span>[] body;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RequestWrapper</span><span class="params">(HttpServletRequest request)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        <span class="keyword">super</span>(request);</div><div class="line">        body = getBodyString(request).getBytes(Charset.forName(<span class="string">"UTF-8"</span>));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> BufferedReader <span class="title">getReader</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(getInputStream()));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> ServletInputStream <span class="title">getInputStream</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line"></div><div class="line">        <span class="comment">//这里从body里面直接读了，没有去读inputStream了，很巧妙的方式</span></div><div class="line">        <span class="keyword">final</span> ByteArrayInputStream bais = <span class="keyword">new</span> ByteArrayInputStream(body);</div><div class="line"></div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ServletInputStream() &#123;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">read</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">                <span class="keyword">return</span> bais.read();</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isFinished</span><span class="params">()</span> </span>&#123;</div><div class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isReady</span><span class="params">()</span> </span>&#123;</div><div class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setReadListener</span><span class="params">(ReadListener readListener)</span> </span>&#123;</div><div class="line"></div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span>  String <span class="title">getBodyString</span><span class="params">(ServletRequest request)</span> </span>&#123;</div><div class="line">        StringBuilder sb = <span class="keyword">new</span> StringBuilder();</div><div class="line">        InputStream inputStream = <span class="keyword">null</span>;</div><div class="line">        BufferedReader reader = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            inputStream = request.getInputStream();</div><div class="line">            reader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(inputStream, Charset.forName(<span class="string">"UTF-8"</span>)));</div><div class="line">            String line = <span class="string">""</span>;</div><div class="line">            <span class="keyword">while</span> ((line = reader.readLine()) != <span class="keyword">null</span>) &#123;</div><div class="line">                sb.append(line);</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">            logger.warn(<span class="string">"处理异常"</span>,e);</div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            <span class="keyword">if</span> (inputStream != <span class="keyword">null</span>) &#123;</div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    inputStream.close();</div><div class="line">                &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">                    logger.warn(<span class="string">"处理异常"</span>,e);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">if</span> (reader != <span class="keyword">null</span>) &#123;</div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    reader.close();</div><div class="line">                &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">                    logger.warn(<span class="string">"处理异常"</span>,e);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> sb.toString();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>先写一个<strong>ResponseWrapper</strong>类来继承HttpServletResponseWrapper</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.dzy.itar.pinpin.support.filter;</div><div class="line"></div><div class="line"><span class="keyword">import</span> org.apache.commons.io.output.TeeOutputStream;</div><div class="line"><span class="keyword">import</span> javax.servlet.ServletOutputStream;</div><div class="line"><span class="keyword">import</span> javax.servlet.ServletResponse;</div><div class="line"><span class="keyword">import</span> javax.servlet.WriteListener;</div><div class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponse;</div><div class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponseWrapper;</div><div class="line"><span class="keyword">import</span> java.io.ByteArrayOutputStream;</div><div class="line"><span class="keyword">import</span> java.io.IOException;</div><div class="line"><span class="keyword">import</span> java.io.PrintWriter;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ResponseWrapper</span> <span class="keyword">extends</span> <span class="title">HttpServletResponseWrapper</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ByteArrayOutputStream bos = <span class="keyword">new</span> ByteArrayOutputStream();</div><div class="line">    <span class="keyword">private</span> PrintWriter writer = <span class="keyword">new</span> PrintWriter(bos);</div><div class="line">    <span class="keyword">private</span> <span class="keyword">long</span> id;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ResponseWrapper</span><span class="params">(Long requestId, HttpServletResponse response)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(response);</div><div class="line">        <span class="keyword">this</span>.id = requestId;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> ServletResponse <span class="title">getResponse</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> ServletOutputStream <span class="title">getOutputStream</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ServletOutputStream() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isReady</span><span class="params">()</span> </span>&#123;</div><div class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setWriteListener</span><span class="params">(WriteListener writeListener)</span> </span>&#123;</div><div class="line"></div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">private</span> TeeOutputStream tee = <span class="keyword">new</span> TeeOutputStream(ResponseWrapper.<span class="keyword">super</span>.getOutputStream(), bos);</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">write</span><span class="params">(<span class="keyword">int</span> b)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">                tee.write(b);</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> PrintWriter <span class="title">getWriter</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> TeePrintWriter(<span class="keyword">super</span>.getWriter(), writer);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">byte</span>[] toByteArray()&#123;</div><div class="line">        <span class="keyword">return</span> bos.toByteArray();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getId</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> id;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">(<span class="keyword">long</span> id)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.id = id;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.dzy.itar.pinpin.support.filter;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.io.PrintWriter;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TeePrintWriter</span> <span class="keyword">extends</span> <span class="title">PrintWriter</span></span>&#123;</div><div class="line"></div><div class="line">    PrintWriter branch;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TeePrintWriter</span><span class="params">(PrintWriter main, PrintWriter branch)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(main, <span class="keyword">true</span>);</div><div class="line">        <span class="keyword">this</span>.branch = branch;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">write</span><span class="params">(<span class="keyword">char</span> buf[], <span class="keyword">int</span> off, <span class="keyword">int</span> len)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.write(buf, off, len);</div><div class="line">        <span class="keyword">super</span>.flush();</div><div class="line">        branch.write(buf, off, len);</div><div class="line">        branch.flush();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">write</span><span class="params">(String s, <span class="keyword">int</span> off, <span class="keyword">int</span> len)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.write(s, off, len);</div><div class="line">        <span class="keyword">super</span>.flush();</div><div class="line">        branch.write(s, off, len);</div><div class="line">        branch.flush();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">write</span><span class="params">(<span class="keyword">int</span> c)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.write(c);</div><div class="line">        <span class="keyword">super</span>.flush();</div><div class="line">        branch.write(c);</div><div class="line">        branch.flush();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">flush</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.flush();</div><div class="line">        branch.flush();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.dzy.itar.pinpin.support.filter;</div><div class="line"></div><div class="line"><span class="keyword">import</span> org.slf4j.Logger;</div><div class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</div><div class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</div><div class="line"><span class="keyword">import</span> org.springframework.web.filter.OncePerRequestFilter;</div><div class="line"></div><div class="line"><span class="keyword">import</span> javax.servlet.FilterChain;</div><div class="line"><span class="keyword">import</span> javax.servlet.ServletException;</div><div class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</div><div class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponse;</div><div class="line"><span class="keyword">import</span> javax.servlet.http.HttpSession;</div><div class="line"><span class="keyword">import</span> java.io.IOException;</div><div class="line"><span class="keyword">import</span> java.io.UnsupportedEncodingException;</div><div class="line"><span class="keyword">import</span> java.util.concurrent.atomic.AtomicLong;</div><div class="line"></div><div class="line"><span class="meta">@Component</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LoggingFilter</span> <span class="keyword">extends</span> <span class="title">OncePerRequestFilter</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(LoggingFilter.class);</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String REQUEST_PREFIX = <span class="string">"Request: "</span>;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String RESPONSE_PREFIX = <span class="string">"Response: "</span>;</div><div class="line">    <span class="keyword">private</span> AtomicLong id = <span class="keyword">new</span> AtomicLong(<span class="number">1</span>);</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doFilterInternal</span><span class="params">(HttpServletRequest request, HttpServletResponse response, <span class="keyword">final</span> FilterChain filterChain)</span> <span class="keyword">throws</span> ServletException, IOException </span>&#123;</div><div class="line">        <span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</div><div class="line">            <span class="keyword">long</span> requestId = id.incrementAndGet();</div><div class="line">            request = <span class="keyword">new</span> RequestWrapper(requestId, request);</div><div class="line">            response = <span class="keyword">new</span> ResponseWrapper(requestId, response);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            filterChain.doFilter(request, response);</div><div class="line"><span class="comment">//            response.flushBuffer();</span></div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            <span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</div><div class="line">                logRequest(request);</div><div class="line">                logResponse((ResponseWrapper) response);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">logRequest</span><span class="params">(<span class="keyword">final</span> HttpServletRequest request)</span> </span>&#123;</div><div class="line">        StringBuilder msg = <span class="keyword">new</span> StringBuilder();</div><div class="line">        msg.append(REQUEST_PREFIX);</div><div class="line">        <span class="keyword">if</span> (request <span class="keyword">instanceof</span> RequestWrapper) &#123;</div><div class="line">            msg.append(<span class="string">"request id="</span>).append(((RequestWrapper) request).getId()).append(<span class="string">"; "</span>);</div><div class="line">        &#125;</div><div class="line">        HttpSession session = request.getSession(<span class="keyword">false</span>);</div><div class="line">        <span class="keyword">if</span> (session != <span class="keyword">null</span>) &#123;</div><div class="line">            msg.append(<span class="string">"session id="</span>).append(session.getId()).append(<span class="string">"; "</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (request.getMethod() != <span class="keyword">null</span>) &#123;</div><div class="line">            msg.append(<span class="string">"method="</span>).append(request.getMethod()).append(<span class="string">"; "</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (request.getContentType() != <span class="keyword">null</span>) &#123;</div><div class="line">            msg.append(<span class="string">"content type="</span>).append(request.getContentType()).append(<span class="string">"; "</span>);</div><div class="line">        &#125;</div><div class="line">        msg.append(<span class="string">"uri="</span>).append(request.getRequestURI());</div><div class="line">        <span class="keyword">if</span> (request.getQueryString() != <span class="keyword">null</span>) &#123;</div><div class="line">            msg.append(<span class="string">'?'</span>).append(request.getQueryString());</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (request <span class="keyword">instanceof</span> RequestWrapper &amp;&amp; !isMultipart(request) &amp;&amp; !isBinaryContent(request)) &#123;</div><div class="line">            RequestWrapper requestWrapper = (RequestWrapper) request;</div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                String charEncoding = requestWrapper.getCharacterEncoding() != <span class="keyword">null</span> ? requestWrapper.getCharacterEncoding() :</div><div class="line">                        <span class="string">"UTF-8"</span>;</div><div class="line">                msg.append(<span class="string">"; payload="</span>).append(<span class="keyword">new</span> String(requestWrapper.toByteArray(), charEncoding));</div><div class="line">            &#125; <span class="keyword">catch</span> (UnsupportedEncodingException e) &#123;</div><div class="line">                logger.warn(<span class="string">"Failed to parse request payload"</span>, e);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">        &#125;</div><div class="line">        logger.debug(msg.toString());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">isBinaryContent</span><span class="params">(<span class="keyword">final</span> HttpServletRequest request)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (request.getContentType() == <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> request.getContentType().startsWith(<span class="string">"image"</span>) || request.getContentType().startsWith(<span class="string">"video"</span>) || request.getContentType().startsWith(<span class="string">"audio"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">isMultipart</span><span class="params">(<span class="keyword">final</span> HttpServletRequest request)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> request.getContentType() != <span class="keyword">null</span> &amp;&amp; request.getContentType().startsWith(<span class="string">"multipart/form-data"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">logResponse</span><span class="params">(<span class="keyword">final</span> ResponseWrapper response)</span> </span>&#123;</div><div class="line">        StringBuilder msg = <span class="keyword">new</span> StringBuilder();</div><div class="line">        msg.append(RESPONSE_PREFIX);</div><div class="line">        msg.append(<span class="string">"request id="</span>).append((response.getId()));</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            msg.append(<span class="string">"; payload="</span>).append(<span class="keyword">new</span> String(response.toByteArray(), response.getCharacterEncoding()));</div><div class="line">        &#125; <span class="keyword">catch</span> (UnsupportedEncodingException e) &#123;</div><div class="line">            logger.warn(<span class="string">"Failed to parse response payload"</span>, e);</div><div class="line">        &#125;</div><div class="line">        logger.debug(msg.toString());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>PrintWriter是一种写入字符的一种操作类，可以写入字符，TeePrintWriter继承了他，主要功能是把原始的字符流copy到branch里面。</p>
-<p>LoggingFilter是一种filter，继承OncePerRequestFilter，每次请求都会经过他。</p>
-<p>主要代码就是上面这样的，我把代码放到了<a href="https://git.oschina.net/mfun/request-response-test.git" target="_blank" rel="external">这里</a>大家可以下载借鉴</p>
-<h4 id="源码解析"><a href="#源码解析" class="headerlink" title="源码解析"></a>源码解析</h4><p>SpringMVC在处理完毕请求之后，会调用<code>AbstractMessageConverterMethodProcessor</code>里的<code>writeWithMessageConverters</code>方法，然后会调用<code>AbstractGenericHttpMessageConverter</code> 的write方法，把返回的接口输出到HttpOutputMessage里面去，事实上，然后会调用WriteInternal方法</p>
-<p><img src="https://ojkdckcc1.bkt.clouddn.com/微信截图_20170526190609.png" alt=""></p>
-<p>然后里面有getBody（）方法，然后里面就调用到了我们的getOutputStream方法，终于走到我们写的方法了</p>
-<p><img src="https://ojkdckcc1.bkt.clouddn.com/微信截图_20170609133912.png" alt=""></p>
-<p>然后我们就可以处理这个流了</p>
-<p>主要是copy了一份，然后再filter里面打印了出来</p>
-<p>完毕</p>
-<p>！</p>
-
-        
-        </div>
-	
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://blog.vrzart.com/2017/06/09/Spring boot返回request、response log添加/" data-id="cjcg181ym001omgj3b3po7yfs" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
+    <a data-url="http://blog.vrzart.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/" data-id="cjf3tfb7j003sv8j37deij66y" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1725,6 +1765,25 @@ var _hmt = _hmt || [];
                     <li>
                         
                         <div class="item-thumbnail">
+                            <a href="/2018/03/23/Transaction在Controller层的探索/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2018/03/23/Transaction在Controller层的探索/" class="title">Transaction在Controller层的探索</a></p>
+                            <p class="item-date"><time datetime="2018-03-23T10:40:56.467Z" itemprop="datePublished">2018-03-23</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
                             <a href="/2017/12/28/datatables服务端分页配置最新教程2018/" class="thumbnail">
     
     
@@ -1798,25 +1857,6 @@ var _hmt = _hmt || [];
                         </div>
                     </li>
                 
-                    <li>
-                        
-                        <div class="item-thumbnail">
-                            <a href="/2017/10/30/Spring AOP系列之代理创建/" class="thumbnail">
-    
-    
-        <span class="thumbnail-image thumbnail-none"></span>
-    
-</a>
-
-                        </div>
-                        
-                        <div class="item-inner">
-                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-Boot/">Spring Boot</a></p>
-                            <p class="item-title"><a href="/2017/10/30/Spring AOP系列之代理创建/" class="title">Spring Boot  AOP系列之动态代理创建</a></p>
-                            <p class="item-date"><time datetime="2017-10-30T04:22:01.000Z" itemprop="datePublished">2017-10-30</time></p>
-                        </div>
-                    </li>
-                
             </ul>
         </div>
     </div>
@@ -1835,7 +1875,7 @@ var _hmt = _hmt || [];
     <div class="widget-wrap">
         <h3 class="widget-title">Archivos</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
         </div>
     </div>
 
@@ -1844,7 +1884,7 @@ var _hmt = _hmt || [];
     <div class="widget-wrap">
         <h3 class="widget-title">Etiquetas</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端/">前端</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端/">前端</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1853,7 +1893,7 @@ var _hmt = _hmt || [];
     <div class="widget-wrap">
         <h3 class="widget-title">Nube de etiquetas</h3>
         <div class="widget tagcloud">
-            <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Spring/" style="font-size: 13.33px;">Spring</a> <a href="/tags/Spring-Boot/" style="font-size: 16.67px;">Spring Boot</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/前端/" style="font-size: 10px;">前端</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+            <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Spring/" style="font-size: 13.33px;">Spring</a> <a href="/tags/Spring-Boot/" style="font-size: 16.67px;">Spring Boot</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 13.33px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/前端/" style="font-size: 10px;">前端</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
         </div>
     </div>
 

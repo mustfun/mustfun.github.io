@@ -98,14 +98,14 @@ var _hmt = _hmt || [];
             <div id="search-form-wrap">
 
     <form class="search-form">
-        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <input type="text" class="ins-search-input search-form-input" placeholder="Cari" />
         <button type="submit" class="search-form-submit"></button>
     </form>
     <div class="ins-search">
     <div class="ins-search-mask"></div>
     <div class="ins-search-container">
         <div class="ins-input-wrapper">
-            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <input type="text" class="ins-search-input" placeholder="Tulis Sesuatu.." />
             <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
         </div>
         <div class="ins-section-wrapper">
@@ -117,11 +117,11 @@ var _hmt = _hmt || [];
 (function (window) {
     var INSIGHT_CONFIG = {
         TRANSLATION: {
-            POSTS: 'Posts',
-            PAGES: 'Pages',
-            CATEGORIES: 'Categories',
-            TAGS: 'Tags',
-            UNTITLED: '(Untitled)',
+            POSTS: 'Pos',
+            PAGES: 'Halaman',
+            CATEGORIES: 'Kategori',
+            TAGS: 'Tag',
+            UNTITLED: 'Tanpa Judul',
         },
         ROOT_URL: '/',
         CONTENT_URL: '/content.json',
@@ -151,7 +151,7 @@ var _hmt = _hmt || [];
                 <td>
                     
     <div class="search-form">
-        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <input type="text" class="ins-search-input search-form-input" placeholder="Cari" />
     </div>
 
                 </td>
@@ -171,16 +171,16 @@ var _hmt = _hmt || [];
             <h2 id="name">itar</h2>
             <h3 id="title">Senior Software Enginee</h3>
             <span id="location"><i class="fa fa-map-marker"></i>shanghai, China</span>
-            <a id="follow" target="_blank" href="https://github.com/mustfun/">FOLLOW</a>
+            <a id="follow" target="_blank" href="https://github.com/mustfun/">IKUTI</a>
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                48
-                <span>posts</span>
+                49
+                <span>pos</span>
             </div>
             <div class="article-info-block">
-                29
-                <span>tags</span>
+                30
+                <span>tag</span>
             </div>
         </div>
         
@@ -228,6 +228,208 @@ var _hmt = _hmt || [];
 
             
             <section id="main">
+    <article id="post-Hystrix核心篇-滑动窗口基础" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2018/04/20/Hystrix核心篇-滑动窗口基础/">Hystrix核心篇-滑动窗口基础</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/04/20/Hystrix核心篇-滑动窗口基础/">
+            <time datetime="2018-04-20T10:00:10.000Z" itemprop="datePublished">2018-04-20</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/服务治理/">服务治理</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/服务治理/">服务治理</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>RxJava可能有些小伙伴没有听过是什么东西，可能是因为大家平时在做业务需求的时候对异步编程了解得比较少，而RxJava就是这么一个响应式编程框架，RxJava在安卓上面用得非常多，做安卓的朋友肯定对它很熟悉。那我这里为什么要讲这个呢？因为spring cloud中服务治理框架Hystrix中大量用到了RxJava的响应式编程，为了便于理解，这里也简单给大家介绍一下。这里介绍的版本是RxJava 1.X版本的， 而在去年的早些时候，官方便宣布，将在一段时间后不再对 RxJava 1.x 进行维护，推出了RxJava2.X版本，既然有新的，为什么不介绍新的呢？因为目前最新的Hystrix版本1.5.12中使用的RxJava是1.2版本的，而2.X版本的api改动还是比较大的，所以为了大家能更加简单的理解Hystrix，所以这里是对1.X版本的介绍。</p>
+<h1 id="响应式编程是什么"><a href="#响应式编程是什么" class="headerlink" title="响应式编程是什么"></a>响应式编程是什么</h1><p><strong>响应式编程</strong>是一种基于异步数据流概念的编程模式，有点类似于JAVA里面的lambda表达式，相信大家都很熟悉lambda吧。数据流，stream，大家肯定不陌生，我们可以对stream有很多操作，filter、map、reduce 等常见操作。然后响应式中的核心就是响应二字，响应什么呢？响应的是事件，event 。 而流就是一个按照时间进行排序的事件序列。RxJava里面的事件是基于观察者模式，事件流将从上往下，从订阅源传递到观察者。</p>
+<h1 id="RxJava中重要概念"><a href="#RxJava中重要概念" class="headerlink" title="RxJava中重要概念"></a>RxJava中重要概念</h1><p>RxJava 有四个基本概念：<code>Observable</code> (可观察者，即被观察者)、 <code>Observer</code> (观察者)、 <code>Subscriber</code> (订阅，是<code>Observer</code>的抽象实现类，本质上使用是一样的)、事件。<code>Observable</code> 和 <code>Observer</code> 通过 <code>subscribe()</code> 方法实现订阅关系，从而 <code>Observable</code> 可以在需要的时候发出事件来通知 <code>Observer</code>。<code>Observable</code> 就像是一个生产者，在不断的生产消息，而<code>Subscriber</code> 和 <code>Observer</code> 就像是一个消费者，在不断的消费消息</p>
+<p>另外， RxJava 的事件回调方法还定义了两个特殊的事件，在Hystrix中用得也非常多：<code>onCompleted()</code> 和 <code>onError()</code>。</p>
+<ul>
+<li><code>onCompleted()</code>: 事件队列完结。RxJava 不仅把每个事件单独处理，还会把它们看做一个队列。RxJava 规定，当不会再有新的 <code>onNext()</code> 发出时，需要触发 <code>onCompleted()</code> 方法作为标志。</li>
+<li><code>onError()</code>: 事件队列异常。在事件处理过程中出异常时，<code>onError()</code> 会被触发，同时队列自动终止，不允许再有事件发出。</li>
+</ul>
+<h1 id="怎么做"><a href="#怎么做" class="headerlink" title="怎么做"></a>怎么做</h1><p>说了这么多概念，估计大家都是一头雾水，我们直接来些实际的，加深大家的印象理解。用多的自然而然就会了，就懂了，这里说得可能不是最全的，但是说的都是Hystrix中用得很多的一些操作符，加深大家对Hystrix的理解，看源码就会容易一些。</p>
+<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">Observable&lt;String&gt; producer = Observable.create(<span class="keyword">new</span> Observable.OnSubscribe&lt;String&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(Subscriber&lt;? <span class="keyword">super</span> String&gt; subscriber)</span> </span>&#123;</div><div class="line">                subscriber.onNext(<span class="string">"apple"</span>);</div><div class="line">                subscriber.onNext(<span class="string">"orange"</span>);</div><div class="line">                subscriber.onCompleted();</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">Subscriber&lt;String&gt; consumer = <span class="keyword">new</span> Subscriber&lt;String&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onNext</span><span class="params">(String s)</span> </span>&#123;</div><div class="line">                LOG.info(<span class="string">"我收到的水果有 = &#123;&#125;"</span> , s);</div><div class="line">            &#125;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCompleted</span><span class="params">()</span> </span>&#123;</div><div class="line">            &#125;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onError</span><span class="params">(Throwable e)</span> </span>&#123;</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">producer.subscribe(consumer);</div></pre></td></tr></table></figure>
+<p>先来一个简单的例子给大家直观的介绍下<code>Observable</code> 和 <code>Subscriber</code> 做了些什么，<code>Observable</code> 使用了onNext方法生产了2个水果，Apple和orange ，然后调用了onCompleted方法结束了这次生产， 消费者用onnext方法收到了2个水果，所以消费者就将收到的水果打印出来了，没有做任何处理</p>
+<p>执行结果如下：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">10</span>:<span class="number">21</span>:<span class="number">11</span><span class="variable">.440</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :我收到的水果有 = apple</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">10</span>:<span class="number">21</span>:<span class="number">11</span><span class="variable">.440</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :我收到的水果有 = orange</div></pre></td></tr></table></figure>
+<p>然后再给大家介绍一下Hystrix中用得非常多的操作符</p>
+<h2 id="create"><a href="#create" class="headerlink" title="create"></a>create</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">Observable.create(<span class="keyword">new</span> Observable.OnSubscribe&lt;String&gt;() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(Subscriber&lt;? <span class="keyword">super</span> String&gt; subscriber)</span> </span>&#123;</div><div class="line">            subscriber.onNext(<span class="string">"item1"</span>);</div><div class="line">            subscriber.onNext(<span class="string">"item2"</span>);</div><div class="line">            subscriber.onCompleted();</div><div class="line">        &#125;</div><div class="line">&#125;);</div><div class="line"><span class="comment">//在上面的例子中已经跟大家讲过了，create就是创建一个Observable，来生产消息</span></div></pre></td></tr></table></figure>
+<h2 id="from"><a href="#from" class="headerlink" title="from"></a>from</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">List&lt;String&gt; fruitList = Arrays.asList(<span class="string">"apple"</span>,<span class="string">"orange"</span>);</div><div class="line">        Observable.from(fruitList).subscribe(<span class="keyword">new</span> Action1&lt;String&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(String fruit)</span> </span>&#123;</div><div class="line">                LOG.info(<span class="string">"fruit = &#123;&#125;"</span> , fruit);</div><div class="line">            &#125;</div><div class="line">        &#125;);</div></pre></td></tr></table></figure>
+<p>上面订阅者的代码被我简化了，直接new 一个Action1， 是subscribe支持的一种订阅方式，跟Subscriber是一样的道理，只是更加简化。然后我们再用lambda表达式简化一下就是这样的了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">List&lt;String&gt; fruitList = Arrays.asList(<span class="string">"apple"</span>,<span class="string">"orange"</span>);</div><div class="line">        Observable.from(fruitList).subscribe(fruit -&gt; LOG.info(<span class="string">"fruit = &#123;&#125;"</span> , fruit));</div></pre></td></tr></table></figure>
+<p>执行结果如下：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">10</span>:<span class="number">30</span>:<span class="number">59</span><span class="variable">.030</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :fruid = apple</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">10</span>:<span class="number">30</span>:<span class="number">59</span><span class="variable">.030</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :fruid = orange</div></pre></td></tr></table></figure>
+<h2 id="defer"><a href="#defer" class="headerlink" title="defer"></a><strong>defer</strong></h2><p>只有当订阅者订阅才创建Observable，为每个订阅创建一个新的Observable。内部通过<code>OnSubscribeDefer</code>在订阅时调用Func0创建Observable</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">List&lt;String&gt; fruitList = Arrays.asList(<span class="string">"apple"</span>,<span class="string">"orange"</span>);</div><div class="line">        Observable.defer(<span class="keyword">new</span> Func0&lt;Observable&lt;String&gt;&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> Observable&lt;String&gt; <span class="title">call</span><span class="params">()</span> </span>&#123;</div><div class="line">                <span class="keyword">return</span> Observable.from(fruitList);</div><div class="line">            &#125;</div><div class="line">        &#125;).subscribe(<span class="keyword">new</span> Action1&lt;String&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(String fruit)</span> </span>&#123;</div><div class="line">                LOG.info(<span class="string">"defer fruit = &#123;&#125;"</span> , fruit);</div><div class="line">            &#125;</div><div class="line">        &#125;);</div></pre></td></tr></table></figure>
+<p>不知道大家理解了没有，每次生产消息都会生产一个新的消息生产者</p>
+<p>执行结果如下：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">10</span>:<span class="number">37</span>:<span class="number">26</span><span class="variable">.209</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :defer fruit = apple</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">10</span>:<span class="number">37</span>:<span class="number">26</span><span class="variable">.209</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :defer fruit = orange</div></pre></td></tr></table></figure>
+<h2 id="startWith"><a href="#startWith" class="headerlink" title="startWith"></a>startWith</h2><p>在生产的第一个消息前加上一个或者一些消息，看例子比较直观</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">List&lt;String&gt; fruitList = Arrays.asList(<span class="string">"apple"</span>,<span class="string">"orange"</span>);</div><div class="line">       Observable.from(fruitList)</div><div class="line">               .startWith(<span class="string">"before apple"</span>,<span class="string">"before apple2"</span>)</div><div class="line">               .subscribe(fruit-&gt;LOG.info(<span class="string">"fruit = &#123;&#125;"</span> , fruit));</div></pre></td></tr></table></figure>
+<p>执行结果如下:</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">10</span>:<span class="number">40</span>:<span class="number">52</span><span class="variable">.221</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :fruit = <span class="keyword">before</span> apple</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">10</span>:<span class="number">40</span>:<span class="number">52</span><span class="variable">.221</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :fruit = <span class="keyword">before</span> apple2</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">10</span>:<span class="number">40</span>:<span class="number">52</span><span class="variable">.222</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :fruit = apple</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">10</span>:<span class="number">40</span>:<span class="number">52</span><span class="variable">.222</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :fruit = orange</div></pre></td></tr></table></figure>
+<h2 id="Filter"><a href="#Filter" class="headerlink" title="Filter"></a>Filter</h2><p>跟lambda里面的filter很像，也是用来筛选数据的，filter接收的Func1第二个参数是Boolean，定死的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">List&lt;Integer&gt; list = Arrays.asList(<span class="number">10</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>);</div><div class="line">Observable.from(list)</div><div class="line">                .filter(<span class="keyword">new</span> Func1&lt;Integer, Boolean&gt;() &#123;</div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> Boolean <span class="title">call</span><span class="params">(Integer integer)</span> </span>&#123;</div><div class="line">                        <span class="keyword">return</span> integer&gt;<span class="number">4</span>;</div><div class="line">                    &#125;</div><div class="line">                &#125;)</div><div class="line">                .subscribe(num-&gt;LOG.info(<span class="string">"比4大的num = &#123;&#125;"</span> , num));</div></pre></td></tr></table></figure>
+<h2 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h2><p>Map是将需要生产的数据经过Func1进行变换之后，然后在发送给消费者。第二个参数是Object类型的，可以转化成一个Object对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">List&lt;Integer&gt; list = Arrays.asList(<span class="number">10</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>);</div><div class="line">        Observable.from(list)</div><div class="line">                .map(<span class="keyword">new</span> Func1&lt;Integer, Object&gt;() &#123;</div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> Object <span class="title">call</span><span class="params">(Integer integer)</span> </span>&#123;</div><div class="line">                        <span class="keyword">return</span> integer+<span class="string">"变成str"</span>;</div><div class="line">                    &#125;</div><div class="line">                &#125;)</div><div class="line">                .subscribe(s -&gt; LOG.info(<span class="string">"s = &#123;&#125;"</span> , s));</div></pre></td></tr></table></figure>
+<p>输出如下：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">08</span>:<span class="number">02</span><span class="variable">.743</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :s = <span class="number">10</span>变成str</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">08</span>:<span class="number">02</span><span class="variable">.747</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :s = <span class="number">5</span>变成str</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">08</span>:<span class="number">02</span><span class="variable">.747</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :s = <span class="number">3</span>变成str</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">08</span>:<span class="number">02</span><span class="variable">.748</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :s = <span class="number">2</span>变成str</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">08</span>:<span class="number">02</span><span class="variable">.748</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :s = <span class="number">1</span>变成str</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">08</span>:<span class="number">02</span><span class="variable">.748</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :s = <span class="number">0</span>变成str</div></pre></td></tr></table></figure>
+<h2 id="FlatMap"><a href="#FlatMap" class="headerlink" title="FlatMap"></a>FlatMap</h2><p>跟map有些类似，但是也有很大的区别，map是一个对象变成另外一个对象，<strong>而flatMap可以把一个对象转化为多个对象</strong> , 其实FlatMap是将一个对象转成了一个<code>Observable</code> 对象，转完之后，最开始的生产者并不发送这个 <code>Observable</code>, 而是将它激活，于是它开始发送事件，每一个创建出来的 <code>Observable</code> 发送的事件，都被汇入同一个 <code>Observable</code> ，而这个 <code>Observable</code> 负责将这些事件统一交给 <code>Subscriber</code> 的回调方法，这样也就产生了一对多的概念，就像是把对象铺平了一样，flat</p>
+<p>我会跟lambda的flatMap做一个对比，还是很像的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">List&lt;Integer&gt; list = Arrays.asList(<span class="number">10</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>);</div><div class="line">List&lt;Object&gt; flatMapcollect = list.stream().flatMap(<span class="keyword">new</span> Function&lt;Integer, Stream&lt;?&gt;&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="keyword">public</span> Stream&lt;?&gt; apply(Integer integer) &#123;</div><div class="line">                <span class="comment">//通过list里面的元素创建一个list返回回去</span></div><div class="line">                List&lt;Integer&gt; list1 = Arrays.asList(integer, integer + <span class="number">10</span>, integer + <span class="number">100</span>, integer + <span class="number">1000</span>);</div><div class="line">                <span class="keyword">return</span> list1.stream();</div><div class="line">            &#125;</div><div class="line">        &#125;).collect(Collectors.toList());</div><div class="line">        flatMapcollect.forEach(s-&gt;LOG.info(<span class="string">"complex integer  = &#123;&#125;"</span> , s));</div></pre></td></tr></table></figure>
+<p>打印的结果是一开始的每个元素10 ，5等都被加上了10 100 1000 然后输出了，相当于平铺了</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">50</span>:<span class="number">21</span><span class="variable">.186</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :complex <span class="keyword">integer</span>  = <span class="number">10</span>   <span class="comment">// 10本来数字</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">50</span>:<span class="number">21</span><span class="variable">.191</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :complex <span class="keyword">integer</span>  = <span class="number">20</span>   <span class="comment">//加上10之后</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">50</span>:<span class="number">21</span><span class="variable">.191</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :complex <span class="keyword">integer</span>  = <span class="number">110</span>  <span class="comment">//加上100之后</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">50</span>:<span class="number">21</span><span class="variable">.191</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :complex <span class="keyword">integer</span>  = <span class="number">1010</span>  <span class="comment">//加上1000之后</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">50</span>:<span class="number">21</span><span class="variable">.191</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :complex <span class="keyword">integer</span>  = <span class="number">5</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">50</span>:<span class="number">21</span><span class="variable">.191</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :complex <span class="keyword">integer</span>  = <span class="number">15</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">50</span>:<span class="number">21</span><span class="variable">.191</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :complex <span class="keyword">integer</span>  = <span class="number">105</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">50</span>:<span class="number">21</span><span class="variable">.191</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :complex <span class="keyword">integer</span>  = <span class="number">1005</span></div><div class="line"><span class="comment">//限于篇幅，后面的略，都是 源数 加上10 100 1000后输出的</span></div></pre></td></tr></table></figure>
+<p>RxJava里面的flatMap， 我乘以10，乘以100然后加下<code>|</code>转成一个String</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">List&lt;Integer&gt; list = Arrays.asList(<span class="number">10</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>);</div><div class="line"></div><div class="line">        Observable.from(list).flatMap(<span class="keyword">new</span> Func1&lt;Integer, Observable&lt;?&gt;&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="keyword">public</span> Observable&lt;?&gt; call(Integer num) &#123;</div><div class="line">                List&lt;String&gt; strings = Arrays.asList(<span class="string">"|"</span> + num + <span class="string">"|"</span>, <span class="string">"|"</span> + num * <span class="number">10</span> + <span class="string">"|"</span>, <span class="string">"|"</span> + num * <span class="number">100</span> + <span class="string">"|"</span>);</div><div class="line">                <span class="keyword">return</span> Observable.from(strings);</div><div class="line">            &#125;</div><div class="line">        &#125;).subscribe(<span class="keyword">new</span> Action1&lt;Object&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(Object o)</span> </span>&#123;</div><div class="line">                LOG.info(<span class="string">"新转化后的字符串是 = &#123;&#125;"</span> , o);</div><div class="line">            &#125;</div><div class="line">        &#125;);</div></pre></td></tr></table></figure>
+<p>输出如下：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">57</span>:<span class="number">13</span><span class="variable">.316</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :新转化后的字符串是 = |<span class="number">10</span>|</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">57</span>:<span class="number">13</span><span class="variable">.320</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :新转化后的字符串是 = |<span class="number">100</span>|</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">57</span>:<span class="number">13</span><span class="variable">.320</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :新转化后的字符串是 = |<span class="number">1000</span>|</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">57</span>:<span class="number">13</span><span class="variable">.320</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :新转化后的字符串是 = |<span class="number">5</span>|</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">57</span>:<span class="number">13</span><span class="variable">.320</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :新转化后的字符串是 = |<span class="number">50</span>|</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">57</span>:<span class="number">13</span><span class="variable">.320</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :新转化后的字符串是 = |<span class="number">500</span>|</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">57</span>:<span class="number">13</span><span class="variable">.320</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :新转化后的字符串是 = |<span class="number">3</span>|</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">57</span>:<span class="number">13</span><span class="variable">.321</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :新转化后的字符串是 = |<span class="number">30</span>|</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">11</span>:<span class="number">57</span>:<span class="number">13</span><span class="variable">.321</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :新转化后的字符串是 = |<span class="number">300</span>|</div></pre></td></tr></table></figure>
+<h2 id="reduce"><a href="#reduce" class="headerlink" title="reduce"></a>reduce</h2><p>reduce是一个聚合函数，接收上次运算的结果，放在下次的参数中，然后输出最后的结果，结果只输出一次。有点类似于递归。跟scan操作符很像，但是有区别，大家看下scan的输出就知道是什么区别了。</p>
+<p>RxJava里面的reduce</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">Observable.from(list).reduce(<span class="keyword">new</span> Func2&lt;Integer, Integer, Integer&gt;() &#123;</div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> Integer <span class="title">call</span><span class="params">(Integer result, Integer num)</span> </span>&#123;</div><div class="line">                        LOG.info(<span class="string">"开始前： result &#123;&#125;, num = &#123;&#125;"</span> , result,num);</div><div class="line">                        result+=num;</div><div class="line">                        <span class="keyword">return</span> result;</div><div class="line">                    &#125;</div><div class="line">                &#125;).subscribe(<span class="keyword">new</span> Action1&lt;Integer&gt;() &#123;</div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(Integer result)</span> </span>&#123;</div><div class="line">                        LOG.info(<span class="string">"result = &#123;&#125;"</span> , result);</div><div class="line">                    &#125;</div><div class="line">                &#125;);</div></pre></td></tr></table></figure>
+<p>打印结果如下：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.237</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :开始前： result <span class="number">10</span>, num = <span class="number">5</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.241</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :开始前： result <span class="number">15</span>, num = <span class="number">3</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.241</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :开始前： result <span class="number">18</span>, num = <span class="number">2</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.241</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :开始前： result <span class="number">20</span>, num = <span class="number">1</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.241</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :开始前： result <span class="number">21</span>, num = <span class="number">0</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.241</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :result = <span class="number">21</span></div></pre></td></tr></table></figure>
+<p>lambda里面的reduce</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">List&lt;Integer&gt; list = Arrays.asList(<span class="number">10</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>);</div><div class="line"></div><div class="line">        Integer sum = list.stream().reduce((result, sum1) -&gt; &#123;</div><div class="line">            result += sum1;</div><div class="line">            <span class="keyword">return</span> result;</div><div class="line">        &#125;).get();</div><div class="line">        LOG.info(<span class="string">"sum = &#123;&#125;"</span> , sum);</div><div class="line"><span class="comment">//sum是21，就是累加起来</span></div></pre></td></tr></table></figure>
+<h2 id="scan"><a href="#scan" class="headerlink" title="scan"></a>scan</h2><p>scan和reduce都是把上一次操作的结果做为第二次的参数传递给第二次Observable使用，但是scan每次操作之后先把数据输出，然后在调用scan的回调函数进行第二次操作，看例子</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">Observable.from(list)</div><div class="line">                .scan(<span class="keyword">new</span> Func2&lt;Integer, Integer, Integer&gt;() &#123;</div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> Integer <span class="title">call</span><span class="params">(Integer result, Integer num)</span> </span>&#123;</div><div class="line">                        LOG.info(<span class="string">"开始前： result &#123;&#125;, num = &#123;&#125;"</span> , result,num);</div><div class="line">                        result+=num;</div><div class="line">                        <span class="keyword">return</span> result;</div><div class="line">                    &#125;</div><div class="line">                &#125;).subscribe(<span class="keyword">new</span> Action1&lt;Integer&gt;() &#123;</div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(Integer result)</span> </span>&#123;</div><div class="line">                        LOG.info(<span class="string">"result = &#123;&#125;"</span> , result);</div><div class="line">                    &#125;</div><div class="line">                &#125;);</div></pre></td></tr></table></figure>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.245</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :result = <span class="number">10</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.245</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :开始前： result <span class="number">10</span>, num = <span class="number">5</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.245</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :result = <span class="number">15</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.245</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :开始前： result <span class="number">15</span>, num = <span class="number">3</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.245</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :result = <span class="number">18</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.245</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :开始前： result <span class="number">18</span>, num = <span class="number">2</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.245</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :result = <span class="number">20</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.245</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :开始前： result <span class="number">20</span>, num = <span class="number">1</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.245</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :result = <span class="number">21</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.245</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :开始前： result <span class="number">21</span>, num = <span class="number">0</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">13</span>:<span class="number">47</span>:<span class="number">29</span><span class="variable">.245</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :result = <span class="number">21</span></div></pre></td></tr></table></figure>
+<p>每次运算后都会调用订阅者</p>
+<h2 id="window"><a href="#window" class="headerlink" title="window"></a>window</h2><p>Hystrix 滑动窗口的核心用的就是window操作符，那么window有什么作用呢？他能将Observable的数据分拆成一些Observable窗口，然后把Observable窗口推送给订阅者，而不是一个数据，是一个Observable。来点例子更加直白</p>
+<h3 id="window-int-count-int-skip"><a href="#window-int-count-int-skip" class="headerlink" title="window(int count, int skip)"></a>window(int count, int skip)</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">List&lt;Integer&gt; list = Arrays.asList(<span class="number">10</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>);</div><div class="line">        Observable.from(list).window(<span class="number">2</span>, <span class="number">2</span>).subscribe(<span class="keyword">new</span> Action1&lt;Observable&lt;Integer&gt;&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(Observable&lt;Integer&gt; integerObservable)</span> </span>&#123;</div><div class="line">                integerObservable.reduce((sum, num) -&gt; sum+=num).subscribe(<span class="keyword">new</span> Action1&lt;Integer&gt;() &#123;</div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(Integer integer)</span> </span>&#123;</div><div class="line">                        LOG.info(<span class="string">"我被2个打印一次 = &#123;&#125;"</span> , integer);</div><div class="line">                    &#125;</div><div class="line">                &#125;);</div><div class="line">            &#125;</div><div class="line">        &#125;);</div></pre></td></tr></table></figure>
+<p>window里面有2个参数，第一个参数2 表示 选取2个事件，比如说10,5   5,3 等，第二个参数是skip，表示跳跃2个事件，来选取，所以是3组窗口，里面是 （10,5）（3,2）（1,0）</p>
+<p>输出：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">14</span>:<span class="number">06</span>:<span class="number">08</span><span class="variable">.703</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :我被<span class="number">2</span>个打印一次 = <span class="number">15</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">14</span>:<span class="number">06</span>:<span class="number">08</span><span class="variable">.707</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :我被<span class="number">2</span>个打印一次 = <span class="number">5</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">14</span>:<span class="number">06</span>:<span class="number">08</span><span class="variable">.707</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :我被<span class="number">2</span>个打印一次 = <span class="number">1</span></div></pre></td></tr></table></figure>
+<h3 id="window-long-timespan-TimeUnit-unit"><a href="#window-long-timespan-TimeUnit-unit" class="headerlink" title="window(long timespan, TimeUnit unit)"></a>window(long timespan, TimeUnit unit)</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</div><div class="line">        Observable inputEventStream = Observable.create(<span class="keyword">new</span> Observable.OnSubscribe&lt;Object&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(Subscriber&lt;? <span class="keyword">super</span> Object&gt; subscriber)</span> </span>&#123;</div><div class="line">                subscriber.onNext(<span class="string">"我是生产者........."</span>);</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">        inputEventStream.window(<span class="number">1000</span>,TimeUnit.MILLISECONDS).subscribe(<span class="keyword">new</span> Action1() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(Object o)</span> </span>&#123;</div><div class="line">                Calendar calendar = Calendar.getInstance();</div><div class="line">                <span class="keyword">int</span> i = calendar.get(Calendar.SECOND);</div><div class="line">                LOG.info(<span class="string">"我会&#123;&#125;就被唤醒触发..."</span>,i);</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">        countDownLatch.await();</div></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">14</span>:<span class="number">26</span>:<span class="number">18</span><span class="variable">.721</span> INFO  [#][#] &lt;RxComputationScheduler-<span class="number">1</span>&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :我会<span class="number">18</span>就被唤醒触发...</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">14</span>:<span class="number">26</span>:<span class="number">19</span><span class="variable">.722</span> INFO  [#][#] &lt;RxComputationScheduler-<span class="number">1</span>&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :我会<span class="number">19</span>就被唤醒触发...</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">14</span>:<span class="number">26</span>:<span class="number">20</span><span class="variable">.721</span> INFO  [#][#] &lt;RxComputationScheduler-<span class="number">1</span>&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :我会<span class="number">20</span>就被唤醒触发...</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">14</span>:<span class="number">26</span>:<span class="number">21</span><span class="variable">.721</span> INFO  [#][#] &lt;RxComputationScheduler-<span class="number">1</span>&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :我会<span class="number">21</span>就被唤醒触发...</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">14</span>:<span class="number">26</span>:<span class="number">22</span><span class="variable">.722</span> INFO  [#][#] &lt;RxComputationScheduler-<span class="number">1</span>&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :我会<span class="number">22</span>就被唤醒触发...</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">14</span>:<span class="number">26</span>:<span class="number">23</span><span class="variable">.721</span> INFO  [#][#] &lt;RxComputationScheduler-<span class="number">1</span>&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :我会<span class="number">23</span>就被唤醒触发...</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">14</span>:<span class="number">26</span>:<span class="number">24</span><span class="variable">.721</span> INFO  [#][#] &lt;RxComputationScheduler-<span class="number">1</span>&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :我会<span class="number">24</span>就被唤醒触发...</div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">14</span>:<span class="number">26</span>:<span class="number">25</span><span class="variable">.721</span> INFO  [#][#] &lt;RxComputationScheduler-<span class="number">1</span>&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :我会<span class="number">25</span>就被唤醒触发...</div><div class="line">.....</div><div class="line">...</div><div class="line">..</div></pre></td></tr></table></figure>
+<p>这里用CountDownLatch 阻塞了主线程的关闭，如果不用锁，那么主线程关闭了之后，你就看不到定时输出了。</p>
+<p>第二个demo，用到了window另外的一个函数，第一个参数是缓存在这个window的间隔时间，第二个参数是时间单位 , 1s内收到的所有的生产消息都会缓存到window里面，然后统一发出给订阅者。就好像一个时间轴上面，有个窗子在收集数据，1s钟之后收集好了之后，就发送出去，然后到了第二个窗子，这就是Hystrix滑动窗口的精髓所在。</p>
+<h1 id="学以致用"><a href="#学以致用" class="headerlink" title="学以致用"></a>学以致用</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">     * 两个数字相加，reduce，scan用</div><div class="line">     */</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Func2&lt;Integer, Integer, Integer&gt; PUBLIC_SUM =</div><div class="line">            (integer, integer2) -&gt; integer + integer2;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Func1&lt;Observable&lt;Integer&gt;, Observable&lt;Integer&gt;&gt; WINDOW_SUM =</div><div class="line">            <span class="comment">//跳过第一个数据，因为给了scan一个默认值0，这个值需要跳过，如果不设置就不需要跳过</span></div><div class="line">            window -&gt; window.scan(<span class="number">0</span>, PUBLIC_SUM).skip(<span class="number">1</span>);</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Func1&lt;Observable&lt;Integer&gt;, Observable&lt;Integer&gt;&gt; INNER_BUCKET_SUM =</div><div class="line">            integerObservable -&gt; integerObservable.reduce(<span class="number">0</span>, PUBLIC_SUM);</div><div class="line"></div><div class="line">    <span class="meta">@Test</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testWindowSlide</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">        CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</div><div class="line">        BehaviorSubject&lt;Integer&gt; behaviorSubject = BehaviorSubject.create();</div><div class="line">        behaviorSubject</div><div class="line">                <span class="comment">// 1秒作为一个基本块,横向移动</span></div><div class="line">                .window(<span class="number">1000</span>, TimeUnit.MILLISECONDS)</div><div class="line">                <span class="comment">//将flatMap汇总平铺成一个事件,然后累加成一个Observable&lt;Integer&gt;对象，比如说1s内有10个对象，被累加起来</span></div><div class="line">                .flatMap(INNER_BUCKET_SUM)</div><div class="line">                <span class="comment">//对这个对象2个发送，步长为1</span></div><div class="line">                .window(<span class="number">2</span>,<span class="number">1</span>)</div><div class="line">                <span class="comment">//对窗口里面的进行求和,用的scan, 每次累加都会打印出来</span></div><div class="line">                .flatMap(WINDOW_SUM)</div><div class="line">                .subscribe((Integer integer) -&gt;</div><div class="line">                        <span class="comment">// 输出统计数据到日志</span></div><div class="line">                        LOG.info(<span class="string">"[&#123;&#125;] call ...... &#123;&#125;"</span>,</div><div class="line">                                Thread.currentThread().getName(), integer));</div><div class="line"></div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000</span>; i++) &#123;</div><div class="line">            <span class="comment">//200ms生产一个数据，</span></div><div class="line">            behaviorSubject.onNext(i);</div><div class="line">            LOG.info(<span class="string">"i = &#123;&#125;"</span> ,i);</div><div class="line">            Thread.sleep(<span class="number">200</span>);</div><div class="line">        &#125;</div><div class="line">        countDownLatch.await();</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">06</span><span class="variable">.547</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :i = <span class="number">0</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">06</span><span class="variable">.756</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :i = <span class="number">1</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">07</span><span class="variable">.010</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :i = <span class="number">2</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">07</span><span class="variable">.211</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :i = <span class="number">3</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">07</span><span class="variable">.411</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :i = <span class="number">4</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">07</span><span class="variable">.517</span> INFO  [#][#] &lt;RxComputationScheduler-<span class="number">1</span>&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :[RxComputationScheduler-<span class="number">1</span>] call ...... <span class="number">10</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">07</span><span class="variable">.517</span> INFO  [#][#] &lt;RxComputationScheduler-<span class="number">1</span>&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :[RxComputationScheduler-<span class="number">1</span>] call ...... <span class="number">10</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">07</span><span class="variable">.611</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :i = <span class="number">5</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">07</span><span class="variable">.811</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :i = <span class="number">6</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">08</span><span class="variable">.011</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :i = <span class="number">7</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">08</span><span class="variable">.211</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :i = <span class="number">8</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">08</span><span class="variable">.411</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :i = <span class="number">9</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">08</span><span class="variable">.517</span> INFO  [#][#] &lt;RxComputationScheduler-<span class="number">1</span>&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :[RxComputationScheduler-<span class="number">1</span>] call ...... <span class="number">45</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">08</span><span class="variable">.517</span> INFO  [#][#] &lt;RxComputationScheduler-<span class="number">1</span>&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :[RxComputationScheduler-<span class="number">1</span>] call ...... <span class="number">35</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">08</span><span class="variable">.611</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :i = <span class="number">10</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">08</span><span class="variable">.811</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :i = <span class="number">11</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">09</span><span class="variable">.011</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :i = <span class="number">12</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">09</span><span class="variable">.211</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :i = <span class="number">13</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">09</span><span class="variable">.411</span> INFO  [#][#] &lt;main&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :i = <span class="number">14</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">09</span><span class="variable">.517</span> INFO  [#][#] &lt;RxComputationScheduler-<span class="number">1</span>&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :[RxComputationScheduler-<span class="number">1</span>] call ...... <span class="number">95</span></div><div class="line"><span class="number">2018</span>-<span class="number">04</span>-<span class="number">27</span> <span class="number">15</span>:<span class="number">46</span>:<span class="number">09</span><span class="variable">.517</span> INFO  [#][#] &lt;RxComputationScheduler-<span class="number">1</span>&gt; com<span class="variable">.dzy</span><span class="variable">.learn</span><span class="variable">.other</span><span class="variable">.NormalTest</span> :[RxComputationScheduler-<span class="number">1</span>] call ...... <span class="number">60</span></div></pre></td></tr></table></figure>
+<p>解析，第一个window产生了一个滑动窗口，每秒钟就会把生产者生产的消息累加起来，第二个window是积累2个对象，然后进行发送，每次跳一个数字，第二个window是建立在第一个windows累加之后的基础上的，可能有点难理解，我们来看第一个window产生的序列如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="number">0</span>  <span class="number">10</span>  <span class="number">35</span>  <span class="number">60</span>  <span class="number">85</span>  ......</div></pre></td></tr></table></figure>
+<p>有的同学可能会问，你怎么知道，我看的log日志，打印出来的序列是 10 10 、 45 35 、95  60  、 145  85 、因为这里用的scan，每次累加之后都会把源数打印一遍，所以是0 10 35 60 85 。第二个window就在这个基础上进行累加 0+10   10+35   35+60   60+85，这样就完成了一个滑动窗口的监控过程</p>
+<h1 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h1><p>这里总结的也许不是最全的，也许不是最新的版本，但是是Hystrix中用到的，结合Hystrix进行针对性讲解，对Hystrix的理解更加深刻，如有错误，望加以斧正，谢谢。</p>
+
+        
+        </div>
+	
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://blog.vrzart.com/2018/04/20/Hystrix核心篇-滑动窗口基础/" data-id="cjghnv7cg0000noj3xp4wezd8" class="article-share-link"><i class="fa fa-share"></i>Bagikan</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-Transaction在Controller层的探索" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -336,7 +538,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2018/03/23/Transaction在Controller层的探索/" data-id="cjfanty1s000ufkj3gzl1ibbv" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2018/03/23/Transaction在Controller层的探索/" data-id="cjfanty1s000ufkj3gzl1ibbv" class="article-share-link"><i class="fa fa-share"></i>Bagikan</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -463,7 +665,7 @@ var _hmt = _hmt || [];
 </li>
 </ol></p>
             <p class="article-more-link">
-                <a href="/2017/12/28/datatables服务端分页配置最新教程2018/#more">Read More</a>
+                <a href="/2017/12/28/datatables服务端分页配置最新教程2018/#more">자세히 보기</a>
             </p>
         
         </div>
@@ -475,7 +677,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/12/28/datatables服务端分页配置最新教程2018/" data-id="cjfanty2n001gfkj3hwjyblt4" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/12/28/datatables服务端分页配置最新教程2018/" data-id="cjfanty2n001gfkj3hwjyblt4" class="article-share-link"><i class="fa fa-share"></i>Bagikan</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -610,7 +812,7 @@ var _hmt = _hmt || [];
 <h3 id="一、背景介绍"><a href="#一、背景介绍" class="headerlink" title="一、背景介绍"></a>一、背景介绍</h3><p>　　对于上述我们说到的这个需求，有很多中实现方式，比较容易想到的就是拦截器，过滤器等，这里我使用的是过滤器的方式来实现的，一是因为Spring天然就对Filter支持得比较好，二是开发方便容易。</p>
 <p>　　对于过滤器的实现方式，我这里也提供2种方式来实现，一种是复制<code>ServletOutputStream</code>的方式，一种是不复制<code>ServletOutputStream</code>的方式，两种方式各有用处，随君选择，后续我会开一篇原理的文章</p></p>
             <p class="article-more-link">
-                <a href="/2017/12/22/利用HttpServletResponseWrapper对reponse进行包装/#more">Read More</a>
+                <a href="/2017/12/22/利用HttpServletResponseWrapper对reponse进行包装/#more">자세히 보기</a>
             </p>
         
         </div>
@@ -622,7 +824,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/12/22/利用HttpServletResponseWrapper对reponse进行包装/" data-id="cjfanty3i002qfkj3eeu43quz" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/12/22/利用HttpServletResponseWrapper对reponse进行包装/" data-id="cjfanty3i002qfkj3eeu43quz" class="article-share-link"><i class="fa fa-share"></i>Bagikan</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -745,7 +947,7 @@ var _hmt = _hmt || [];
 </blockquote>
 <h3 id="一、前置知识"><a href="#一、前置知识" class="headerlink" title="一、前置知识"></a>一、前置知识</h3><p>OK，我们首先介绍一下，请求从浏览器过来，我们的服务器会经历些什么。先看一张jetty的内部结构图</p></p>
             <p class="article-more-link">
-                <a href="/2017/12/21/Spring filter原理深入浅出/#more">Read More</a>
+                <a href="/2017/12/21/Spring filter原理深入浅出/#more">자세히 보기</a>
             </p>
         
         </div>
@@ -757,7 +959,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/12/21/Spring filter原理深入浅出/" data-id="cjfanty1s000pfkj3jztu18ai" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/12/21/Spring filter原理深入浅出/" data-id="cjfanty1s000pfkj3jztu18ai" class="article-share-link"><i class="fa fa-share"></i>Bagikan</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -885,7 +1087,7 @@ var _hmt = _hmt || [];
 <p>走进<code>newProxyInstance</code>这个方法</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">final</span> Class&lt;?&gt;[] intfs = interfaces.clone();</div><div class="line"><span class="keyword">final</span> SecurityManager sm = System.getSecurityManager();</div><div class="line"><span class="keyword">if</span> (sm != <span class="keyword">null</span>) &#123;</div><div class="line">  checkProxyAccess(Reflection.getCallerClass(), loader, intfs);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*</span></div><div class="line"> * 从缓存中取出或者生成代理</div><div class="line">*/</div><div class="line">Class&lt;?&gt; cl = getProxyClass0(loader, intfs);</div></pre></td></tr></table></figure></p>
             <p class="article-more-link">
-                <a href="/2017/10/30/Spring AOP系列之AOP原理介绍/#more">Read More</a>
+                <a href="/2017/10/30/Spring AOP系列之AOP原理介绍/#more">자세히 보기</a>
             </p>
         
         </div>
@@ -897,7 +1099,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之AOP原理介绍/" data-id="cjfanty3i002nfkj3yte3g5dd" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之AOP原理介绍/" data-id="cjfanty3i002nfkj3yte3g5dd" class="article-share-link"><i class="fa fa-share"></i>Bagikan</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1024,7 +1226,7 @@ var _hmt = _hmt || [];
 <p>实现类如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloworldImpl</span> <span class="keyword">implements</span> <span class="title">HelloWorld</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.print(<span class="string">"hello world"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
             <p class="article-more-link">
-                <a href="/2017/10/30/Spring AOP系列之代理创建/#more">Read More</a>
+                <a href="/2017/10/30/Spring AOP系列之代理创建/#more">자세히 보기</a>
             </p>
         
         </div>
@@ -1036,7 +1238,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之代理创建/" data-id="cjfanty1s000kfkj3hfx7fp0v" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之代理创建/" data-id="cjfanty1s000kfkj3hfx7fp0v" class="article-share-link"><i class="fa fa-share"></i>Bagikan</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1158,7 +1360,7 @@ var _hmt = _hmt || [];
 <h4 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h4><h5 id="TypeReference方式"><a href="#TypeReference方式" class="headerlink" title="TypeReference方式"></a>TypeReference方式</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GET</span></div><div class="line">   <span class="meta">@Path</span>(<span class="string">"getUserCourse"</span>)</div><div class="line">   <span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line">   <span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourse()&#123;</div><div class="line">       <span class="keyword">return</span> externalBiz.getUserCourse();</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> Result&lt;List&lt;UserCourseDto&gt;&gt; getUserCourse()&#123;</div><div class="line">        String result = restTemplate.getForObject(MOCK_JSON_URL, String.class);</div><div class="line">        <span class="keyword">return</span> JSONObject.parseObject(result, <span class="keyword">new</span> TypeReference&lt;Result&lt;List&lt;UserCourseDto&gt;&gt;&gt;() &#123;&#125;);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
             <p class="article-more-link">
-                <a href="/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/#more">Read More</a>
+                <a href="/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/#more">자세히 보기</a>
             </p>
         
         </div>
@@ -1170,7 +1372,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" data-id="cjfanty0x0001fkj3njzrestg" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" data-id="cjfanty0x0001fkj3njzrestg" class="article-share-link"><i class="fa fa-share"></i>Bagikan</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1385,7 +1587,7 @@ var _hmt = _hmt || [];
 </table>
 <h2 id="规范实现"><a href="#规范实现" class="headerlink" title="规范实现"></a>规范实现</h2><p>下文将以resteasy为例</p></p>
             <p class="article-more-link">
-                <a href="/2017/07/20/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/#more">Read More</a>
+                <a href="/2017/07/20/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/#more">자세히 보기</a>
             </p>
         
         </div>
@@ -1397,7 +1599,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/07/20/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/" data-id="cjfanty1s000ifkj3aer33t1v" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/07/20/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/" data-id="cjfanty1s000ifkj3aer33t1v" class="article-share-link"><i class="fa fa-share"></i>Bagikan</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1518,7 +1720,7 @@ var _hmt = _hmt || [];
             <p><h2 id="Spring-Boot-集成-resteasy篇-—-jax-rs常用注解介绍"><a href="#Spring-Boot-集成-resteasy篇-—-jax-rs常用注解介绍" class="headerlink" title="Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍"></a>Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍</h2><h3 id="GET"><a href="#GET" class="headerlink" title="@GET"></a>@GET</h3><p>http请求方式里面的get请求，标记这个请求方式为get</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * http://localhost:8080/v1/province/city/1</div><div class="line"> * <span class="doctag">@param</span> id</div><div class="line"> * <span class="doctag">@return</span></div><div class="line"> */</div><div class="line"><span class="meta">@Path</span>(<span class="string">"city/&#123;id&#125;"</span>)</div><div class="line"><span class="meta">@GET</span></div><div class="line"><span class="meta">@Produces</span>(MediaType.APPLICATION_JSON) <span class="comment">//表示输出json</span></div><div class="line"><span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON) <span class="comment">//表示输入为json</span></div><div class="line"><span class="function"><span class="keyword">public</span> Result&lt;Boolean&gt; <span class="title">getCity</span><span class="params">(@PathParam(<span class="string">"id"</span>)</span> Long id) </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Result&lt;&gt;();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
             <p class="article-more-link">
-                <a href="/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/#more">Read More</a>
+                <a href="/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/#more">자세히 보기</a>
             </p>
         
         </div>
@@ -1530,149 +1732,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" data-id="cjfanty1s000xfkj3vsk7vccq" class="article-share-link"><i class="fa fa-share"></i>Share</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
-    <article id="post-高可用数据同步方案-SqlServer迁移Mysql实战" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/">高可用数据同步方案-SqlServer迁移Mysql实战</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/">
-            <time datetime="2017-07-04T07:22:01.000Z" itemprop="datePublished">2017-07-04</time>
-        </a>
-    </div>
-
-
-                        
-    <div class="article-category">
-    	<i class="fa fa-folder"></i>
-        <a class="article-category-link" href="/categories/mysql/">mysql</a>
-    </div>
-
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/mysql/">mysql</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            <p><h3 id="高可用数据同步方案-SqlServer迁移Mysql实战"><a href="#高可用数据同步方案-SqlServer迁移Mysql实战" class="headerlink" title="高可用数据同步方案-SqlServer迁移Mysql实战"></a>高可用数据同步方案-SqlServer迁移Mysql实战</h3><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>  随着业务量的上升，以前的架构已经不满足业务的发展，数据作为业务中最重要的一环，需要有更好的架构作为支撑。目前我司有sql server转mysql的需求，所以结合当前业务，我挑选了阿里云开源的一个很好用的同步工具DataX</p>
-<h5 id="DataX介绍"><a href="#DataX介绍" class="headerlink" title="DataX介绍"></a>DataX介绍</h5><blockquote>
-<p>DataX 是一个异构数据源离线同步工具，致力于实现包括关系型数据库(MySQL、Oracle等)、HDFS、Hive、MaxCompute(原ODPS)、HBase、FTP等各种异构数据源之间稳定高效的数据同步功能。</p>
-</blockquote>
-<h5 id="框架设计"><a href="#框架设计" class="headerlink" title="框架设计"></a>框架设计</h5><p><img src="https://cloud.githubusercontent.com/assets/1067175/17879884/ec7e36f4-6927-11e6-8f5f-ffc43d6a468b.png" alt="datax_framework_new"></p>
-<p>DataX本身作为离线数据同步框架，采用Framework + plugin架构构建。将数据源读取和写入抽象成为Reader/Writer插件，纳入到整个同步框架中。</p>
-<ul>
-<li>Reader：Reader为数据采集模块，负责采集数据源的数据，将数据发送给Framework。</li>
-<li>Writer： Writer为数据写入模块，负责不断向Framework取数据，并将数据写入到目的端。</li>
-<li>Framework：Framework用于连接reader和writer，作为两者的数据传输通道，并处理缓冲，流控，并发，数据转换等核心技术问题。</li>
-</ul></p>
-            <p class="article-more-link">
-                <a href="/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/#more">Read More</a>
-            </p>
-        
-        </div>
-	
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="http://blog.vrzart.com/2017/07/04/高可用数据同步方案-SqlServer迁移Mysql实战/" data-id="cjfanty59003zfkj31d2cdki7" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" data-id="cjfanty1s000xfkj3vsk7vccq" class="article-share-link"><i class="fa fa-share"></i>Bagikan</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1749,7 +1809,7 @@ var _hmt = _hmt || [];
 
 
     <nav id="page-nav">
-        <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+        <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/">Berikutnya &raquo;</a>
     </nav>
 </section>
             
@@ -1758,9 +1818,28 @@ var _hmt = _hmt || [];
    
         
     <div class="widget-wrap">
-        <h3 class="widget-title">recent</h3>
+        <h3 class="widget-title">Terbaru</h3>
         <div class="widget">
             <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/04/20/Hystrix核心篇-滑动窗口基础/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/服务治理/">服务治理</a></p>
+                            <p class="item-title"><a href="/2018/04/20/Hystrix核心篇-滑动窗口基础/" class="title">Hystrix核心篇-滑动窗口基础</a></p>
+                            <p class="item-date"><time datetime="2018-04-20T10:00:10.000Z" itemprop="datePublished">2018-04-20</time></p>
+                        </div>
+                    </li>
                 
                     <li>
                         
@@ -1838,25 +1917,6 @@ var _hmt = _hmt || [];
                         </div>
                     </li>
                 
-                    <li>
-                        
-                        <div class="item-thumbnail">
-                            <a href="/2017/10/30/Spring AOP系列之AOP原理介绍/" class="thumbnail">
-    
-    
-        <span class="thumbnail-image thumbnail-none"></span>
-    
-</a>
-
-                        </div>
-                        
-                        <div class="item-inner">
-                            <p class="item-category"><a class="article-category-link" href="/categories/Spring-Boot/">Spring Boot</a></p>
-                            <p class="item-title"><a href="/2017/10/30/Spring AOP系列之AOP原理介绍/" class="title">Spring Boot  AOP系列之AOP原理介绍</a></p>
-                            <p class="item-date"><time datetime="2017-10-30T07:22:01.000Z" itemprop="datePublished">2017-10-30</time></p>
-                        </div>
-                    </li>
-                
             </ul>
         </div>
     </div>
@@ -1864,43 +1924,43 @@ var _hmt = _hmt || [];
     
         
     <div class="widget-wrap">
-        <h3 class="widget-title">categories</h3>
+        <h3 class="widget-title">Kategori</h3>
         <div class="widget">
-            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring/">Spring</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Boot/">Spring Boot</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/前端/">前端</a><span class="category-list-count">1</span></li></ul>
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/">JAVA</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring/">Spring</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Boot/">Spring Boot</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/前端/">前端</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/服务治理/">服务治理</a><span class="category-list-count">1</span></li></ul>
         </div>
     </div>
 
     
         
     <div class="widget-wrap">
-        <h3 class="widget-title">archives</h3>
+        <h3 class="widget-title">Arsip</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a><span class="archive-list-count">30</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a><span class="archive-list-count">5</span></li></ul>
         </div>
     </div>
 
     
         
     <div class="widget-wrap">
-        <h3 class="widget-title">tags</h3>
+        <h3 class="widget-title">tag</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端/">前端</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot/">Spring Boot</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java基础/">java基础</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/netty/">netty</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reids/">reids</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/smarty/">smarty</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring-boot/">spring boot</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql/">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其它/">其它</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端/">前端</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/多线程/">多线程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大数据/">大数据</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务治理/">服务治理</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息中间件/">消息中间件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活感悟/">生活感悟</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试准备/">面试准备</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/面试题/">面试题</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
     
         
     <div class="widget-wrap">
-        <h3 class="widget-title">tag cloud</h3>
+        <h3 class="widget-title">awan tag</h3>
         <div class="widget tagcloud">
-            <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Spring/" style="font-size: 13.33px;">Spring</a> <a href="/tags/Spring-Boot/" style="font-size: 16.67px;">Spring Boot</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 13.33px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/前端/" style="font-size: 10px;">前端</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+            <a href="/tags/JVM/" style="font-size: 10px;">JVM</a> <a href="/tags/Spring/" style="font-size: 13.33px;">Spring</a> <a href="/tags/Spring-Boot/" style="font-size: 16.67px;">Spring Boot</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/java基础/" style="font-size: 10px;">java基础</a> <a href="/tags/linux/" style="font-size: 13.33px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/mybatis/" style="font-size: 10px;">mybatis</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/netty/" style="font-size: 10px;">netty</a> <a href="/tags/reids/" style="font-size: 10px;">reids</a> <a href="/tags/smarty/" style="font-size: 13.33px;">smarty</a> <a href="/tags/spring/" style="font-size: 13.33px;">spring</a> <a href="/tags/spring-boot/" style="font-size: 13.33px;">spring boot</a> <a href="/tags/sql/" style="font-size: 10px;">sql</a> <a href="/tags/其它/" style="font-size: 10px;">其它</a> <a href="/tags/前端/" style="font-size: 10px;">前端</a> <a href="/tags/多线程/" style="font-size: 16.67px;">多线程</a> <a href="/tags/大数据/" style="font-size: 13.33px;">大数据</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/服务治理/" style="font-size: 10px;">服务治理</a> <a href="/tags/消息中间件/" style="font-size: 10px;">消息中间件</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a> <a href="/tags/生活感悟/" style="font-size: 10px;">生活感悟</a> <a href="/tags/面试准备/" style="font-size: 10px;">面试准备</a> <a href="/tags/面试题/" style="font-size: 13.33px;">面试题</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
         </div>
     </div>
 
     
         
     <div class="widget-wrap widget-list">
-        <h3 class="widget-title">links</h3>
+        <h3 class="widget-title">tautan</h3>
         <div class="widget">
             <ul>
                 

@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.vrzart.com/2018/04/20/Hystrix%E6%A0%B8%E5%BF%83%E7%AF%87-%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E5%9F%BA%E7%A1%80/</loc>
+    
+    <lastmod>2018-04-27T07:53:51.812Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.vrzart.com/2018/03/23/Transaction%E5%9C%A8Controller%E5%B1%82%E7%9A%84%E6%8E%A2%E7%B4%A2/</loc>
     
     <lastmod>2018-03-23T10:46:39.068Z</lastmod>

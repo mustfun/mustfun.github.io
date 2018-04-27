@@ -271,14 +271,7 @@ var _hmt = _hmt || [];
         <div class="article-entry" itemprop="articleBody">
         
             <p><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>RxJava可能有些小伙伴没有听过是什么东西，可能是因为大家平时在做业务需求的时候对异步编程了解得比较少，而RxJava就是这么一个响应式编程框架，RxJava在安卓上面用得非常多，做安卓的朋友肯定对它很熟悉。那我这里为什么要讲这个呢？因为spring cloud中服务治理框架Hystrix中大量用到了RxJava的响应式编程，为了便于理解，这里也简单给大家介绍一下。这里介绍的版本是RxJava 1.X版本的， 而在去年的早些时候，官方便宣布，将在一段时间后不再对 RxJava 1.x 进行维护，推出了RxJava2.X版本，既然有新的，为什么不介绍新的呢？因为目前最新的Hystrix版本1.5.12中使用的RxJava是1.2版本的，而2.X版本的api改动还是比较大的，所以为了大家能更加简单的理解Hystrix，所以这里是对1.X版本的介绍。</p>
-<h1 id="响应式编程是什么"><a href="#响应式编程是什么" class="headerlink" title="响应式编程是什么"></a>响应式编程是什么</h1><p><strong>响应式编程</strong>是一种基于异步数据流概念的编程模式，有点类似于JAVA里面的lambda表达式，相信大家都很熟悉lambda吧。数据流，stream，大家肯定不陌生，我们可以对stream有很多操作，filter、map、reduce 等常见操作。然后响应式中的核心就是响应二字，响应什么呢？响应的是事件，event 。 而流就是一个按照时间进行排序的事件序列。RxJava里面的事件是基于观察者模式，事件流将从上往下，从订阅源传递到观察者。</p>
-<h1 id="RxJava中重要概念"><a href="#RxJava中重要概念" class="headerlink" title="RxJava中重要概念"></a>RxJava中重要概念</h1><p>RxJava 有四个基本概念：<code>Observable</code> (可观察者，即被观察者)、 <code>Observer</code> (观察者)、 <code>Subscriber</code> (订阅，是<code>Observer</code>的抽象实现类，本质上使用是一样的)、事件。<code>Observable</code> 和 <code>Observer</code> 通过 <code>subscribe()</code> 方法实现订阅关系，从而 <code>Observable</code> 可以在需要的时候发出事件来通知 <code>Observer</code>。<code>Observable</code> 就像是一个生产者，在不断的生产消息，而<code>Subscriber</code> 和 <code>Observer</code> 就像是一个消费者，在不断的消费消息</p>
-<p>另外， RxJava 的事件回调方法还定义了两个特殊的事件，在Hystrix中用得也非常多：<code>onCompleted()</code> 和 <code>onError()</code>。</p>
-<ul>
-<li><code>onCompleted()</code>: 事件队列完结。RxJava 不仅把每个事件单独处理，还会把它们看做一个队列。RxJava 规定，当不会再有新的 <code>onNext()</code> 发出时，需要触发 <code>onCompleted()</code> 方法作为标志。</li>
-<li><code>onError()</code>: 事件队列异常。在事件处理过程中出异常时，<code>onError()</code> 会被触发，同时队列自动终止，不允许再有事件发出。</li>
-</ul>
-<h1 id="怎么做"><a href="#怎么做" class="headerlink" title="怎么做"></a>怎么做</h1><p>说了这么多概念，估计大家都是一头雾水，我们直接来些实际的，加深大家的印象理解。用多的自然而然就会了，就懂了，这里说得可能不是最全的，但是说的都是Hystrix中用得很多的一些操作符，加深大家对Hystrix的理解，看源码就会容易一些。</p></p>
+<h1 id="响应式编程是什么"><a href="#响应式编程是什么" class="headerlink" title="响应式编程是什么"></a>响应式编程是什么</h1><p><strong>响应式编程</strong>是一种基于异步数据流概念的编程模式，有点类似于JAVA里面的lambda表达式，相信大家都很熟悉lambda吧。数据流，stream，大家肯定不陌生，我们可以对stream有很多操作，filter、map、reduce 等常见操作。然后响应式中的核心就是响应二字，响应什么呢？响应的是事件，event 。 而流就是一个按照时间进行排序的事件序列。RxJava里面的事件是基于观察者模式，事件流将从上往下，从订阅源传递到观察者。</p></p>
             <p class="article-more-link">
                 <a href="/2018/04/20/Hystrix核心篇-滑动窗口基础/#more">Read More</a>
             </p>
@@ -292,7 +285,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2018/04/20/Hystrix核心篇-滑动窗口基础/" data-id="cjgho01dz0000ewj33mtkr2jk" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2018/04/20/Hystrix核心篇-滑动窗口基础/" data-id="cjgho2t0k000514j3i8xc8mzd" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -476,7 +469,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2018/03/23/Transaction在Controller层的探索/" data-id="cjgho01fc0013ewj32vvoj93k" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2018/03/23/Transaction在Controller层的探索/" data-id="cjgho2t1o001814j3mkuk7ino" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -615,7 +608,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/12/28/datatables服务端分页配置最新教程2018/" data-id="cjgho01fg001aewj3l3axyako" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/12/28/datatables服务端分页配置最新教程2018/" data-id="cjgho2t14000l14j3aes6e5g7" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -762,7 +755,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/12/22/利用HttpServletResponseWrapper对reponse进行包装/" data-id="cjgho01gd002dewj3uy9er3b0" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/12/22/利用HttpServletResponseWrapper对reponse进行包装/" data-id="cjgho2t3a003414j33wihtnen" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -897,7 +890,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/12/21/Spring filter原理深入浅出/" data-id="cjgho01fa0010ewj3nevlr3qq" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/12/21/Spring filter原理深入浅出/" data-id="cjgho2t1r001c14j3ii1biojq" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1037,7 +1030,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之AOP原理介绍/" data-id="cjgho01ez000mewj3zlalx4he" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之AOP原理介绍/" data-id="cjgho2t0v000c14j3qjq27xhy" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1176,7 +1169,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之代理创建/" data-id="cjgho01f2000rewj34ntzgy65" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/10/30/Spring AOP系列之代理创建/" data-id="cjgho2t2i002314j3wteturxn" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1310,7 +1303,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" data-id="cjgho01e90002ewj3hgqxvodr" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/08/16/Fastjson解析多级泛型的几种方式—新增使用class文件来解析多级泛型/" data-id="cjgho2t1g001014j34hyried8" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1537,7 +1530,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/07/20/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/" data-id="cjgho01f4000tewj3xw770zyl" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/07/20/Spring Boot 集成 resteasy篇 — jax-rs初步介绍和spring boot集成/" data-id="cjgho2t3b003614j370s4idhm" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1670,7 +1663,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://blog.vrzart.com/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" data-id="cjgho01f6000uewj31gh2jp46" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://blog.vrzart.com/2017/07/19/Spring Boot 集成 resteasy篇 — jax-rs常用注解介绍/" data-id="cjgho2t0z000g14j30016ojkq" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
